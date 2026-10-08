@@ -5,6 +5,8 @@ Cập nhật 2026-10-08 (Asia/Tokyo), Codex. Kế hoạch nguồn: `plan/tasks.j
 ## NOW
 
 - Người dùng yêu cầu commit/push source tới ClearRAM. Đã xác minh GitHub API: repo trống, default_branch main và tài khoản hiện tại có push; Git local được khởi tạo ở project, origin đúng URL được chỉ định. Chỉ đưa source app, scripts/tests, kế hoạch/handoff, AGENTS và CI vào commit. `.data`, artifact tạm, shortcut, secrets và harness cài riêng không được stage; snapshot test sạch ở `docs/verification/`. Git history/remote là nguồn xác minh commit sau publication; không coi push là release MVP.
+- Source commit `a53e87e09d756d9adcedf386e89a54c75c26a77d` đã push main; `git ls-remote origin refs/heads/main` khớp local SHA. 48 file được review bằng hash staged blob, path/pattern scan và PS5 BOM; `git diff --cached --check`/plan build/check đạt. Commit dùng email noreply trong repo này, không sửa cấu hình Git global.
+- CI source commit đã **success**: https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/37747840494. Đã quan sát mọi step Plan consistency, PowerShell policy/collector, WPF smoke và Clear/progress/Strong/checkbox success. Trace `docs/verification/github-actions-initial.json`; đây là CI của commit source nói trên, không phải nghiệm thu toàn bộ Windows/VM/MVP.
 - Snapshot GUI smoke đang lưu: 19 controls/394 rows/255.5 MB (`docs/verification/gui-smoke.json`, 2026-10-08T06:12:45Z), trước các controls Clear hiện tại. Số 149.9 MB trong ghi chú cũ không khớp artifact cuối; không dùng nó để claim đạt budget. QA GUI vẫn review, cần đo lại footprint.
 - Theo yêu cầu người dùng, đã tạo `%DesktopKnownFolder%\MemoryClear.lnk`. Target: Windows PowerShell 5.1, `-NoProfile -STA -ExecutionPolicy Bypass -WindowStyle Hidden -File` tới source; working directory là project, không cần admin. `scripts/Create-DesktopShortcut.ps1` chạy thành công trên 5.1 và COM readback xác minh Target/Arguments/WorkingDirectory; bằng chứng `artifacts/desktop-shortcut.json`. Chưa bấm shortcut để tránh tự mở thêm app; kết quả này là kiểm tra file/command, không giả là nghiệm thu mở GUI từ Desktop.
 - Người dùng chọn PowerShell GUI trước, Windows 10/11 x64; Linux và C#/Avalonia để sau. Clear không cần chọn process, có tiến trình và tùy chọn mạnh hơn theo yêu cầu mới.
@@ -27,7 +29,6 @@ Cập nhật 2026-10-08 (Asia/Tokyo), Codex. Kế hoạch nguồn: `plan/tasks.j
 
 ## OPEN
 
-- until: GitHub Actions của commit source trả kết quả thực và có execution trace. CI mới chưa được chứng minh chỉ bằng các snapshot local; theo dõi workflow `Verify PowerShell preview`.
 - until: người dùng mở GUI từ Desktop và xác nhận hoạt động. Shortcut đã xác minh cấu trúc; nếu di chuyển project phải chạy lại script tạo shortcut từ vị trí mới.
 - until: CLEAR-01 có báo cáo VM áp lực RAM/foreground/cancel/progress Normal/Strong và hiệu năng khi dùng lại app. Hiện fixture/native API/worker/progress/UI state được kiểm chứng; chưa chạy Clear lên process công việc thật.
 - until: UI-01/QA-01/CLEAR-01 và handoff đạt tiêu chí. Phase 03 giữ review; Windows 10/DPI/keyboard/GUI overhead/soak còn thiếu.

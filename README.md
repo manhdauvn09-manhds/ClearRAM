@@ -80,3 +80,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLI
 Mở `MemoryClear-Plan.html`; nguồn trạng thái ở `plan/tasks.json`. Kết thúc mọi phase phải có tài liệu trong `docs/handoffs/` theo `TEMPLATE.md`.
 
 Bằng chứng được chọn cho repo công khai nằm ở `docs/verification/` (bản snapshot, không phải CI mới). `artifacts/` và `.data/` là dữ liệu local do app/test tạo, không commit. Log process, settings cá nhân, shortcut và harness cài riêng cũng không được đưa lên repo. CI chạy các kiểm tra hiện có; xem kết quả thực tế trong GitHub Actions, không suy ra CI đã đạt từ báo cáo local.
+
+CI của commit source đầu tiên `a53e87e` đã đạt: [execution trace](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/37747840494), snapshot tại `docs/verification/github-actions-initial.json`. Các nghiệm thu Windows/VM/overhead còn thiếu vẫn giữ nguyên trạng thái trong kế hoạch.
