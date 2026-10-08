@@ -1,0 +1,27 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const report=JSON.parse(fs.readFileSync(path.join(root,'artifacts/clear-tests.json'),'utf8').replace(/^\uFEFF/,''));
+if(report.Failed!==0||report.Passed<12)throw Error('Progress/Strong verification has not passed.');
+const file=path.join(root,'plan/tasks.json'),plan=JSON.parse(fs.readFileSync(file,'utf8'));
+if(!['2026-10-08.2','2026-10-08.3'].includes(plan.revision))throw Error('Unexpected revision; reconcile newer progress first.');
+if(plan.revision!=='2026-10-08.3'){plan.previousRevision=plan.revision;plan.previousTaskIds=plan.tasks.map(t=>t.id);plan.revision='2026-10-08.3';}
+plan.updated='2026-10-08';
+plan.assumption='Đã chốt PowerShell GUI trước: Windows 10/11 x64, Windows PowerShell 5.1 + WPF, portable folder + CLI. Clear một chạm không cần chọn; có tiến trình/quét/xử lý/hoàn tất và tùy chọn Clear mạnh hơn (opt-in), cả hai chỉ trim working set, giữ process/dữ liệu. Đóng/force kill xác nhận riêng, auto kill tắt; app cá nhân chưa được cung cấp. C#/Avalonia và Linux để sau.';
+const clear=plan.tasks.find(t=>t.id==='CLEAR-01');
+clear.title='Clear một chạm, tiến trình và mức mạnh hơn';
+clear.acceptance='Không cần chọn process; progress quét/xử lý có count/thời gian thật, terminal success/cancel/timeout/error/cooldown rõ ràng; Normal/Strong có giới hạn và cùng bảo vệ. Fresh policy/identity/CPU/foreground, hủy được, không close/kill; báo RAM trước/sau và giới hạn commit/RAM nạp lại; fixture/VM UX và hiệu năng được kiểm chứng.';
+clear.evidence=`MemoryClear.ps1; app/MemoryClear.Clear.psm1; clear-policy schemaVersion 2; tests/Check-Clear.ps1 PASS ${report.Passed}/${report.Passed} trên PowerShell ${report.PowerShell}; artifacts/clear-tests.json; artifacts/clear-preview.png.`;
+clear.notes='Đã có progress queue từ worker thật, spinner khi quét, count khi xử lý, thời lượng/giờ hoàn tất và trạng thái dừng/lỗi/cooldown riêng. Strong opt-in: 32 process/60 giây/32 MB/CPU 1%/target 35%/cooldown 120 giây, giữ mọi bảo vệ. Test chỉ trim fixture, không app công việc. Chưa nghiệm thu VM pressure/foreground/cancel/page faults, Windows 10 hoặc overhead GUI; giữ review.';
+clear.status='review';clear.updated='2026-10-08';
+const ui=plan.tasks.find(t=>t.id==='UI-01');ui.notes='Checkbox có test hồi quy. Clear có progress bar/count, thời gian/trạng thái kết thúc, Strong opt-in và khóa mode khi chạy; test WPF offscreen đã đạt. Còn tương tác thực, DPI/keyboard và ma trận Windows; giữ review.';
+const ho=plan.tasks.find(t=>t.id==='HO-03');ho.notes='Handoff nháp cập nhật tiến trình Clear và Strong, có báo cáo 12 kiểm tra. UI-01/CLEAR-01/QA-01 còn nghiệm thu; phase 03 chưa hoàn tất.';
+fs.writeFileSync(file,JSON.stringify(plan,null,2)+'\n');
+const htmlPath=path.join(root,'MemoryClear-Plan.html');let html=fs.readFileSync(htmlPath,'utf8');
+html=html.replace('Đã có trong bản PowerShell preview. Bấm Clear ở header, không cần tick hay chọn process.','Đã có trong PowerShell preview: Clear ở header, tiến trình đang chạy/hoàn tất và tùy chọn Clear mạnh hơn; không cần chọn process.');
+html=html.replace('Tối đa 12 process/lượt, ngân sách 30 giây, cooldown 60 giây; dừng khi RAM khả dụng đạt 20% hoặc yêu cầu hủy.','Thường: 12 process/30 giây, target 20%, nghỉ 60 giây. Mạnh hơn: 32 process/60 giây, từ 32 MB và CPU ≤1%, target 35%, nghỉ 120 giây. Cả hai giữ các kiểm tra bảo vệ và có Dừng.');
+html=html.replace('10 kiểm tra Clear đạt trên PowerShell 5.1;',`${report.Passed} kiểm tra Clear/progress/Strong đạt trên PowerShell 5.1;`);
+if(!html.includes('id="clear-progress-note"'))html=html.replace('<section id="technology">','<div class="note" id="clear-progress-note"><strong>Biết rõ Clear đang làm gì:</strong> khi quét có thanh chạy và thời gian đã chạy; khi xử lý hiện số process đã kiểm tra/tổng số. Khi kết thúc giữ giờ hoàn tất, thời lượng, mode và RAM trước/sau. Hủy, hết thời gian, lỗi và cooldown có trạng thái riêng; không dự báo ETA hay cam kết số RAM thu hồi. Tick <strong>Clear mạnh hơn</strong> trước khi bấm nếu muốn mở rộng ứng viên; app có thể nạp lại RAM nhiều hơn.</div>\n<section id="technology">');
+fs.writeFileSync(htmlPath,html);
+console.log('Progress/Strong recorded; phase 03 remains in review.');

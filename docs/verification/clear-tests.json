@@ -1,0 +1,76 @@
+﻿{
+    "Timestamp":  "2026-10-08T07:32:21.1877768Z",
+    "PowerShell":  "5.1.26100.8875",
+    "Passed":  12,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Product policy and source syntax",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Planner skips unknown CPU, busy, protected, reused identity and active path",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Planner caps count and prioritizes working set",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Strong profile expands candidates while retaining protected and foreground exclusions",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Invalid policy fails closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "One click without selection queues Clear and supports pending cancel",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "UI captures Strong mode and displays real count progress plus terminal states",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Real GUI worker receives cancellation token without scanning user processes",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Stable handle rejects stale PID identity and cannot close or kill",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Excluded PID and protected path deny trim",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancelled Clear skips all scans and actions; cooldown prevents repetition",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Real trim preserves fixture process and data",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Measurement":  {
+                        "BeforeWorkingSetMB":  45.91,
+                        "AfterWorkingSetMB":  0.61,
+                        "DataVerified":  true,
+                        "StillRunning":  true,
+                        "OnlyDisposableFixture":  true
+                    },
+    "Mode":  "Offscreen UI and owned fixture only; no user process trimmed"
+}

@@ -1,0 +1,11 @@
+{
+  "Timestamp": "2026-10-08T07:47:53.8830895Z",
+  "PowerShell": "5.1.26100.8875",
+  "Shortcut": "%DesktopKnownFolder%\\MemoryClear.lnk",
+  "Target": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "Arguments": "-NoProfile -STA -ExecutionPolicy Bypass -WindowStyle Hidden -File \"<project folder>\\MemoryClear.ps1\"",
+  "WorkingDirectory": "<project folder>",
+  "Verified": true,
+  "Launched": false,
+  "PublicationNote": "Local paths redacted after COM readback verification; no GUI launched."
+}

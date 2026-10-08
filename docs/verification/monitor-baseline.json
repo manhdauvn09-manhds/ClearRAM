@@ -1,0 +1,17 @@
+﻿{
+    "Timestamp":  "2026-10-08T04:58:50.4333756Z",
+    "OS":  "Microsoft Windows 11 Pro",
+    "Build":  "26200",
+    "LogicalCPUs":  12,
+    "PowerShell":  "5.1.26100.8875",
+    "Samples":  4,
+    "TotalMatchesCIM":  true,
+    "AvailableWithinCIMWindow":  true,
+    "AvailableToleranceMB":  218.4,
+    "TotalGB":  15.69,
+    "ColdScanMs":  2900.9,
+    "AverageSteadyScanMs":  537.8,
+    "CpuPercentWholeMachine":  1.23,
+    "PeakObservedWorkingSetMB":  97.6,
+    "Scope":  "Short collector baseline only. Not GUI idle/soak or VM acceptance."
+}

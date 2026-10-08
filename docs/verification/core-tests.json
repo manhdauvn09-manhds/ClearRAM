@@ -1,0 +1,94 @@
+﻿{
+    "Timestamp":  "2026-10-08T05:50:54.4133018Z",
+    "PowerShell":  "5.1.26100.8875",
+    "Integration":  true,
+    "Results":  [
+                    {
+                        "Name":  "PowerShell source parses",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Same-user application can be manually selected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Unknown identity fails closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Critical process fails closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Different SID and session fail closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Windows component and host are blocked",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Service and unavailable service inventory fail closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Protection takes precedence over emergency allowlist",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Emergency allowlist is explicit and path-specific",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Settings round-trip enforces automation off",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Malformed settings fail closed and can be repaired",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Snapshot bounds and CPU warm-up",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Current host is denied even with real identity",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Audit log stays bounded",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Stale identity is rejected without killing fixture",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Hidden fixture without main window is not force-killed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Force kill verifies fixture exit",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Passed":  17,
+    "Failed":  0
+}

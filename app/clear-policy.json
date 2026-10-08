@@ -1,0 +1,21 @@
+{
+  "$schema": "./clear-policy.schema.json",
+  "governs": "product_runtime",
+  "schemaVersion": 2,
+  "minWorkingSetMB": 64,
+  "maxCpuPercent": 0.1,
+  "sampleMilliseconds": 750,
+  "liveProbeMilliseconds": 150,
+  "maxProcesses": 12,
+  "maxDurationSeconds": 30,
+  "cooldownSeconds": 60,
+  "targetAvailableFraction": 0.2,
+  "strong": {
+    "minWorkingSetMB": 32,
+    "maxCpuPercent": 1,
+    "maxProcesses": 32,
+    "maxDurationSeconds": 60,
+    "cooldownSeconds": 120,
+    "targetAvailableFraction": 0.35
+  }
+}

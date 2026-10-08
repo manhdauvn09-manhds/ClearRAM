@@ -1,0 +1,33 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const report=JSON.parse(fs.readFileSync(path.join(root,'artifacts/clear-tests.json'),'utf8').replace(/^\uFEFF/,''));
+if(report.Failed!==0||report.Passed<10)throw Error('Clear verification has not passed.');
+const file=path.join(root,'plan/tasks.json'),plan=JSON.parse(fs.readFileSync(file,'utf8'));
+if(!['2026-10-08.1','2026-10-08.2'].includes(plan.revision))throw Error('This recorder is for the earlier Clear preview; reconcile newer progress instead of downgrading it.');
+if(plan.revision!=='2026-10-08.2'){
+  plan.previousRevision=plan.revision;plan.previousTaskIds=plan.tasks.map(t=>t.id);plan.revision='2026-10-08.2';
+}
+plan.updated='2026-10-08';
+plan.assumption='Đã chốt PowerShell GUI trước: Windows 10/11 x64, Windows PowerShell 5.1 + WPF, portable folder + CLI. Bổ sung yêu cầu 2026-10-08: Clear một chạm không cần chọn; bản preview thu hồi working set có giới hạn, giữ process/dữ liệu, không đoán app không cần để kill. Đóng/force kill vẫn xác nhận riêng, auto kill tắt; danh sách app cá nhân chưa được cung cấp. C#/Avalonia và Linux để sau.';
+const task={id:'CLEAR-01',phase:'03 · Quan sát',scope:'mvp',title:'Clear một chạm: thu hồi working set, giữ ứng dụng',priority:'P0',status:'review',deps:['MON-01','MON-02','BASE-03','HO-02'],owner:'Codex',estimate:'Bổ sung theo yêu cầu',acceptance:'Không cần chọn process; planner có giới hạn/cooldown, fresh policy/identity/CPU/foreground, hủy được; handle không có quyền close/kill; kết quả trước/sau và giới hạn commit/RAM nạp lại rõ ràng; kiểm tra fixture và RAM pressure/UX trong VM.',evidence:`MemoryClear.ps1; app/MemoryClear.Clear.psm1; app/clear-policy.json + schema; tests/Check-Clear.ps1 PASS ${report.Passed}/${report.Passed}; artifacts/clear-tests.json; artifacts/clear-preview.png (offscreen).`,notes:'Đã triển khai theo yêu cầu người dùng. Test chỉ trim fixture do test tạo, dữ liệu còn nguyên; không chạy Clear lên app công việc. Chưa nghiệm thu lượt Clear toàn máy đang chịu áp lực RAM, phản hồi foreground/cancel trong VM, Windows 10 hoặc ảnh hưởng page faults khi dùng lại. Không quảng cáo toàn bộ RAM sẽ trống.',updated:'2026-10-08'};
+const existing=plan.tasks.find(t=>t.id===task.id);
+if(existing)Object.assign(existing,task);else plan.tasks.splice(plan.tasks.findIndex(t=>t.id==='QA-01'),0,task);
+const ui=plan.tasks.find(t=>t.id==='UI-01');
+ui.title='Dashboard, checkbox và thao tác Clear một chạm';
+if(!ui.evidence.includes('clear-tests.json'))ui.evidence+=' Clear: artifacts/clear-tests.json, artifacts/clear-preview.png.';
+ui.notes='Checkbox đã sửa và có test. Clear ở header hoạt động không cần chọn, chạy worker và có Dừng. Các số liệu vẫn readonly. Còn tương tác thực, DPI/keyboard và ma trận Windows; UI-01 giữ review.';
+const ho=plan.tasks.find(t=>t.id==='HO-03');if(!ho.deps.includes(task.id))ho.deps.push(task.id);
+ho.evidence='docs/handoffs/PHASE-03-HANDOFF.md (nháp); Handoff.md; artifacts/clear-tests.json; node plan/build-plan.mjs + node plan/check-plan.mjs.';
+ho.notes='Handoff nháp cập nhật checkbox và Clear; UI-01/CLEAR-01/QA-01 chưa đủ nghiệm thu phase 03. Không đóng phase hoặc bỏ các gate SAFE/ACT/EMG.';
+const ext=plan.tasks.find(t=>t.id==='EXT-04');
+ext.notes='Clear trim được đưa vào preview hiện tại theo yêu cầu 2026-10-08 (CLEAR-01). Task mở rộng này vẫn để sau cho benchmark sâu/giảm ưu tiên CPU; không purge cache hay tắt bảo mật.';
+fs.writeFileSync(file,JSON.stringify(plan,null,2)+'\n');
+let html=fs.readFileSync(path.join(root,'MemoryClear-Plan.html'),'utf8');
+html=html.replace('<span class="pill gray">Không chạy hàng loạt</span>','<span class="pill">Clear có giới hạn</span>');
+html=html.replace('Dashboard · Chọn app · Xác nhận','Dashboard · Clear một chạm · Đóng có xác nhận');
+html=html.replace('<div class="mock-actions"><span class="mock-button">','<div class="mock-actions"><span class="mock-button primary">Clear · không cần chọn</span><span class="mock-button">');
+if(!html.includes('id="clear-update"'))html=html.replace('<section id="technology">','<section id="clear-update"><div class="section-head"><div><div class="eyebrow">Yêu cầu bổ sung · 08.10.2026</div><h2>Clear một chạm, giữ nguyên ứng dụng.</h2></div><p>Đã có trong bản PowerShell preview. Bấm Clear ở header, không cần tick hay chọn process.</p></div><div class="three-col"><article class="card"><h3>Tự tìm ứng viên</h3><p>Working set từ 64 MB, CPU ít hoạt động qua hai delta; cùng user/session và xác minh đầy đủ. Bỏ qua hệ thống/service, app được bảo vệ, foreground và executable của app vừa dùng.</p></article><article class="card"><h3>Thu hồi có giới hạn</h3><p>EmptyWorkingSet giữ process và dữ liệu. Tối đa 12 process/lượt, ngân sách 30 giây, cooldown 60 giây; dừng khi RAM khả dụng đạt 20% hoặc yêu cầu hủy.</p></article><article class="card"><h3>Kết quả trung thực</h3><p>RAM có thể nạp lại và app có thể chậm hơn. Không giải phóng commit, không cam kết dọn toàn bộ RAM. Không thể đoán app “chắc chắn không cần” để đóng.</p></article></div><div class="note"><strong>Bằng chứng:</strong> 10 kiểm tra Clear đạt trên PowerShell 5.1; chỉ trim process thử do test tạo. <a href="artifacts/clear-tests.json">Báo cáo</a> · <a href="artifacts/clear-preview.png">Giao diện render</a> · <a href="docs/handoffs/PHASE-03-HANDOFF.md">Handoff nháp</a>. Ma trận Windows/VM và nghiệm thu toàn phase vẫn chưa hoàn tất.</div></section>\n\n<section id="technology">');
+fs.writeFileSync(path.join(root,'MemoryClear-Plan.html'),html);
+console.log('Clear preview recorded; phase 03 remains in review.');

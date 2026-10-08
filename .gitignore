@@ -1,0 +1,26 @@
+.tools/
+**/bin/
+**/obj/
+artifacts/
+.data/
+*.user
+*.suo
+*.lnk
+.env
+.env.*
+!.env.example
+
+# Harness Portal ingest key - secret, never commit (C5)
+.harness/portal-sync.key
+
+# Harness per-machine state (checkout credential, member_email) - never commit
+.harness/local/
+
+# One-time backup written when a legacy guide block is migrated
+*.pre-migration.bak
+
+# Harness ledger append lock - runtime state
+.harness/ledger/chain.lock
+
+# Shipped copies the installer leaves beside a file you own or edited - resolve, then delete
+*.new

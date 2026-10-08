@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const dir=path.dirname(fileURLToPath(import.meta.url)), root=path.dirname(dir), file=path.join(dir,'tasks.json');
+const report=JSON.parse(fs.readFileSync(path.join(root,'artifacts/checkbox-tests.json'),'utf8').replace(/^\uFEFF/,''));
+if(!report.Passed)throw Error('Checkbox verification has not passed.');
+const plan=JSON.parse(fs.readFileSync(file,'utf8'));
+const ui=plan.tasks.find(t=>t.id==='UI-01');
+ui.status='review';ui.updated='2026-10-08';
+ui.evidence='app/MainWindow.xaml; MemoryClear.ps1; WPF smoke; tests/Check-Checkboxes.ps1 PASS; artifacts/checkbox-tests.json (Windows PowerShell 5.1).';
+ui.notes='Đã sửa checkbox: cột Chọn hỗ trợ multi-select không Ctrl, giữ sau refresh; Cho đóng gấp tick trực tiếp, lưu/nạp quyền theo executable, protected bị khóa. Không đóng process khi tick. Còn kiểm tra tương tác đầy đủ, DPI/keyboard và ma trận Windows.';
+const handoff=plan.tasks.find(t=>t.id==='HO-03');
+handoff.notes='Handoff nháp đã cập nhật lỗi checkbox và bằng chứng; chờ nghiệm thu UI-01/QA-01, phase 03 chưa hoàn tất.';
+fs.writeFileSync(file,JSON.stringify(plan,null,2)+'\n');
+console.log('Checkbox fix recorded; UI-01 and HO-03 remain in review.');

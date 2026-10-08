@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["governs", "schemaVersion", "minWorkingSetMB", "maxCpuPercent", "sampleMilliseconds", "liveProbeMilliseconds", "maxProcesses", "maxDurationSeconds", "cooldownSeconds", "targetAvailableFraction", "strong"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "governs": {"const": "product_runtime"},
+    "schemaVersion": {"const": 2},
+    "minWorkingSetMB": {"type": "number", "minimum": 16, "maximum": 4096},
+    "maxCpuPercent": {"type": "number", "minimum": 0, "maximum": 1},
+    "sampleMilliseconds": {"type": "integer", "minimum": 500, "maximum": 5000},
+    "liveProbeMilliseconds": {"type": "integer", "minimum": 100, "maximum": 1000},
+    "maxProcesses": {"type": "integer", "minimum": 1, "maximum": 32},
+    "maxDurationSeconds": {"type": "integer", "minimum": 5, "maximum": 120},
+    "cooldownSeconds": {"type": "integer", "minimum": 30, "maximum": 600},
+    "targetAvailableFraction": {"type": "number", "minimum": 0.05, "maximum": 0.5},
+    "strong": {
+      "type": "object", "additionalProperties": false,
+      "required": ["minWorkingSetMB", "maxCpuPercent", "maxProcesses", "maxDurationSeconds", "cooldownSeconds", "targetAvailableFraction"],
+      "properties": {
+        "minWorkingSetMB": {"type": "number", "minimum": 16, "maximum": 4096},
+        "maxCpuPercent": {"type": "number", "minimum": 0, "maximum": 1},
+        "maxProcesses": {"type": "integer", "minimum": 1, "maximum": 32},
+        "maxDurationSeconds": {"type": "integer", "minimum": 5, "maximum": 120},
+        "cooldownSeconds": {"type": "integer", "minimum": 30, "maximum": 600},
+        "targetAvailableFraction": {"type": "number", "minimum": 0.05, "maximum": 0.5}
+      }
+    }
+  }
+}

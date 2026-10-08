@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 1,
+  "project": "MemoryClear",
+  "revision": "2026-10-08.5",
+  "updated": "2026-10-08",
+  "assumption": "Đã chốt PowerShell GUI trước: Windows 10/11 x64, Windows PowerShell 5.1 + WPF, portable folder + CLI. Clear một chạm không cần chọn; có tiến trình/quét/xử lý/hoàn tất và tùy chọn Clear mạnh hơn (opt-in), cả hai chỉ trim working set, giữ process/dữ liệu. Đóng/force kill xác nhận riêng, auto kill tắt; app cá nhân chưa được cung cấp. C#/Avalonia và Linux để sau.",
+  "tasks": [
+    {
+      "id": "DOC-01",
+      "phase": "00 · Tài liệu",
+      "scope": "docs",
+      "title": "Đề xuất sản phẩm và kiến trúc",
+      "priority": "P0",
+      "status": "done",
+      "deps": [],
+      "owner": "Codex",
+      "estimate": "Đã làm",
+      "acceptance": "Có phương án công nghệ, kỹ thuật quản lý RAM, cơ chế bảo vệ, mockup và lộ trình.",
+      "evidence": "MemoryClear-Plan.html: các mục 01–06 đã tạo từ yêu cầu trước.",
+      "notes": "Đây là đề xuất; không đồng nghĩa kiến trúc đã được duyệt.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "DOC-02",
+      "phase": "00 · Tài liệu",
+      "scope": "docs",
+      "title": "Xuất bản tài liệu HTML offline",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DOC-01"
+      ],
+      "owner": "Codex",
+      "estimate": "Đã làm",
+      "acceptance": "Có file HTML độc lập, định dạng responsive, nguồn tham khảo và nút in.",
+      "evidence": "MemoryClear-Plan.html đã lưu và kiểm tra tồn tại; người dùng đang mở file.",
+      "notes": "Không phải ứng dụng MemoryClear đã hoạt động.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "DOC-03",
+      "phase": "00 · Tài liệu",
+      "scope": "docs",
+      "title": "Kế hoạch chi tiết và bảng quản lý tiến độ",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DOC-02"
+      ],
+      "owner": "Codex",
+      "estimate": "Đã làm",
+      "acceptance": "Có task ID, trạng thái, phụ thuộc, tiêu chí, ghi chú, xuất/nhập JSON và hướng dẫn cập nhật.",
+      "evidence": "plan/tasks.json, IMPLEMENTATION_PLAN.md, MemoryClear-Plan.html; node plan/check-plan.mjs PASS: đồng bộ dữ liệu, cú pháp JS, status/dependency gates, lọc, escape, xuất/nhập, lưu/khôi phục và lỗi storage.",
+      "notes": "Đã kiểm tra logic tự động. Chưa kiểm tra lại hiển thị bằng browser vì công cụ UI lỗi sandbox; đây không phải bằng chứng ứng dụng MemoryClear đã triển khai.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-00",
+      "phase": "00 · Tài liệu",
+      "scope": "docs",
+      "title": "Tạo tài liệu handoff và kết thúc phase 00",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DOC-01",
+        "DOC-02",
+        "DOC-03"
+      ],
+      "owner": "Codex",
+      "estimate": "Đã làm",
+      "acceptance": "Tạo docs/handoffs/PHASE-00-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "docs/handoffs/PHASE-00-HANDOFF.md; node plan/build-plan.mjs và node plan/check-plan.mjs kiểm tra liên kết, phụ thuộc và logic bảng tiến độ.",
+      "notes": "Bàn giao tài liệu đề xuất; chưa triển khai app. Kiểm tra hiển thị trình duyệt vẫn chưa chạy được vì lỗi sandbox.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "DEC-01",
+      "phase": "01 · Chốt phạm vi",
+      "scope": "mvp",
+      "title": "Chốt OS, công nghệ và hình thức phát hành",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DOC-01",
+        "HO-00"
+      ],
+      "owner": "Codex",
+      "estimate": "Cần chốt",
+      "acceptance": "Ghi quyết định Windows build/kiến trúc CPU cần hỗ trợ, stack, GUI/CLI và portable/installer.",
+      "evidence": "Người dùng trả lời: “Làm script PowerShell có GUI trước”. README.md; docs/ARCHITECTURE.md; Windows PowerShell 5.1.26100.8875 + WPF smoke đạt.",
+      "notes": "Chọn PowerShell/WPF portable GUI + CLI. Windows 10/11 x64 là mục tiêu kiểm thử, mới xác minh trên Win11 build 26200.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "DEC-02",
+      "phase": "01 · Chốt phạm vi",
+      "scope": "mvp",
+      "title": "Chốt quyền tự động và danh sách app cần giữ",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "HO-00"
+      ],
+      "owner": "Codex",
+      "estimate": "Cần chốt",
+      "acceptance": "Có cấu hình RAM, app nặng, app bảo vệ và quyền đóng/force kill riêng; chốt admin chỉ khi cần.",
+      "evidence": "docs/ARCHITECTURE.md; Get-MCSettings defaults; policy tests đạt.",
+      "notes": "Người triển khai chọn defaults an toàn để tiếp tục yêu cầu: thủ công, close trước, force xác nhận, auto tắt; protected/allowlist cá nhân trống. Không tuyên bố người dùng đã chọn app hoặc quyền tự động.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "DEC-03",
+      "phase": "01 · Chốt phạm vi",
+      "scope": "mvp",
+      "title": "Chốt ngân sách tài nguyên và ma trận nghiệm thu",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DEC-01",
+        "DEC-02",
+        "HO-00"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Ghi máy tham chiếu, mục tiêu CPU/RAM của app, sai lệch số đo, chu kỳ lấy mẫu, số process và kịch bản nghiệm thu.",
+      "evidence": "docs/ARCHITECTURE.md; artifacts/monitor-baseline.json có máy tham chiếu và số đo.",
+      "notes": "Ngân sách ban đầu: GUI ≤2% CPU toàn máy, ≤250 MB working set; thu nhỏ 10s/mẫu. Mục tiêu nghiệm thu, chưa claim GUI đã đạt. Ma trận Win10/11/DPI/VM còn phải chạy.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "HO-01",
+      "phase": "01 · Chốt phạm vi",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 01",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DEC-01",
+        "DEC-02",
+        "DEC-03"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-01-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "docs/handoffs/PHASE-01-HANDOFF.md",
+      "notes": "Handoff ghi rõ lựa chọn người dùng, defaults và giới hạn.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "BASE-01",
+      "phase": "02 · Nền tảng",
+      "scope": "mvp",
+      "title": "Khởi tạo cấu trúc PowerShell/WPF và kiểm tra nguồn",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DEC-01",
+        "HO-01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Tách module core, adapter Win32, XAML/GUI, CLI và tests; không dependency tải ngoài; có lệnh kiểm tra local và CI workflow.",
+      "evidence": "app/, MemoryClear.ps1, MemoryClear.Cli.ps1, tests/, .github/workflows/verify.yml. 17/17 tests local.",
+      "notes": "CI workflow đã viết nhưng chưa chạy trên GitHub. Không cần .NET SDK.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "BASE-02",
+      "phase": "02 · Nền tảng",
+      "scope": "mvp",
+      "title": "Định nghĩa contract, danh tính process và capability",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "BASE-01",
+        "HO-01"
+      ],
+      "owner": "Codex",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Có Identity PID/start time/path/SID/session/critical, Snapshot/Row và ActionResult; unknown/thiếu quyền được biểu diễn rõ; capability Win32 giới hạn theo thao tác.",
+      "evidence": "docs/ARCHITECTURE.md; app/Native.cs; app/MemoryClear.Core.psm1; snapshot/policy/stale identity tests.",
+      "notes": "Contract PSObject + native handle; CPU null ở mẫu đầu, RAM working set và private riêng.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "BASE-03",
+      "phase": "02 · Nền tảng",
+      "scope": "mvp",
+      "title": "Cấu hình, migration và log cục bộ",
+      "priority": "P1",
+      "status": "done",
+      "deps": [
+        "BASE-02",
+        "HO-01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Đọc/ghi cấu hình có schema, ghi nguyên tử, khôi phục khi file lỗi; log giới hạn dung lượng và không lưu command line nhạy cảm mặc định.",
+      "evidence": "Get/Save-MCSettings, Write-MCEvent; test round-trip, safe fallback và audit 205→200 event đạt.",
+      "notes": "Schema 1; không auto kill; settings/log cục bộ. Đồng thời nhiều GUI/CLI writer chưa nghiệm thu.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "HO-02",
+      "phase": "02 · Nền tảng",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 02",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "BASE-01",
+        "BASE-02",
+        "BASE-03"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-02-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "docs/handoffs/PHASE-02-HANDOFF.md; artifacts/tests/results.json 17/17.",
+      "notes": "Foundation script đã có; các phase nghiệm thu action vẫn chưa hoàn tất.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "MON-01",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Thu thập RAM/CPU toàn hệ thống trên Windows",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "BASE-02",
+        "DEC-03",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Đo total/available RAM, commit/limit, CPU theo delta; mẫu đầu không hiển thị CPU giả; xử lý resume/sleep.",
+      "evidence": "app/MemoryClear.Core.psm1, app/Native.cs; snapshot/policy tests, artifacts/monitor-baseline.json.",
+      "notes": "Số đo native và dữ liệu process thật; unknown/permission errors không làm hỏng vòng quét.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "MON-02",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Inventory process và phân loại nguồn gốc",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "BASE-02",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Đọc tên, PID/start time, user/session, path, service mapping, working set/private memory; process thoát/thiếu quyền không làm lỗi cả vòng quét.",
+      "evidence": "app/MemoryClear.Core.psm1, app/Native.cs; snapshot/policy tests, artifacts/monitor-baseline.json.",
+      "notes": "Số đo native và dữ liệu process thật; unknown/permission errors không làm hỏng vòng quét.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "MON-03",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Nhóm ứng dụng, CPU process và lịch sử ngắn",
+      "priority": "P1",
+      "status": "done",
+      "deps": [
+        "MON-01",
+        "MON-02",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "CPU chuẩn hóa toàn máy; nhóm app có cơ sở và fallback về process; history có giới hạn; không nhận diện tab browser khi thiếu dữ liệu.",
+      "evidence": "app/MemoryClear.Core.psm1, app/Native.cs; snapshot/policy tests, artifacts/monitor-baseline.json.",
+      "notes": "Fallback danh sách process; chưa gộp app/tab. CPU delta chuẩn hóa, một snapshot trước nên history hữu hạn.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "UI-01",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Dashboard, checkbox và thao tác Clear một chạm",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "MON-01",
+        "MON-02",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–3 ngày",
+      "acceptance": "Bảng RAM/CPU có sort/filter, detail và nhãn unknown; cập nhật không đơ UI; keyboard và DPI cơ bản dùng được.",
+      "evidence": "app/MainWindow.xaml; MemoryClear.ps1; WPF smoke; tests/Check-Checkboxes.ps1 PASS; artifacts/checkbox-tests.json (Windows PowerShell 5.1). Clear: artifacts/clear-tests.json, artifacts/clear-preview.png. Desktop shortcut: scripts/Create-DesktopShortcut.ps1; artifacts/desktop-shortcut.json Verified=true (PowerShell 5.1; not launched). Public snapshots: docs/verification/ (historical local checks, not new CI).",
+      "notes": "Checkbox có test hồi quy. Clear có progress bar/count, thời gian/trạng thái kết thúc, Strong opt-in và khóa mode khi chạy; test WPF offscreen đã đạt. Còn tương tác thực, DPI/keyboard và ma trận Windows; giữ review. Đã tạo MemoryClear.lnk trên Desktop thật/OneDrive và xác minh command; chờ người dùng mở từ đó.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "CLEAR-01",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Clear một chạm, tiến trình và mức mạnh hơn",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "MON-01",
+        "MON-02",
+        "BASE-03",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "Bổ sung theo yêu cầu",
+      "acceptance": "Không cần chọn process; progress quét/xử lý có count/thời gian thật, terminal success/cancel/timeout/error/cooldown rõ ràng; Normal/Strong có giới hạn và cùng bảo vệ. Fresh policy/identity/CPU/foreground, hủy được, không close/kill; báo RAM trước/sau và giới hạn commit/RAM nạp lại; fixture/VM UX và hiệu năng được kiểm chứng.",
+      "evidence": "MemoryClear.ps1; app/MemoryClear.Clear.psm1; clear-policy schemaVersion 2; tests/Check-Clear.ps1 PASS 12/12 trên PowerShell 5.1.26100.8875; artifacts/clear-tests.json; artifacts/clear-preview.png.",
+      "notes": "Đã có progress queue từ worker thật, spinner khi quét, count khi xử lý, thời lượng/giờ hoàn tất và trạng thái dừng/lỗi/cooldown riêng. Strong opt-in: 32 process/60 giây/32 MB/CPU 1%/target 35%/cooldown 120 giây, giữ mọi bảo vệ. Test chỉ trim fixture, không app công việc. Chưa nghiệm thu VM pressure/foreground/cancel/page faults, Windows 10 hoặc overhead GUI; giữ review.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "QA-01",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Đối chiếu số liệu và đo overhead baseline",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "MON-03",
+        "UI-01",
+        "DEC-03",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Báo cáo trên máy tham chiếu: idle/load, nhiều process, thu nhỏ/mở; so sánh cùng loại metric và thời điểm với công cụ OS trong ngưỡng đã chốt.",
+      "evidence": "artifacts/monitor-baseline.json: 4 mẫu, total/available RAM đối chiếu CIM; collector 1.23% CPU, 97.6 MB working set.",
+      "notes": "Chưa phải overhead toàn GUI/soak, tải/thu nhỏ hoặc Windows 10; phase chưa đủ nghiệm thu. Snapshot GUI smoke hiện lưu: 19 controls/394 rows/255.5 MB, trước Clear controls; chưa đạt budget và cần đo lại. docs/verification/gui-smoke.json.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "HO-03",
+      "phase": "03 · Quan sát",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 03",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "MON-01",
+        "MON-02",
+        "MON-03",
+        "UI-01",
+        "QA-01",
+        "CLEAR-01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-03-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "docs/handoffs/PHASE-03-HANDOFF.md (nháp); Handoff.md; artifacts/clear-tests.json; node plan/build-plan.mjs + node plan/check-plan.mjs.",
+      "notes": "Handoff nháp cập nhật tiến trình Clear và Strong, có báo cáo 12 kiểm tra. UI-01/CLEAR-01/QA-01 còn nghiệm thu; phase 03 chưa hoàn tất.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "SAFE-01",
+      "phase": "04 · Bảo vệ",
+      "scope": "mvp",
+      "title": "Policy bảo vệ theo nhiều tín hiệu",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "MON-02",
+        "DEC-02",
+        "HO-03"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1.5–2.5 ngày",
+      "acceptance": "Chặn system/service/security/login, session khác, chính app và helper; unknown bị chặn tự động; allowlist không vượt quy tắc chặn cứng.",
+      "evidence": "",
+      "notes": "Không chỉ dựa vào tên process; policy kiểm tra cả GUI và CLI. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "SAFE-02",
+      "phase": "04 · Bảo vệ",
+      "scope": "mvp",
+      "title": "Quản lý app được bảo vệ và app được phép đóng",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "SAFE-01",
+        "BASE-03",
+        "UI-01",
+        "HO-03"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Chỉnh và lưu quy tắc theo danh tính phù hợp; close/force permission tách biệt; UI giải thích vì sao được phép hoặc bị chặn.",
+      "evidence": "",
+      "notes": "Đổi executable hoặc thiếu xác minh phải kiểm tra lại quyền đã cấp. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "SAFE-03",
+      "phase": "04 · Bảo vệ",
+      "scope": "mvp",
+      "title": "Chống PID tái sử dụng và phương án hết hạn",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "SAFE-01",
+        "BASE-02",
+        "HO-03"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Revalidate identity và policy ngay trước thao tác; dùng handle ổn định; thay đổi identity/target set thì hủy hoặc lập lại phương án.",
+      "evidence": "",
+      "notes": "Không giữ PID rồi kill mù; không mặc định mở rộng cả cây process. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "SAFE-04",
+      "phase": "04 · Bảo vệ",
+      "scope": "mvp",
+      "title": "Kiểm thử âm tính và race condition của policy",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "SAFE-02",
+        "SAFE-03",
+        "HO-03"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Test giả lập protected/unknown, PID đổi, thiếu quyền, process biến mất, tên giả, descendant chưa duyệt; không có lệnh tác động mục tiêu bị chặn.",
+      "evidence": "",
+      "notes": "Gate bắt buộc trước nghiệm thu hành động thực. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-04",
+      "phase": "04 · Bảo vệ",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 04",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "SAFE-01",
+        "SAFE-02",
+        "SAFE-03",
+        "SAFE-04"
+      ],
+      "owner": "Người hoàn tất phase",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-04-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "",
+      "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "ACT-01",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "Đóng bình thường với timeout và hủy chờ",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "SAFE-03",
+        "SAFE-04",
+        "HO-04"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Gửi yêu cầu đóng hợp lệ, chờ bất đồng bộ, trả kết quả refused/timeout/exited; hộp thoại lưu không tự chuyển sang force kill.",
+      "evidence": "",
+      "notes": "Hủy chờ không hoàn tác lệnh đóng đã gửi. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "ACT-02",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "Force kill với xác nhận đúng mục tiêu",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ACT-01",
+        "HO-04"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Hiện đúng app/PID/phạm vi và mất dữ liệu chưa lưu; kiểm tra lại quyền; chờ xác minh đã kết thúc; không báo thành công chỉ vì gửi lệnh.",
+      "evidence": "",
+      "notes": "Không hỗ trợ force kill thành phần hệ thống trong MVP. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "ACT-03",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "Giới hạn quyền người dùng và đánh giá nhu cầu helper",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ACT-02",
+        "DEC-02",
+        "HO-04"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–3 ngày",
+      "acceptance": "GUI chạy user thường; target thiếu quyền bị chặn, không bypass OS protection. Nếu scope sau cần helper: xác thực caller/target và policy, helper thoát khi xong.",
+      "evidence": "",
+      "notes": "Bản PowerShell không có helper/admin; thiếu quyền trả Denied. Nghiệm thu quyền trên môi trường user thường vẫn còn.",
+      "updated": "2026-10-08"
+    },
+    {
+      "id": "ACT-04",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "CLI dùng chung policy và executor",
+      "priority": "P1",
+      "status": "todo",
+      "deps": [
+        "ACT-02",
+        "BASE-03",
+        "HO-04"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "list/inspect/plan/close/kill có help, exit code và JSON output; dry-run mặc định cho phương án; không có đường tắt bỏ policy.",
+      "evidence": "",
+      "notes": "Tên process không được nội suy thành shell command. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "QA-02",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "Nghiệm thu hành động trong máy ảo",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ACT-03",
+        "ACT-04",
+        "SAFE-04",
+        "HO-04"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "App thử bình thường/treo/chưa lưu, timeout, deny access và protected target; GUI/CLI cùng kết quả policy; lưu log và báo cáo.",
+      "evidence": "",
+      "notes": "Không thử kill trên công việc thật của người dùng.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-05",
+      "phase": "05 · Thao tác thủ công",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 05",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ACT-01",
+        "ACT-02",
+        "ACT-03",
+        "ACT-04",
+        "QA-02"
+      ],
+      "owner": "Người hoàn tất phase",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-05-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "",
+      "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EMG-01",
+      "phase": "06 · Giải phóng khẩn cấp",
+      "scope": "mvp",
+      "title": "Planner theo mục tiêu RAM và thứ tự cho phép",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "QA-01",
+        "QA-02",
+        "HO-05"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Chỉ chọn allowlist, tôn trọng bảo vệ; preview từng thao tác; ước lượng không cộng trùng RAM; phương án có thời hạn và identity.",
+      "evidence": "",
+      "notes": "Mục tiêu là available RAM; không cam kết đủ tài nguyên nếu hết ứng viên. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EMG-02",
+      "phase": "06 · Giải phóng khẩn cấp",
+      "scope": "mvp",
+      "title": "Thực thi tuần tự, dừng và đo lại",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "EMG-01",
+        "HO-05"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Một operation tại một thời điểm, revalidate từng target; dừng khi đủ/hết ứng viên/hủy; cancel chỉ ngăn lệnh tiếp theo; force chỉ theo quyền đã chốt.",
+      "evidence": "",
+      "notes": "Không tự force kill app đang đợi lưu trong cấu hình thủ công. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EMG-03",
+      "phase": "06 · Giải phóng khẩn cấp",
+      "scope": "mvp",
+      "title": "Màn hình preview, tiến độ và kết quả khẩn cấp",
+      "priority": "P1",
+      "status": "todo",
+      "deps": [
+        "EMG-02",
+        "UI-01",
+        "HO-05"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–1.5 ngày",
+      "acceptance": "Hiện ứng viên, hành động, cảnh báo, kết quả từng app, available RAM trước/sau và lý do dừng; không hiển thị nút Undo gây hiểu nhầm.",
+      "evidence": "",
+      "notes": "Phân biệt app đã thoát với RAM toàn máy thay đổi do tác vụ khác. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "QA-03",
+      "phase": "06 · Giải phóng khẩn cấp",
+      "scope": "mvp",
+      "title": "Kiểm thử áp lực RAM và các điều kiện dừng",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "EMG-03",
+        "HO-05"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Trong VM: đủ RAM giữa chừng, không đủ ứng viên, app tự khởi động lại, target đổi, cancel, app treo và RAM dao động; UI còn phản hồi.",
+      "evidence": "",
+      "notes": "Gate bắt buộc trước đóng gói MVP.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-06",
+      "phase": "06 · Giải phóng khẩn cấp",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 06",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "EMG-01",
+        "EMG-02",
+        "EMG-03",
+        "QA-03"
+      ],
+      "owner": "Người hoàn tất phase",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-06-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "",
+      "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "REL-01",
+      "phase": "07 · Phát hành MVP",
+      "scope": "mvp",
+      "title": "Đóng gói portable và tài liệu vận hành",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "QA-03",
+        "HO-06"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1–2 ngày",
+      "acceptance": "Có artifact theo kiến trúc đã chốt, version/checksum, README chạy/quyền/giới hạn, đường dẫn settings/log; không tự thêm startup/service.",
+      "evidence": "",
+      "notes": "Quyết định ký số và kênh phân phối được ghi rõ, không tuyên bố đã ký nếu chưa làm.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "REL-02",
+      "phase": "07 · Phát hành MVP",
+      "scope": "mvp",
+      "title": "Ma trận Windows và benchmark cuối",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "REL-01",
+        "DEC-03",
+        "HO-06"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "1.5–3 ngày",
+      "acceptance": "Chạy trên Windows 10/11 build đã chọn, user thường/admin khi cần, DPI, locale, không có runtime cài sẵn; đo overhead và soak test có thời lượng ghi rõ.",
+      "evidence": "",
+      "notes": "Không claim tương thích các build chưa được kiểm chứng.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "REL-03",
+      "phase": "07 · Phát hành MVP",
+      "scope": "mvp",
+      "title": "Người dùng nghiệm thu và chốt bản đầu",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "REL-02",
+        "HO-06"
+      ],
+      "owner": "Người dùng + người triển khai",
+      "estimate": "Chờ lịch nghiệm thu",
+      "acceptance": "Chạy kịch bản đã chốt, không còn lỗi P0/P1 ảnh hưởng bảo vệ, ghi lỗi còn lại và xác nhận phát hành.",
+      "evidence": "",
+      "notes": "App build được chưa đủ để đánh dấu phát hành hoàn tất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-07",
+      "phase": "07 · Phát hành MVP",
+      "scope": "mvp",
+      "title": "Tạo tài liệu handoff và kết thúc phase 07",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "REL-01",
+        "REL-02",
+        "REL-03"
+      ],
+      "owner": "Người hoàn tất phase",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-07-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "",
+      "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EXT-01",
+      "phase": "08 · Mở rộng",
+      "scope": "later",
+      "title": "Linux adapter và capability theo distro",
+      "priority": "P1",
+      "status": "later",
+      "deps": [
+        "REL-03",
+        "HO-07"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "Ước lượng sau khi chốt distro",
+      "acceptance": "Chốt distro/kernel/session; đọc /proc và PSS khi có quyền; SIGTERM/SIGKILL, pidfd nếu hỗ trợ; bảo vệ PID 1/session/service/cgroup.",
+      "evidence": "",
+      "notes": "Fallback không đảm bảo danh tính thì chặn thao tác; không kill cả cgroup/session mặc định.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EXT-02",
+      "phase": "08 · Mở rộng",
+      "scope": "later",
+      "title": "Đóng gói và nghiệm thu desktop Linux",
+      "priority": "P1",
+      "status": "later",
+      "deps": [
+        "EXT-01",
+        "HO-07"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "Ước lượng sau khi chốt distro",
+      "acceptance": "Kiểm tra X11/Wayland theo phạm vi, quyền user, dependency, GUI/CLI và policy trong VM; có gói và hướng dẫn.",
+      "evidence": "",
+      "notes": "Không dùng sudo toàn app và không drop_caches mặc định.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EXT-03",
+      "phase": "08 · Mở rộng",
+      "scope": "later",
+      "title": "Tự xử lý theo ngưỡng có hysteresis/cooldown",
+      "priority": "P2",
+      "status": "later",
+      "deps": [
+        "REL-03",
+        "DEC-02",
+        "HO-07"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "Cần chốt riêng",
+      "acceptance": "Opt-in, allowlist, ngưỡng kéo dài, hysteresis/cooldown, giới hạn số thao tác, audit và nút tắt; không force khi chưa cấp quyền.",
+      "evidence": "",
+      "notes": "Không dùng phần trăm RAM đơn lẻ làm tín hiệu duy nhất.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "EXT-04",
+      "phase": "08 · Mở rộng",
+      "scope": "later",
+      "title": "Trim và giảm ưu tiên CPU tùy chọn",
+      "priority": "P2",
+      "status": "later",
+      "deps": [
+        "REL-03",
+        "HO-07"
+      ],
+      "owner": "Chưa phân công",
+      "estimate": "Cần benchmark riêng",
+      "acceptance": "Chỉ target đủ điều kiện; UI giải thích tác dụng; benchmark trước/sau và khả năng RAM tăng lại; không quảng cáo suspend là dọn RAM.",
+      "evidence": "",
+      "notes": "Clear trim được đưa vào preview hiện tại theo yêu cầu 2026-10-08 (CLEAR-01). Task mở rộng này vẫn để sau cho benchmark sâu/giảm ưu tiên CPU; không purge cache hay tắt bảo mật.",
+      "updated": "2026-10-07"
+    },
+    {
+      "id": "HO-08",
+      "phase": "08 · Mở rộng",
+      "scope": "later",
+      "title": "Tạo tài liệu handoff và kết thúc phase 08",
+      "priority": "P0",
+      "status": "later",
+      "deps": [
+        "EXT-01",
+        "EXT-02",
+        "EXT-03",
+        "EXT-04"
+      ],
+      "owner": "Người hoàn tất phase",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Tạo docs/handoffs/PHASE-08-HANDOFF.md theo TEMPLATE.md: kết quả/task IDs, quyết định, file thay đổi, lệnh và kết quả kiểm tra, tồn tại, bước tiếp theo. Cập nhật status/evidence; gửi link bàn giao. Không đóng phase nếu task bắt buộc chưa đạt.",
+      "evidence": "",
+      "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
+      "updated": "2026-10-07"
+    }
+  ],
+  "previousRevision": "2026-10-08.4",
+  "previousTaskIds": [
+    "DOC-01",
+    "DOC-02",
+    "DOC-03",
+    "HO-00",
+    "DEC-01",
+    "DEC-02",
+    "DEC-03",
+    "HO-01",
+    "BASE-01",
+    "BASE-02",
+    "BASE-03",
+    "HO-02",
+    "MON-01",
+    "MON-02",
+    "MON-03",
+    "UI-01",
+    "CLEAR-01",
+    "QA-01",
+    "HO-03",
+    "SAFE-01",
+    "SAFE-02",
+    "SAFE-03",
+    "SAFE-04",
+    "HO-04",
+    "ACT-01",
+    "ACT-02",
+    "ACT-03",
+    "ACT-04",
+    "QA-02",
+    "HO-05",
+    "EMG-01",
+    "EMG-02",
+    "EMG-03",
+    "QA-03",
+    "HO-06",
+    "REL-01",
+    "REL-02",
+    "REL-03",
+    "HO-07",
+    "EXT-01",
+    "EXT-02",
+    "EXT-03",
+    "EXT-04",
+    "HO-08"
+  ],
+  "handoffPolicy": "Cuối mỗi phase bắt buộc tạo docs/handoffs/PHASE-XX-HANDOFF.md theo TEMPLATE.md, cập nhật evidence của HO-XX và gửi link cho người dùng. Phase chỉ hoàn tất khi task và handoff đã hoàn tất. Nếu dừng giữa chừng, viết bản nháp và giữ trạng thái chưa hoàn tất."
+}

@@ -1,0 +1,12 @@
+﻿{
+    "Passed":  true,
+    "PowerShell":  "5.1.26100.8875",
+    "MultiSelectWithoutCtrl":  true,
+    "SelectionSurvivesRefresh":  true,
+    "AllowPermissionSaved":  true,
+    "PermissionSurvivesReload":  true,
+    "UntickRemovesPermission":  true,
+    "ProtectedCheckboxDisabled":  true,
+    "NoProcessAction":  true,
+    "Timestamp":  "2026-10-08T07:10:12.3633913Z"
+}

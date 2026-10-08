@@ -1,0 +1,28 @@
+name: Verify PowerShell preview
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Plan consistency
+        shell: pwsh
+        run: |
+          node plan/build-plan.mjs
+          node plan/check-plan.mjs
+      - name: PowerShell policy and collector tests
+        shell: powershell
+        run: .\tests\Run-Tests.ps1
+      - name: WPF offscreen smoke
+        shell: powershell
+        run: powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\MemoryClear.ps1 -SmokeTest
+      - name: Clear progress, Strong profile and checkbox verification
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Check-Clear.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Check-Checkboxes.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
