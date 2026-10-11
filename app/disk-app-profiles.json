@@ -1,0 +1,128 @@
+{
+  "$schema": "disk-app-profiles.schema.json",
+  "schemaVersion": 1,
+  "governs": "product_runtime",
+  "executionEnabled": false,
+  "profiles": [
+    {
+      "id": "chrome-stable",
+      "name": "Google Chrome",
+      "knownFolder": "Local",
+      "relativeRoot": "Google\\Chrome\\User Data",
+      "layout": "Chromium",
+      "installNames": [
+        "Google Chrome"
+      ],
+      "publishers": [
+        "Google LLC",
+        "Google Inc."
+      ],
+      "executables": [
+        "chrome.exe"
+      ],
+      "cacheBranches": [
+        "Cache",
+        "Code Cache",
+        "GPUCache"
+      ],
+      "protectedBranches": [
+        "Bookmarks",
+        "Cookies",
+        "Network",
+        "Login Data",
+        "History",
+        "Preferences",
+        "Sessions",
+        "Local Storage",
+        "IndexedDB",
+        "Service Worker",
+        "WebStorage"
+      ],
+      "cacheEffect": "Ứng viên cache web/code/GPU; nếu đủ điều kiện dọn, lần mở sau có thể tải lại và chậm hơn. Không gồm cookie, mật khẩu hay dữ liệu offline.",
+      "personalEffect": "Có thể chứa đăng nhập, mật khẩu, bookmark, lịch sử, phiên làm việc hoặc dữ liệu web offline; giữ lại.",
+      "sources": [
+        "https://chromium.googlesource.com/chromium/src/+/HEAD/docs/user_data_dir.md"
+      ]
+    },
+    {
+      "id": "edge-stable",
+      "name": "Microsoft Edge",
+      "knownFolder": "Local",
+      "relativeRoot": "Microsoft\\Edge\\User Data",
+      "layout": "Chromium",
+      "installNames": [
+        "Microsoft Edge"
+      ],
+      "publishers": [
+        "Microsoft Corporation"
+      ],
+      "executables": [
+        "msedge.exe"
+      ],
+      "cacheBranches": [
+        "Cache",
+        "Code Cache",
+        "GPUCache"
+      ],
+      "protectedBranches": [
+        "Bookmarks",
+        "Cookies",
+        "Network",
+        "Login Data",
+        "History",
+        "Preferences",
+        "Sessions",
+        "Local Storage",
+        "IndexedDB",
+        "Service Worker",
+        "WebStorage"
+      ],
+      "cacheEffect": "Ứng viên cache Edge theo layout Chromium; cần xác minh phiên bản/policy. Có thể phải tải lại web hoặc tạo lại GPU cache sau khi dọn.",
+      "personalEffect": "Giữ đăng nhập, bookmark, mật khẩu, phiên làm việc và dữ liệu offline. Không coi toàn bộ profile là cache.",
+      "sources": [
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/userdatadir",
+        "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/diskcachedir"
+      ]
+    },
+    {
+      "id": "vscode-stable",
+      "name": "Visual Studio Code",
+      "knownFolder": "Roaming",
+      "relativeRoot": "Code",
+      "layout": "Flat",
+      "installNames": [
+        "Microsoft Visual Studio Code",
+        "Microsoft Visual Studio Code (User)"
+      ],
+      "publishers": [
+        "Microsoft Corporation"
+      ],
+      "executables": [
+        "Code.exe"
+      ],
+      "cacheBranches": [
+        "Cache",
+        "Code Cache",
+        "GPUCache",
+        "CachedData"
+      ],
+      "protectedBranches": [
+        "User",
+        "Backups",
+        "Local Storage",
+        "Session Storage",
+        "IndexedDB",
+        "Service Worker",
+        "Network"
+      ],
+      "cacheEffect": "Ứng viên cache VS Code; lần mở tiếp theo có thể tạo lại và chậm hơn. Không gồm User, workspaceStorage, local history hoặc Backups.",
+      "personalEffect": "Giữ settings, snippets, extension state/database, lịch sử file và bản khôi phục nội dung chưa lưu.",
+      "sources": [
+        "https://code.visualstudio.com/docs/setup/uninstall",
+        "https://code.visualstudio.com/docs/configure/settings",
+        "https://code.visualstudio.com/docs/setup/portable",
+        "https://github.com/microsoft/vscode/blob/main/src/main.ts"
+      ]
+    }
+  ]
+}

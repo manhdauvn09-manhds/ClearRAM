@@ -1,0 +1,13 @@
+﻿#requires -version 5.1
+$ErrorActionPreference='Stop';$root=Split-Path $PSScriptRoot -Parent
+Import-Module (Join-Path $root 'app\CleanData\WindowsProviders.psm1') -Force
+$results=New-Object 'System.Collections.Generic.List[object]'
+function Check {param($Name,$Action);try{&$Action;$results.Add([pscustomobject]@{Name=$Name;Passed=$true;Error=''})}catch{$results.Add([pscustomobject]@{Name=$Name;Passed=$false;Error=$_.Exception.Message})}}
+function Assert {param([bool]$v);if(-not$v){throw 'Assertion failed'}}
+Check 'Three allowlisted providers, delegated only, no direct writes' {$p=Get-MCWindowsProviderCatalog;Assert ($p.providers.Count-eq3-and$p.mode-eq'WindowsDelegated')}
+Check 'Current capability uses authoritative registry build with provenance' {$c=Get-MCWindowsCleanupCapabilities;Assert ($c.Source-like'HKLM*CurrentBuildNumber'-and$c.Status-in@('SupportedDelegation','Unknown','Unsupported')-and-not$c.DirectSystemWrites-and$null-eq$c.MeasuredCleanupBytes)}
+Check 'Prepare Storage Apps Update does not launch or invent cleanup metrics' {foreach($name in @('Storage','Apps','Update')){$r=Open-MCWindowsCleanup $name -PreviewOnly;Assert ($r.Status-in@('Prepared','Unavailable')-and$null-eq$r.DeletedBytes);if($r.Status-eq'Prepared'){Assert (-not$r.LaunchExecuted-and$r.Uri-like'ms-settings:*')}}}
+Check 'Unknown provider input rejected' {$rejected=$false;try{Open-MCWindowsCleanup 'ArbitraryCommand' -PreviewOnly|Out-Null}catch{$rejected=$true};Assert $rejected}
+Check 'Catalog URI corruption fails closed' {$m=Get-Module WindowsProviders;&$m {$script:ProviderOriginal=$script:ProviderRoot;$script:ProviderRoot=Join-Path $script:ProviderRoot ('artifacts\provider-policy-'+[guid]::NewGuid().ToString('N'));New-Item -ItemType Directory -Path (Join-Path $script:ProviderRoot 'app') -Force|Out-Null;$p=Get-Content (Join-Path $script:ProviderOriginal 'app\windows-cleanup-providers.json') -Raw|ConvertFrom-Json;$p.providers[0].uri='cmd.exe';$p|ConvertTo-Json -Depth 6|Set-Content (Join-Path $script:ProviderRoot 'app\windows-cleanup-providers.json') -Encoding UTF8};try{$rejected=$false;try{Get-MCWindowsProviderCatalog|Out-Null}catch{$rejected=$true};Assert $rejected}finally{&$m {$script:ProviderRoot=$script:ProviderOriginal}}}
+$r=[pscustomobject]@{Timestamp=[DateTime]::UtcNow.ToString('o');Runtime=$PSVersionTable.PSVersion.ToString();Passed=@($results|Where-Object{$_.Passed}).Count;Failed=@($results|Where-Object{-not$_.Passed}).Count;Results=$results.ToArray();LaunchExecuted=$false;WindowsCleanupCompletionVerified=$false}
+$r|ConvertTo-Json -Depth 6|Set-Content (Join-Path $root 'docs\verification\windows-provider-tests.json') -Encoding UTF8;$results|Format-Table -AutoSize|Out-String|Write-Output;if($r.Failed){exit 1}

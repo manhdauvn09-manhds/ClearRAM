@@ -1,0 +1,99 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:29.6776470Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  17,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Production rows and arbitrary non-fixture roots cannot receive authority",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Independent extension rules ignore GUI risk/effects, protect unknown/marker/evidence",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Danger requires exact item review, final acknowledgment and session phrase",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Safe-only starts without warning approval; measured progress and single-use execution",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Mutating returned plan cannot downgrade internal danger or alter frozen payload",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed scope and expired/policy-mismatched sessions invalidate before writing",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Back and close discard approvals",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed file and replaced backup ancestry reject stale plan without delete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Backup verifies same-handle hash and restores create-new without losing backup",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Existing restore target is never overwritten",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Tampered backup and malformed journal cannot restore or replay",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancellation before execution retains sources and reports cancellation",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Actual separate worker runspace consumes approved shared session with progress",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Exclusive opened fixture rejects revalidation before journal without force/unlock",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Same-length content change with restored timestamp still invalidates approval and native held transaction",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native absence requires a valid held parent, unavailable ancestry never means empty destination",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed original parent blocks restore candidacy before confirmation",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Native marked disposable fixtures only; independent in-memory approval, transaction, restore, actual runspace",
+    "ProductionExecutionEnabled":  false,
+    "Unverified":  [
+                       "Power loss/full disk/external disconnect/Win10-11 VM",
+                       "Production owner authority and release"
+                   ]
+}

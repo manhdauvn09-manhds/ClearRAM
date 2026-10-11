@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "governs",
+    "mode",
+    "executionEnabled",
+    "maximumItems",
+    "maximumSessions",
+    "ttlSeconds"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "governs": {
+      "const": "product_runtime"
+    },
+    "mode": {
+      "const": "PreviewOnly"
+    },
+    "executionEnabled": {
+      "const": false
+    },
+    "maximumItems": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "maximumSessions": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8
+    },
+    "ttlSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 600
+    }
+  }
+}

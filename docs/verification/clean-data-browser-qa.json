@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-10-09 03:22:18 UTC",
+  "artifact": "MemoryClear-CleanData-Prototype.html",
+  "operation": "cua.createBrowserTab(iab, file:///E:/SourceCode/NEW_APPLICATION/MemoryClear/MemoryClear-CleanData-Prototype.html, visible=true)",
+  "status": "blocked_by_browser_policy",
+  "observedReason": "Browser URL policy blocks file: protocol; allowed protocols http:, https:. No workaround, alternate surface or local server attempted.",
+  "visualQaVerified": false,
+  "screenshotCaptured": false,
+  "alternativeVerification": "13/13 code-level schema/model/DOM fixture checks in clean-data-design-checks.json; not browser rendering"
+}

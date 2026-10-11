@@ -1,0 +1,15 @@
+{
+  "$schema": "temp-cleanup-policy.schema.json",
+  "governs": "product_runtime",
+  "schemaVersion": 1,
+  "capability": "ReviewedTopLevelOwnTemp",
+  "minimumDays": [7, 7, 3],
+  "extensions": [".tmp", ".log"],
+  "maximumItems": 100,
+  "maximumEntries": 5000,
+  "maximumSeconds": 15,
+  "ttlSeconds": 600,
+  "permanentRequiresTwoSteps": true,
+  "allowElevation": false,
+  "recursive": false
+}

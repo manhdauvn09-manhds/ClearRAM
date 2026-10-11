@@ -1,0 +1,13 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:11:57.2012767Z",
+    "Version":  "2026.10.11.1-preview",
+    "Folder":  "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear",
+    "Launcher":  "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear\\Start-MemoryClear.cmd",
+    "Archive":  "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear-2026.10.11.1-preview.zip",
+    "Sha256":  "B9914C4DFF4B48837E261B60F3E5A10E4FBEB35F2DB4EF97AE68333BFE6B9AD7",
+    "FileCount":  55,
+    "PackagedControlsSmoke":  "Passed",
+    "ArchiveEntryHashes":  "Passed",
+    "ReleaseAcceptance":  "Unverified",
+    "MemoryTaskExecutionEnabled":  false
+}

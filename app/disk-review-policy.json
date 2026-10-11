@@ -1,0 +1,10 @@
+{
+  "$schema": "disk-review-policy.schema.json",
+  "schemaVersion": 1,
+  "governs": "product_runtime",
+  "mode": "PreviewOnly",
+  "executionEnabled": false,
+  "maximumItems": 100,
+  "maximumSessions": 8,
+  "ttlSeconds": 600
+}

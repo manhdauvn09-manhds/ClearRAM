@@ -1,5 +1,7 @@
 # MemoryClear workflow
 
+- Khi kết thúc một lượt mà còn công việc, nêu bước tiếp theo cụ thể, đề xuất lựa chọn kèm lý do và hỏi người dùng muốn ưu tiên bước nào. Đây là hỏi hướng tiếp tục, không yêu cầu duyệt lại phạm vi đã được cho phép. Người dùng đã yêu cầu quy tắc này ngày 2026-10-09.
+
 - Read `IMPLEMENTATION_PLAN.md`, `plan/tasks.json`, and the latest applicable document in `docs/handoffs/` before continuing implementation. Respect the user's approved scope.
 - At the end of **every phase**, create or update `docs/handoffs/PHASE-XX-HANDOFF.md` using `docs/handoffs/TEMPLATE.md`. This is part of finishing the phase, not an optional follow-up.
 - Include completed task IDs, decisions, changed files, reproducible verification commands/results, unresolved issues, and precise next steps. State unverified results honestly; never invent a passing check or commit.

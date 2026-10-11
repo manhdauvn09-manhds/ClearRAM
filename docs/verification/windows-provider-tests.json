@@ -1,0 +1,35 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:50.8119197Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  5,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Three allowlisted providers, delegated only, no direct writes",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Current capability uses authoritative registry build with provenance",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Prepare Storage Apps Update does not launch or invent cleanup metrics",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Unknown provider input rejected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Catalog URI corruption fails closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "LaunchExecuted":  false,
+    "WindowsCleanupCompletionVerified":  false
+}

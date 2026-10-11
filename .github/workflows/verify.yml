@@ -1,4 +1,4 @@
-name: Verify PowerShell preview
+﻿name: Verify PowerShell preview
 on: [push, pull_request]
 jobs:
   verify:
@@ -12,7 +12,50 @@ jobs:
         shell: pwsh
         run: |
           node plan/build-plan.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node plan/check-plan.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node plan/build-clean-data.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node plan/check-clean-data.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node plan/check-memory-design.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node plan/check-runtime-policies.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Disk readonly inventory and fixture safety gates
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskInventory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskOwnership.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskAppProfiles.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskOwnerHistory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskGuard.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskFixtureExecutor.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Check-DiskUI.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Check-DiskReview.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Check-DiskReviewUI.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-DiskOperations.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-DiskCrash.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-DiskOperationUI.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-WindowsProviders.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-TempCleanup.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell.exe -NoProfile -STA -File .\tests\Check-MemoryLevels.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: PowerShell policy and collector tests
         shell: powershell
         run: .\tests\Run-Tests.ps1

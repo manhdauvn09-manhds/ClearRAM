@@ -10,10 +10,20 @@ Import-Module (Join-Path $PSScriptRoot 'app\MemoryClear.Core.psm1') -Force
 $reader=New-Object Xml.XmlNodeReader ([xml](Get-Content -LiteralPath (Join-Path $PSScriptRoot 'app\MainWindow.xaml') -Raw -Encoding UTF8))
 $script:window=[Windows.Markup.XamlReader]::Load($reader)
 $script:ui=@{}
+foreach($name in @('MemoryLevel1','MemoryLevel2','MemoryLevel3','MemoryEffects')){$script:ui[$name]=$window.FindName($name);if(-not$ui[$name]){throw "Missing Memory level: $name"}}
 foreach($name in @('ClearMemory','StrongClear','ClearProgress','ClearState','ClearElapsed','RamLabel','CpuLabel','CommitLabel','RamBar','CpuBar','Search','ActionableOnly','Refresh','Processes','CloseSelected','KillSelected','Protect','AllowClose','Details','TargetGB','Emergency','CancelOperation','Status','SelectionLabel')){$script:ui[$name]=$window.FindName($name);if(-not$ui[$name]){throw "Missing control: $name"}}
 $script:snapshot=$null;$script:job=$null;$script:async=$null;$script:jobKind='';$script:queue=@();$script:operation=$false;$script:targetBytes=0;$script:nextScan=[DateTime]::MinValue;$script:cancelled=$false
 $script:clearRequested=$false;$script:clearCancellation=$null;$script:lastForegroundPid=[MemoryClear.Native]::ForegroundProcessId()
 $script:clearMode='Normal';$script:clearWatch=$null;$script:clearRunning=$false;$script:clearProgressQueue=$null
+$script:diskRunning=$false;$script:diskUI=$null;$script:memoryTaskModalActive=$false
+. (Join-Path $PSScriptRoot 'app\MemoryTaskView.ps1')
+function Update-MCMemoryLevel {
+    $ui.StrongClear.IsChecked=[bool]$ui.MemoryLevel2.IsChecked
+    $ui.ClearMemory.Content=if($ui.MemoryLevel3.IsChecked){'Xem tác vụ mức 3'}else{'Clear'}
+    $ui.MemoryEffects.Text=if($ui.MemoryLevel3.IsChecked){'Danh sách Cho đóng gấp của bạn. Chỉ preview; đóng tác vụ còn safety/QA gates. Không tự force kill, không tự suy ra app không cần thiết.'}elseif($ui.MemoryLevel2.IsChecked){'Thu hồi working set của nhiều process hơn; giữ nguyên app/dữ liệu. RAM có thể nạp lại, app có thể phản hồi chậm hơn khi dùng tiếp.'}else{'Thu hồi working set của process đủ điều kiện; giữ nguyên app/dữ liệu. Không làm CPU rảnh bằng cách trim RAM.'}
+}
+foreach($name in @('MemoryLevel1','MemoryLevel2','MemoryLevel3')){$ui[$name].Add_Click({Update-MCMemoryLevel})}
+Update-MCMemoryLevel
 function Update-MCClearProgress {
     if(-not$clearRunning){return}
     $ui.ClearElapsed.Text=('{0:N0}s đã chạy'-f$clearWatch.Elapsed.TotalSeconds)
@@ -59,8 +69,9 @@ function Update-MCView {
 function Set-MCOperationState {
     param([bool]$Active)
     $script:operation=$Active
-    foreach($name in @('ClearMemory','StrongClear','CloseSelected','KillSelected','Protect','AllowClose','Emergency')){$ui[$name].IsEnabled=-not$Active}
+    foreach($name in @('ClearMemory','StrongClear','MemoryLevel1','MemoryLevel2','MemoryLevel3','CloseSelected','KillSelected','Protect','AllowClose','Emergency')){$ui[$name].IsEnabled=-not$Active}
     $ui.CancelOperation.IsEnabled=$Active
+    if($diskUI){foreach($name in @('DiskLevel1','DiskLevel2','DiskLevel3','DiskLarge','DiskAppData','DiskReview','DiskScan','DiskMinimumMB','DiskMinimumAge','DiskExtensions','DiskChooseFolder','DiskResetFolder','DiskWindowsStorage','DiskWindowsApps','DiskTransactions','DiskClean')){$diskUI[$name].IsEnabled=-not$Active};$diskUI.DiskReview.IsEnabled=-not$Active-and$null-ne$diskResult-and$diskUI.DiskFiles.SelectedItems.Count-gt0;$diskUI.DiskStop.IsEnabled=$diskRunning;$diskUI.DiskAnalyze.IsEnabled=-not$Active-and$null-ne$diskResult-and$diskResult.Rows.Count-gt0;$diskUI.DiskPrevious.IsEnabled=-not$Active-and$null-ne$diskResult-and$diskResult.Offset-gt0;$diskUI.DiskNext.IsEnabled=-not$Active-and$null-ne$diskResult-and$diskResult.HasMore}
 }
 function Show-MCMessage {param([string]$Text);[Windows.MessageBox]::Show($window,$Text,'MemoryClear',[Windows.MessageBoxButton]::OK,[Windows.MessageBoxImage]::Information)|Out-Null}
 function Start-MCQueue {
@@ -84,6 +95,7 @@ function Start-MCWorker {
 }
 function Start-MCOneClickClear {
     if($operation){return}
+    if($ui.MemoryLevel3.IsChecked){Show-MCMemoryTaskPreview;return}
     $script:clearMode=if($ui.StrongClear.IsChecked){'Strong'}else{'Normal'}
     $script:clearWatch=[Diagnostics.Stopwatch]::StartNew();$script:clearProgressQueue=New-Object 'System.Collections.Concurrent.ConcurrentQueue[object]';$script:clearRunning=$true
     $script:clearCancellation=New-Object Threading.CancellationTokenSource
@@ -115,7 +127,7 @@ $ui.Processes.AddHandler([Windows.Input.Mouse]::PreviewMouseDownEvent,[Windows.I
 $ui.Processes.Add_SelectionChanged({$ui.SelectionLabel.Text="Đã chọn $($ui.Processes.SelectedItems.Count) process. RAM là working set; CPU chuẩn hóa theo toàn máy."})
 $ui.CloseSelected.Add_Click({Start-MCQueue @($ui.Processes.SelectedItems) 'Close'})
 $ui.KillSelected.Add_Click({Start-MCQueue @($ui.Processes.SelectedItems) 'Kill'})
-$ui.CancelOperation.Add_Click({$pendingClear=$clearRequested;$script:queue=@();$script:clearRequested=$false;$script:cancelled=$true;if($clearCancellation){$clearCancellation.Cancel()};$ui.Status.Text='Đã yêu cầu dừng các bước tiếp theo. Thao tác đã gửi không thể hoàn tác.';if($pendingClear){Complete-MCClearUI ([pscustomobject]@{Status='Cancelled';Message='Đã hủy Clear trước khi bắt đầu; chưa trim process nào.'});$clearCancellation.Dispose();$script:clearCancellation=$null}elseif($clearRunning){$ui.ClearState.Text='Clear · Đang dừng các bước tiếp theo...'};if(-not$job){Set-MCOperationState $false}})
+$ui.CancelOperation.Add_Click({if($diskRunning){if($diskToken){$diskToken.Cancel()};$diskUI.DiskState.Text='Đang dừng tại ranh giới file...';return};$pendingClear=$clearRequested;$script:queue=@();$script:clearRequested=$false;$script:cancelled=$true;if($clearCancellation){$clearCancellation.Cancel()};$ui.Status.Text='Đã yêu cầu dừng các bước tiếp theo. Thao tác đã gửi không thể hoàn tác.';if($pendingClear){Complete-MCClearUI ([pscustomobject]@{Status='Cancelled';Message='Đã hủy Clear trước khi bắt đầu; chưa trim process nào.'});$clearCancellation.Dispose();$script:clearCancellation=$null}elseif($clearRunning){$ui.ClearState.Text='Clear · Đang dừng các bước tiếp theo...'};if(-not$job){Set-MCOperationState $false}})
 $ui.Details.Add_Click({$row=$ui.Processes.SelectedItem;if($row){Show-MCMessage ("$($row.Name) · PID $($row.Pid)`nStart ticks: $($row.StartTicks)`nExecutable: $($row.Path)`n$($row.Policy)`nRAM: $($row.RamMB) MB · Private: $($row.PrivateMB) MB`nUser SID: $($row.Identity.Sid) · Session: $($row.Identity.Session)")}})
 function Toggle-MCPath {
     param([string]$Property)
@@ -143,6 +155,8 @@ $ui.Emergency.Add_Click({try{if(-not$snapshot){return};$target=0.0;if(-not[doubl
     if($snapshot.System.AvailableBytes-ge($target*1GB)){Show-MCMessage 'RAM khả dụng đã đạt mục tiêu.';return}
     $rows=@($snapshot.Rows|Where-Object{$_.Allowed-and$_.AllowClose});if(-not$rows.Count){throw 'Chưa có ứng viên. Chọn process và bấm Cho phép đóng khẩn cấp trước.'};Start-MCQueue $rows 'Close' ($target*1GB)
   }catch{Show-MCMessage $_.Exception.Message}})
+. (Join-Path $PSScriptRoot 'app\CleanData\DiskView.ps1')
+Initialize-MCDiskView -ProjectRoot $PSScriptRoot
 if($SmokeTest-and$ControlsOnly){return}
 if($SmokeTest){
     $script:pool=[RunspaceFactory]::CreateRunspacePool(1,1);$pool.Open()
@@ -172,7 +186,7 @@ $timer.Add_Tick({try{
       $job.Dispose();$script:job=$null
     }
     if($clearRequested){$script:clearRequested=$false;Start-MCWorker 'Clear' $null;return}
-    if($operation){if($targetBytes-gt0-and[MemoryClear.Native]::ReadSystem().AvailableBytes-ge$targetBytes){$script:queue=@();$ui.Status.Text='Đã đạt mục tiêu RAM khả dụng; dừng các bước tiếp theo.'}
+    if($operation){if($diskRunning-or$diskModalActive-or$memoryTaskModalActive){return};if($targetBytes-gt0-and[MemoryClear.Native]::ReadSystem().AvailableBytes-ge$targetBytes){$script:queue=@();$ui.Status.Text='Đã đạt mục tiêu RAM khả dụng; dừng các bước tiếp theo.'}
       if(-not$queue.Count){Set-MCOperationState $false;if($clearCancellation){$clearCancellation.Dispose();$script:clearCancellation=$null};if(-not$cancelled){$ui.Status.Text+=' · Đã xử lý hết danh sách hoặc đạt mục tiêu.'}}
       elseif([DateTime]::UtcNow-lt$nextScan){$item=$queue[0];$script:queue=@($queue|Select-Object -Skip 1);Start-MCWorker 'Action' $item;return}
     }

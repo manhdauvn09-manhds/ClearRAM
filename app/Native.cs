@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 namespace MemoryClear {
+  public static class TaskSessionStore {
+    public static readonly System.Collections.Concurrent.ConcurrentDictionary<string,object> Plans=new System.Collections.Concurrent.ConcurrentDictionary<string,object>();
+    public static void Remove(string id){object unused;Plans.TryRemove(id,out unused);}
+  }
   [StructLayout(LayoutKind.Sequential)] public struct MemoryStatus {
     public uint Length, Load; public ulong TotalPhysical, AvailablePhysical, TotalPageFile, AvailablePageFile, TotalVirtual, AvailableVirtual, AvailableExtendedVirtual;
   }
@@ -34,6 +38,28 @@ namespace MemoryClear {
     public Identity Identity {get;set;}
   }
   public static class Native {
+    delegate bool WindowCallback(IntPtr window,IntPtr parameter);
+    [DllImport("user32.dll",SetLastError=true)] static extern bool EnumWindows(WindowCallback callback,IntPtr parameter);
+    [DllImport("user32.dll")] static extern IntPtr GetWindow(IntPtr window,uint command);
+    [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr window,StringBuilder text,int maximum);
+    [DllImport("user32.dll",EntryPoint="GetWindowLongW")] static extern int GetWindowStyle(IntPtr window,int index);
+    [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr window);
+    public static long TaskWindow(int pid) {
+      using(var process=Process.GetProcessById(pid)){IntPtr main=process.MainWindowHandle;int owner;if(main!=IntPtr.Zero&&GetWindowThreadProcessId(main,out owner)!=0&&owner==pid)return main.ToInt64();}
+      IntPtr found=IntPtr.Zero;
+      EnumWindows(delegate(IntPtr window,IntPtr parameter){int owner;var title=new StringBuilder(512);
+        if(IsWindowVisible(window)&&GetWindowThreadProcessId(window,out owner)!=0&&owner==pid&&(GetWindowStyle(window,-16)&0x00C00000)==0x00C00000&&GetWindowText(window,title,title.Capacity)>0){found=window;return false;}return true;
+      },IntPtr.Zero);return found.ToInt64();
+    }
+    public static uint WindowThread(long window,int pid){int owner;uint thread=GetWindowThreadProcessId(new IntPtr(window),out owner);return owner==pid?thread:0;}
+    internal static bool RequestTaskClose(Identity identity,long window,uint thread){
+      if(window==0||thread==0||WindowThread(window,identity.Pid)!=thread)throw new InvalidOperationException("Window identity changed.");
+      using(var process=Process.GetProcessById(identity.Pid)){
+        if(process.HasExited||process.StartTime.ToUniversalTime().Ticks!=identity.StartTicks)throw new InvalidOperationException("Process changed.");
+        if(WindowThread(window,identity.Pid)!=thread)throw new InvalidOperationException("Window owner changed.");
+        if(!PostMessage(new IntPtr(window),0x10,IntPtr.Zero,IntPtr.Zero))throw new Win32Exception();return true;
+      }
+    }
     [DllImport("psapi.dll", SetLastError=true)] internal static extern bool EmptyWorkingSet(IntPtr process);
     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
     [DllImport("kernel32.dll", SetLastError=true)] static extern bool GlobalMemoryStatusEx(ref MemoryStatus data);
@@ -101,6 +127,7 @@ namespace MemoryClear {
     public void Trim() {if(!canTrim || handle==IntPtr.Zero || HasExited) throw new InvalidOperationException("No trim capability or process exited.");if(!Native.EmptyWorkingSet(handle)) throw new Win32Exception();}
     public bool HasExited {get {return Native.WaitForSingleObject(handle,0)==0;}}
     public bool CloseWindow() { if(canTrim) throw new InvalidOperationException("Trim handle cannot close a process."); if(handle==IntPtr.Zero || HasExited) throw new InvalidOperationException("Process exited."); return Native.RequestClose(Identity); }
+    public bool CloseTaskWindow(long window,uint thread){if(canTrim||canTerminate||handle==IntPtr.Zero||HasExited)throw new InvalidOperationException("Graceful-only stable process handle required.");return Native.RequestTaskClose(Identity,window,thread);}
     public void Kill() { if(!canTerminate || handle==IntPtr.Zero) throw new InvalidOperationException("No termination capability."); if(!Native.TerminateProcess(handle,1)) throw new Win32Exception(); }
     public bool Wait(int milliseconds) {return Native.WaitForSingleObject(handle,(uint)milliseconds)==0;}
     public void Dispose() {if(handle!=IntPtr.Zero){Native.CloseHandle(handle);handle=IntPtr.Zero;}}

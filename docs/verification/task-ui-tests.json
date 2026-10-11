@@ -1,0 +1,44 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:11:37.1486509Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  6,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Async planner locks actions while running",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "DispatcherTimer completes real worker and reports empty opt-in",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Acknowledgement cannot enable empty or gated execution",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Rescan expires previous session and clears acknowledgement",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Cancel signal is observed and worker unlocks",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Closing handler removes plan and stops timer",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Real WPF controls/DispatcherTimer/async empty planner/rescan/cancel; shipped executor remains gated; no user app closed",
+    "Unverified":  [
+                       "Human keyboard/DPI",
+                       "Nonempty GUI execution and save prompt",
+                       "Win10"
+                   ]
+}

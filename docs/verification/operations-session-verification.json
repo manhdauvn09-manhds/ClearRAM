@@ -1,0 +1,362 @@
+{
+  "date": "2026-10-10",
+  "timezone": "Asia/Tokyo",
+  "revision": "2026-10-10.2",
+  "scope": "Observed current Windows11 local fixture execution; no real user cleanup",
+  "readiness": {
+    "path": "artifacts/readiness-20261010-094026-2c5c13f5/readiness.json",
+    "status": "LocalChecksPassed_ReleaseUnverified",
+    "build": 26200,
+    "family": "Windows11",
+    "provenance": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion/CurrentBuildNumber + InstallationType",
+    "steps": [
+      {
+        "Name": "Disk suites",
+        "Status": "Passed",
+        "Seconds": 53.8657757,
+        "Error": ""
+      },
+      {
+        "Name": "RAM Clear fixtures",
+        "Status": "Passed",
+        "Seconds": 12.7221523,
+        "Error": ""
+      },
+      {
+        "Name": "RAM checkbox fixtures",
+        "Status": "Passed",
+        "Seconds": 9.9582339,
+        "Error": ""
+      },
+      {
+        "Name": "Core unit tests",
+        "Status": "Passed",
+        "Seconds": 17.687151699999998,
+        "Error": ""
+      },
+      {
+        "Name": "build-plan",
+        "Status": "Passed",
+        "Seconds": 0.1521215,
+        "Error": ""
+      },
+      {
+        "Name": "check-plan",
+        "Status": "Passed",
+        "Seconds": 0.1799541,
+        "Error": ""
+      },
+      {
+        "Name": "build-clean-data",
+        "Status": "Passed",
+        "Seconds": 0.110818,
+        "Error": ""
+      },
+      {
+        "Name": "check-clean-data",
+        "Status": "Passed",
+        "Seconds": 0.1391537,
+        "Error": ""
+      },
+      {
+        "Name": "check-memory-design",
+        "Status": "Passed",
+        "Seconds": 0.1819198,
+        "Error": ""
+      },
+      {
+        "Name": "check-runtime-policies",
+        "Status": "Passed",
+        "Seconds": 0.10560159999999999,
+        "Error": ""
+      },
+      {
+        "Name": "All PS5 sources parse",
+        "Status": "Passed",
+        "Seconds": 0.30915699999999996,
+        "Error": ""
+      }
+    ],
+    "codeHashes": [
+      {
+        "Path": "app\\clean-data-policy.json",
+        "Sha256": "164DFF2CCE7BA8B8A5BFD3A2C45401744D5704460A9077A2A4743DE2BA5F135E"
+      },
+      {
+        "Path": "app\\clean-data-policy.schema.json",
+        "Sha256": "90BEE3725BF1BAB91E497E5D5480C74E9216CF6C377CF11DDD47547F2D85A9EE"
+      },
+      {
+        "Path": "app\\clear-policy.json",
+        "Sha256": "D827FB005A252D41D6758B80B24E7C52A089F7F4D7E24DF1869A09C4ECCF8749"
+      },
+      {
+        "Path": "app\\clear-policy.schema.json",
+        "Sha256": "EE97318A3BD0E6A702D2AFDCB12BA80EDE1644C98C69613416C1672A159F0EB6"
+      },
+      {
+        "Path": "app\\disk-app-profiles.json",
+        "Sha256": "4A526BA9E3A7E07E79C404791EDCF9B4CD7A3EA478B9DE1A2CC839C13422FFC5"
+      },
+      {
+        "Path": "app\\disk-app-profiles.schema.json",
+        "Sha256": "A921ED1E7F29344D24A8D8C632EC071E0DAB9A8F46D04BF74D32034A92AE4BF9"
+      },
+      {
+        "Path": "app\\disk-execution-policy.json",
+        "Sha256": "96C737CD17BD472E39915B7569ED1ABD68EE545F2ADA14070B57FBE67B2FE378"
+      },
+      {
+        "Path": "app\\disk-execution-policy.schema.json",
+        "Sha256": "59908D40DE8A358C1F49021362595DC603010E276607AF191142EF0A02DBD3B0"
+      },
+      {
+        "Path": "app\\disk-review-policy.json",
+        "Sha256": "2737A7BB48082138BD5C0E1E097666FC704258B3813C8DAD5FDB2A157F0F4B79"
+      },
+      {
+        "Path": "app\\disk-review-policy.schema.json",
+        "Sha256": "2515FC5C87D39C6EAEEB25DA5596E84BF2A1FA17290A4106B002128F5A6445BA"
+      },
+      {
+        "Path": "app\\MainWindow.xaml",
+        "Sha256": "F39C3DA169998003CEA28A4E2D56A1566A535A779CB88DF22B214FC711722655"
+      },
+      {
+        "Path": "app\\MemoryClear.Clear.psm1",
+        "Sha256": "9C1ADAF76195F943F39AF5E64383F2076BB31EA7F54ED0878EB277B3451234B3"
+      },
+      {
+        "Path": "app\\MemoryClear.Core.psm1",
+        "Sha256": "FD4A382381D69506613C248E27F61246B80E72FF7AD1189483476C0AF67D7263"
+      },
+      {
+        "Path": "app\\Native.cs",
+        "Sha256": "A85F248168DFA77A2D53E4793C6EF22B5B227D9DA3D6B462C74247A64BE139C2"
+      },
+      {
+        "Path": "app\\owner-analysis-policy.json",
+        "Sha256": "98B7A1C2EFFA6AEDDA7BA3B4F8520025F3F50C147111F3DA5C56B6E784DCA868"
+      },
+      {
+        "Path": "app\\owner-analysis-policy.schema.json",
+        "Sha256": "FF3AF24E8EEC63DD40E6A3FEA2A871AFA4957A518C0F417733345928C6F6A917"
+      },
+      {
+        "Path": "app\\owner-history-payload.schema.json",
+        "Sha256": "8656ABECAE0783EB07C8840199F7562D339EA734DC99768094B80C51992CB68B"
+      },
+      {
+        "Path": "app\\owner-history-policy.json",
+        "Sha256": "215128EEE0FC15C133CCA243A913BFF3F01775EF2994DF825A164022463245FB"
+      },
+      {
+        "Path": "app\\owner-history-policy.schema.json",
+        "Sha256": "23B08B9AD8BF514486992021D349360CAE25760983DD85614B635972A6E9A1DE"
+      },
+      {
+        "Path": "app\\windows-cleanup-providers.json",
+        "Sha256": "9754085430D10F90ED08A11C940F35ADD74CCE0EBF7D0252937CD27C47D25C12"
+      },
+      {
+        "Path": "app\\windows-cleanup-providers.schema.json",
+        "Sha256": "BBCDD1297722D6576F4A0466019D792FEF3B2602170D1188899A8D11A43EC31C"
+      },
+      {
+        "Path": "app\\CleanData\\AppProfiles.ps1",
+        "Sha256": "390B5A4A7AE252DE472A4DE4785C378605051FC8648DCF0181ACB40912A4885F"
+      },
+      {
+        "Path": "app\\CleanData\\DiskView.ps1",
+        "Sha256": "55FA3289AC8C15FB5F0A17CF7F35BE31181DF66481407E30627F4522D7555922"
+      },
+      {
+        "Path": "app\\CleanData\\DiskView.xaml",
+        "Sha256": "0D23FBCCD3FED9D297A3F3B8FD364C7D45D66037BBCEDF48537D28609D23EFD0"
+      },
+      {
+        "Path": "app\\CleanData\\FileInventory.cs",
+        "Sha256": "E30402AE026C62ED36AA4D2DC64C292265C5C4175FB73AB478553F44E7613AE6"
+      },
+      {
+        "Path": "app\\CleanData\\FixtureExecutor.psm1",
+        "Sha256": "AF4BEE244882ADA6F62588EADD462DE611FCCED7D771BDD3060F0ADF3B25CB99"
+      },
+      {
+        "Path": "app\\CleanData\\MemoryClear.Disk.psm1",
+        "Sha256": "4D3583133431FB8D6D87103E1D24CB1A161D5FC96EFC283394C9A5F0EE9D3E98"
+      },
+      {
+        "Path": "app\\CleanData\\Operations.psm1",
+        "Sha256": "968B9E65DE9BD8CC8408E2538F220443FC49B1D0724EDD20C920CC437030167A"
+      },
+      {
+        "Path": "app\\CleanData\\OperationView.ps1",
+        "Sha256": "1E92DC06726D536C637013A94180A3260B81C3FEBDC5942566C1F5D58251E3D7"
+      },
+      {
+        "Path": "app\\CleanData\\OperationView.xaml",
+        "Sha256": "F7E34A6D44E93521E5C47E8472000B2EB9D9FEF10434D3253A45932B21C41B6C"
+      },
+      {
+        "Path": "app\\CleanData\\OwnerHistory.ps1",
+        "Sha256": "5F14DE7255E6CB75E04098FA2911D1BF3E04F626735E69CD894BEB9D047EA559"
+      },
+      {
+        "Path": "app\\CleanData\\Ownership.ps1",
+        "Sha256": "A035C8A4697C54F2887872FFA50D362F00051B7B87D93A59AB82AC2B4EBA05F2"
+      },
+      {
+        "Path": "app\\CleanData\\Review.psm1",
+        "Sha256": "851FAEDB37C0DD1712DAA7F3A3BAE65FD3DE9399ED1462E23A897C73C856BA59"
+      },
+      {
+        "Path": "app\\CleanData\\ReviewView.ps1",
+        "Sha256": "5BA24CB3FE4F5323D315CF00B788EACB063D0FD8DFED4DE7816CE1C1519552FA"
+      },
+      {
+        "Path": "app\\CleanData\\ReviewView.xaml",
+        "Sha256": "940B70C37BDF81A081D23B8F7DDFC77C40A495344293687375E8E3A916ADA2F8"
+      },
+      {
+        "Path": "app\\CleanData\\WindowsProviders.psm1",
+        "Sha256": "A41B7832B154DB91EA361968610752808D1B00BC8100F34132B06B745EEBAEEB"
+      },
+      {
+        "Path": "MemoryClear.ps1",
+        "Sha256": "03414D36545E9A9B0DE18E3FB25B3B9FF8312FBDF9AFB480A0F4AED5A9CBBBD1"
+      },
+      {
+        "Path": "MemoryClear.Cli.ps1",
+        "Sha256": "3FF6F32D13FCA89269E7E8477929B690D9E41B4CB1D5B34498B9310D2E7E2B8E"
+      }
+    ]
+  },
+  "disk": {
+    "passed": 189,
+    "failed": 0,
+    "suites": 13,
+    "reports": [
+      {
+        "path": "docs/verification/disk-inventory-tests.json",
+        "passed": 18,
+        "timestamp": "2026-10-10T09:40:30.0999762Z"
+      },
+      {
+        "path": "docs/verification/disk-ownership-tests.json",
+        "passed": 13,
+        "timestamp": "2026-10-10T09:40:32.2318532Z"
+      },
+      {
+        "path": "docs/verification/disk-app-profile-tests.json",
+        "passed": 16,
+        "timestamp": "2026-10-10T09:40:34.5932461Z"
+      },
+      {
+        "path": "docs/verification/disk-owner-history-tests.json",
+        "passed": 17,
+        "timestamp": "2026-10-10T09:40:38.4606140Z"
+      },
+      {
+        "path": "docs/verification/disk-guard-tests.json",
+        "passed": 9,
+        "timestamp": "2026-10-10T09:40:39.9801108Z"
+      },
+      {
+        "path": "docs/verification/disk-fixture-executor-tests.json",
+        "passed": 17,
+        "timestamp": "2026-10-10T09:40:43.4786282Z"
+      },
+      {
+        "path": "docs/verification/disk-ui-tests.json",
+        "passed": 30,
+        "timestamp": "2026-10-10T09:40:48.7495320Z"
+      },
+      {
+        "path": "docs/verification/disk-review-tests.json",
+        "passed": 15,
+        "timestamp": "2026-10-10T09:40:51.8595105Z"
+      },
+      {
+        "path": "docs/verification/disk-review-ui-tests.json",
+        "passed": 16,
+        "timestamp": "2026-10-10T09:40:54.8055404Z"
+      },
+      {
+        "path": "docs/verification/disk-operations-tests.json",
+        "passed": 17,
+        "timestamp": "2026-10-10T09:41:00.2388894Z"
+      },
+      {
+        "path": "docs/verification/disk-crash-tests.json",
+        "passed": 3,
+        "timestamp": "2026-10-10T09:41:13.9595203Z"
+      },
+      {
+        "path": "docs/verification/disk-operation-ui-tests.json",
+        "passed": 13,
+        "timestamp": "2026-10-10T09:41:19.1199544Z"
+      },
+      {
+        "path": "docs/verification/windows-provider-tests.json",
+        "passed": 5,
+        "timestamp": "2026-10-10T09:41:20.5121870Z"
+      }
+    ]
+  },
+  "ramClear": {
+    "passed": 12,
+    "failed": 0,
+    "timestamp": "2026-10-10T09:41:32.9497760Z"
+  },
+  "ramCheckbox": {
+    "passed": true,
+    "timestamp": "2026-10-10T09:41:42.9007015Z"
+  },
+  "core": {
+    "passed": 14,
+    "failed": 0,
+    "source": "readiness transcript observed TESTS passed=14 failed=0"
+  },
+  "design": {
+    "disk": 18,
+    "memory": 13,
+    "source": "executed readiness steps and docs/verification/*design-checks.json"
+  },
+  "runtimePolicies": {
+    "passed": 5,
+    "source": "runtime-policy-checks.json"
+  },
+  "previousReadiness": {
+    "path": "artifacts/readiness-20261010-091850-780c1aab/readiness.json",
+    "status": "Failed",
+    "reason": "Review UI test still expected 26 Disk controls after three new controls. Expected count corrected to29; product review entry existed. Failed trace retained."
+  },
+  "vmDiscovery": {
+    "availableCommands": [],
+    "queriedCommands": [
+      "Get-VM",
+      "VBoxManage",
+      "vmrun"
+    ],
+    "computerModel": "Dell Latitude 5340",
+    "hypervisorPresent": true,
+    "meaning": "No discovered CLI, not proof no VM exists; HypervisorPresent not VM proof"
+  },
+  "productionCleanupEnabled": false,
+  "newServerCI": "unproven, not pushed",
+  "release": "incomplete",
+  "unimplemented": [
+    "Independent production owner/risk authority",
+    "External backup provider",
+    "Memory level3 runtime according to dependency/profile gates"
+  ],
+  "unverified": [
+    "Windows10/Windows11 disposable VM matrix",
+    "Full disk/external loss/power loss",
+    "Mapped writers/filter drivers/multi-instance",
+    "Keyboard/DPI/operator acceptance",
+    "Interactive Settings launch and cleanup completion",
+    "Preview ZIP package execution"
+  ]
+}

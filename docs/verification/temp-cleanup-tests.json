@@ -1,0 +1,79 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:54.7209506Z",
+    "Runtime":  "5.1.26100.9444",
+    "Elevated":  false,
+    "OwnTempSelfTestExecuted":  true,
+    "Passed":  12,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Narrow policy; no recursion, elevation or automatic permanent cleanup",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Closed/unknown sessions cannot approve or execute",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Returned policy does not grant permission through a GUI flag",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Native journal rejects malformed identifiers",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Journal create-new, flush and no overwrite",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Native Temp rejects workspace paths, recent and unknown file types",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Selective plan reads only requested QA targets and returns detached rows",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Two-step review and no execution from checkboxes alone",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Exact own QA file permanent delete, durable trace and no replay",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Changed file content after review is retained",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Locked file after approval is retained",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Cancellation before execution retains QA file",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Only exact freshly created own QA Temp files; no existing user files mutated",
+    "RemainingOwnQaFiles":  [
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-old.tmp",
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-locked.log",
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-recent.tmp",
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-unknown.bin",
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-changed.tmp",
+                                "C:\\Users\\ManhDS\\AppData\\Local\\Temp\\memoryclear-qa-57a4dd93d1b5430d90079f94ac766c06-cancelled.tmp"
+                            ]
+}

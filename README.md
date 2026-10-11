@@ -1,5 +1,29 @@
 # MemoryClear · PowerShell GUI preview
 
+## Bản cập nhật 2026-10-11
+
+Clear Normal/Strong và Dọn Temp có duyệt dùng được trên Windows11 đã kiểm tra local. Memory mức3 có planner/executor đóng nhẹ, xác minh thoát, timeout, cancel và journal; bản portable vẫn khóa thực thi mức3 theo gate an toàn. Không tự force hoặc xóa dữ liệu app cũ. Local readiness16 bước đạt, gồm13 checks đóng app QA riêng và6 checks worker/DispatcherTimer. Các provider foreground/service/settings/policy trong test child là synthetic; không là nghiệm thu ứng dụng người dùng hoặc Windows10.
+
+Để chạy source tải từ GitHub, giải nén toàn bộ repo và nhấp đúp `Start-MemoryClear.cmd`. Để dựng bộ portable gọn, chạy `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Build-Portable.ps1"`; script tự cd project. Ở checkout khác, đổi đường dẫn script cho phù hợp. Bản build đã tạo local: version `2026.10.11.1-preview`, checksum/manifest và packaged GUI smoke đạt; [bằng chứng build](docs/verification/portable-build.json). ZIP local không tự trở thành GitHub Release; giới hạn vẫn theo [handoff phase12](docs/handoffs/PHASE-12-HANDOFF.md).
+
+<!-- TEMP-CAPABILITY-10.3 -->
+Đã có **Disk → Dọn Temp có duyệt...** chạy thật với quyền user trên Windows11: .tmp/.log cũ ngay trong Temp, hai bước duyệt, progress/Dừng/kết thúc/nhật ký. Không Undo; không tự xóa dữ liệu app hoặc file lớn. [Cách dùng và giới hạn](docs/CLEAN_DATA_TEMP.md). Self-test12 + WPF7 đạt trên file QA mới tạo riêng, không xóa file có sẵn. Memory đã có3cards: hai mức trim hoạt động, mức3 preview opt-in; executor còn safety/QA gates. User đã chốt danh sách tự cho phép, không tự force. [Contract Memory3](docs/MEMORY_TASK_RUNTIME.md). Những đoạn readonly/fixture bên dưới mô tả scanner/app-data và transaction mẫu, không phải capability Temp riêng.
+
+
+## Disk — đang triển khai (2026-10-09)
+
+App đã có hai tab RAM/CPU và Clean dữ liệu ổ Windows. Tab Disk mới **chỉ quét, không xóa**: temp theo retention ba mức; tìm file lớn/cũ trong Known Folders, mặc định512MB và cho chỉnh MB/tuổi/đuôi file hoặc chọn thư mục con cá nhân trên ổ Windows. Có search, phân trang1000 dòng và cancel/progress nền. Junction/cloud/hardlink/unknown ownership được giữ; hạn mức/lỗi quyền được báo rõ. Size/tuổi không chứng minh rác; đổi bộ lọc sẽ bỏ preview cũ, không tự chọn file.
+
+User chốt portable quyền user, Windows xử lý mục hệ thống; cho xóa vĩnh viễn app data sau hai bước duyệt. Production guards/backup/VM chưa nghiệm thu nên **Dọn an toàn đang khóa**. [Handoff phase10 (nháp)](docs/handoffs/PHASE-10-HANDOFF.md) và `plan/tasks.json` ghi tiến độ thật. FixtureExecutor đã có cùng source handle cho backup/hash/delete và đọc nhật ký sau gián đoạn; đây vẫn là module phát triển, không dùng để dọn dữ liệu người dùng. [Contract và giới hạn transaction](docs/CLEAN_DATA_TRANSACTION.md).
+
+**Cache / dữ liệu app còn sót** mở phạm vi AppData mặc định Chrome, Edge và VS Code. Bấm **Quét chỉ đọc** để phân biệt cache candidate với cookie/mật khẩu/settings/history/Backups cần giữ; sau đó **Phân tích ứng dụng** để đối chiếu metadata và tham chiếu đang có. Thiếu metadata chỉ hiện “có thể còn sót, chưa chứng minh đã gỡ”; chưa có lịch sử uninstall được xác minh, không tự xóa. [Catalog, nguồn và giới hạn](docs/CLEAN_DATA_APP_PROFILES.md).
+
+Sau quét AppData, Phân tích ứng dụng còn lưu **lịch sử quan sát local**: lần từng thấy metadata cài đặt, nguồn/entry ID/version và định danh thư mục. Khi hiện không còn metadata, chi tiết hiển thị căn cứ trước đó; vẫn chưa coi là uninstall đã xác minh. Lịch sử nằm ở `.data/disk-owner-history.json`, không gửi lên mạng và không cho phép xóa; hỏng/khóa/khác user thì giữ dữ liệu và báo rõ. [Contract lịch sử](docs/CLEAN_DATA_OWNER_HISTORY.md).
+
+Sau khi quét, **Phân tích ứng dụng** đối chiếu trang hiện tại với thông tin cài đặt và process/service/task, thêm cột ứng dụng/tham chiếu và tìm kiếm theo tên app. Dữ liệu thiếu/không rõ hoặc shared được giữ; thiếu uninstall key không chứng minh app đã gỡ. Có worker/cancel/shared lock, không tự chọn/xóa và không thu CommandLine. [Contract ownership và giới hạn](docs/CLEAN_DATA_OWNERSHIP.md).
+
+Mở lại app qua shortcut Desktop hoặc `powershell -NoProfile -STA -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\MemoryClear.ps1"`; script tự cd project. Kiểm chứng local bằng một script `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Phase10.ps1"`; chỉ test fixture tự tạo trong artifacts, không clean user data.
+
 Bản portable cho Windows 10/11 x64, dùng Windows PowerShell 5.1 và WPF có sẵn. Không cần .NET SDK, npm hoặc quyền admin để mở giao diện.
 
 Source preview: https://github.com/manhdauvn09-manhds/ClearRAM. Tải Code → Download ZIP hoặc clone, giải nén rồi nhấp đúp `Start-MemoryClear.cmd`. Các lệnh đường dẫn tuyệt đối bên dưới là ví dụ cho workspace phát triển; khi đặt ở thư mục khác, dùng launcher hoặc đổi đường dẫn tương ứng. Bản này còn nghiệm thu Windows/VM, chưa là release MVP.
@@ -76,6 +100,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLI
 ```
 
 ## Kế hoạch và handoff
+
+Tab Disk thêm **Dọn bằng Windows**, **Ứng dụng đã cài**, **Thử giao dịch / phục hồi**. Giao dịch mẫu có background progress/cancel, content hash, backup/journal/history và restore không ghi đè. Production dữ liệu thật vẫn khóa; Memory runtime2mức. [Runbook và giới hạn](docs/CLEAN_DATA_OPERATIONS.md). Nghiệm thu tự cd: `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Readiness.ps1"`. Source preview chưa là release; không suy ra Windows10/11 VM từ local host pass.
+
+Tab Disk hiện có **Duyệt danh sách...**: chọn dòng để xem file/path/tác động. Production vẫn chặn xóa; luồng duyệt hai bước chạy thử bằng dữ liệu mẫu, không xóa file. [Chi tiết và giới hạn](docs/CLEAN_DATA_REVIEW.md). Script sau tự cd project, tạo fixture riêng, mở cửa sổ và kiểm hash khi đóng:
+
+```powershell
+powershell -NoProfile -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Preview-DiskReview.ps1"
+```
 
 Mở `MemoryClear-Plan.html`; nguồn trạng thái ở `plan/tasks.json`. Kết thúc mọi phase phải có tài liệu trong `docs/handoffs/` theo `TEMPLATE.md`.
 

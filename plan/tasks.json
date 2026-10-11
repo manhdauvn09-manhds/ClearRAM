@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "project": "MemoryClear",
-  "revision": "2026-10-08.5",
-  "updated": "2026-10-08",
-  "assumption": "Đã chốt PowerShell GUI trước: Windows 10/11 x64, Windows PowerShell 5.1 + WPF, portable folder + CLI. Clear một chạm không cần chọn; có tiến trình/quét/xử lý/hoàn tất và tùy chọn Clear mạnh hơn (opt-in), cả hai chỉ trim working set, giữ process/dữ liệu. Đóng/force kill xác nhận riêng, auto kill tắt; app cá nhân chưa được cung cấp. C#/Avalonia và Linux để sau.",
+  "revision": "2026-10-11.1",
+  "updated": "2026-10-11",
+  "assumption": "Windows11/PS5.1 portable preview. Clear Normal/Strong và Dọn Temp có duyệt đã có chức năng thật; không tự kill hoặc xóa dữ liệu app tùy ý. Memory3: saved executable opt-in, native PID/start/window/exe fingerprint, frozen plan/TTL/permission revalidation, graceful-only executor và worker/progress/cancel/journal đã chuẩn bị. QA chỉ đóng app thử nghiệm mới tạo; không sửa settings hoặc đóng app người dùng. Shipped executionEnabled=false giữ gate SAFE-04/QA-02 chưa đủ; không tự force. Windows10/VM, human DPI/save-dialog, orphan appdata production và backup khác ổ chưa nghiệm thu. Bộ portable có script build/checksum/manifest, không kèm .data. Phase10/12 chưa hoàn tất; mọi handoff/status phản ánh giới hạn thực tế.",
   "tasks": [
     {
       "id": "DOC-01",
@@ -674,12 +674,12 @@
         "QA-03",
         "HO-06"
       ],
-      "owner": "Chưa phân công",
+      "owner": "Codex",
       "estimate": "1–2 ngày",
       "acceptance": "Có artifact theo kiến trúc đã chốt, version/checksum, README chạy/quyền/giới hạn, đường dẫn settings/log; không tự thêm startup/service.",
-      "evidence": "",
-      "notes": "Quyết định ký số và kênh phân phối được ghi rõ, không tuyên bố đã ký nếu chưa làm.",
-      "updated": "2026-10-07"
+      "evidence": "scripts/Build-Portable.ps1; docs/verification/portable-build.json khi build hoàn tất; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed)",
+      "notes": "Portable preview được user yêu cầu build trực tiếp. Không là nghiệm thu release/gates/phụ thuộc hoặc binary signing/Win10. Không chứa .data/harness/secrets. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance.",
+      "updated": "2026-10-11"
     },
     {
       "id": "REL-02",
@@ -829,9 +829,502 @@
       "evidence": "",
       "notes": "Nếu tạm dừng trước khi xong phase, viết handoff nháp và giữ doing/review. Không cần xin phép riêng để tạo tài liệu handoff.",
       "updated": "2026-10-07"
+    },
+    {
+      "id": "CD-DES01",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Ba mức, catalogue và kiến trúc Clean Data",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "DOC-02"
+      ],
+      "owner": "Codex",
+      "estimate": "Đã làm",
+      "acceptance": "Có retention, ownership, quyền UAC, manifest/revalidate, backup/restore, metrics và gate triển khai.",
+      "evidence": "docs/CLEAN_DATA_ARCHITECTURE.md; plan/clean-data-design.json + schema.",
+      "notes": "Thiết kế; retention/helper trust/backup destination chưa do người dùng chốt.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-DES02",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Plan HTML và prototype tương tác offline",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-DES01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5 ngày",
+      "acceptance": "HTML đẹp responsive; mô phỏng scan/ba mức/review/backup/manifest/progress/cancel/history; cờ simulated, không đọc/xóa FS.",
+      "evidence": "MemoryClear-CleanData-Plan.html + MemoryClear-CleanData-Prototype.html; plan/build-clean-data.mjs; 13/13 design/model/DOM checks. Browser visual QA blocked by file:// policy and documented, not claimed passed.",
+      "notes": "Code Clean thật chưa tích hợp vào GUI PowerShell.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-DES03",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Kiểm chứng contract và luồng prototype",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-DES02"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5 ngày",
+      "acceptance": "Schema, protected/default/review/admin/busy/TTL/backup/unknown tests; verify JS/HTML/tracker; ghi giới hạn browser và runtime thật.",
+      "evidence": "node plan/check-clean-data.mjs 13/13; docs/verification/clean-data-design-checks.json. node plan/build-plan.mjs + node plan/check-plan.mjs PASS source/HTML/gates/import/export. PS5.1.26100.9444 launcher AST parse PASS (not executed). No real FS/UAC/VM/restore/visual browser checks.",
+      "notes": "",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "HO-09",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Handoff kết thúc phase thiết kế Clean Data",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-DES01",
+        "CD-DES02",
+        "CD-DES03",
+        "CD-DES04",
+        "CD-DES05"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25 ngày",
+      "acceptance": "docs/handoffs/PHASE-09-HANDOFF.md theo TEMPLATE.md; evidence task/checks; không coi design-only là executor phát hành.",
+      "evidence": "docs/handoffs/PHASE-09-HANDOFF.md cập nhật09.2, CD-DES04/05 complete,18 Disk checks + plan build/check PASS; root Handoff updated. Runtime phase10 still pending.",
+      "notes": "",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-SCOPE",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Chốt retention, backup và trust privileged helper",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "HO-09"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25–0.5 ngày",
+      "acceptance": "Chốt ba mức và rule retention; backup destination; helper ký/cài protected hoặc OS delegation; không bypass UAC.",
+      "evidence": "User reply trực tiếp: Portable + Windows xử lý mục hệ thống; Cho xóa vĩnh viễn sau hai bước duyệt. Giữ retention7/14/3 theo design; không cài elevated helper; chưa tự chọn app/file cá nhân. Runtime policy app/clean-data-policy.json.",
+      "notes": "User xác nhận chỉ có Windows11 hiện tại. Tiếp tục local Win11; không ghi coverage Windows10/VM và không hỏi lại có VM. Portable + Windows system delegation, permanent data qua hai bước duyệt giữ nguyên. Đã duyệt triển khai; không yêu cầu user confirm lại phương án. Production permanent cần đúng item/scope approval và guards, chưa mở từ HTML/scan.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-01",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Scanner readonly có identity và scope guard",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-SCOPE",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–2 ngày",
+      "acceptance": "OS-volume/SID/KnownFolder, streaming/paging, allocated size/dedupe; không follow reparse/cloud/UNC; permission unknown không zero; test/đo RAM.",
+      "evidence": "Native FileID/ancestor/allocated scan/paging/filters + ProbeDirectory; Inventory18/18 + AppProfiles16/16 fixtures PS5.1.26100.9444. Latest inventory WS90.4MB, no real user cleanup.",
+      "notes": "Scanner readonly đạt local fixtures; unsupported longpath báo Partial. Số WS là snapshot, không GUI/VM/soak benchmark.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-02",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Inventory app và evidence dữ liệu còn sót",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-01"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "HKCU/HKLM 32/64/MSIX/portable/shared/vendor; không Win32_Product; appdata unknown protected, ứng viên cần user review. App removed cache/empty chỉ safe khi owner/no-live-dependency/dataClass xác minh; mixed/user data review.",
+      "evidence": "OwnerHistory.ps1 + native ObservationStore và policy/payload schemas: metadata observations with UTC/source/InstallationId/version, SID/catalog/root binding, expiry/future/corrupt/locked/junction/hardlink guards, never uninstall/deletion authority. History17/17 + Ownership13/13 + AppProfiles16/16 fixtures PS5.1.26100.9444. docs/CLEAN_DATA_OWNER_HISTORY.md; disk-owner-history-tests.json.",
+      "notes": "Lịch sử local là supporting evidence, checksum không chống giả mạo. Còn independent uninstall/version cache semantics/no-live-dependency và live registry/CIM/MSIX/VM proof. Production cleanup disabled.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-03",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Tích hợp tab Clean Data vào WPF",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-01",
+        "CD-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Category/file preview, three levels, progress/cancel, background runspace, single operation RAM/Disk, keyboard/DPI. Bốn nhãn risk, safe trực tiếp không popup, file finder, warning chỉ risky đã chọn, danger hai bước.",
+      "evidence": "DiskUI30 + ReviewUI16 + OperationUI13 PASS; Disk29controls, operation27controls. Native workers Run/Inspect/Restore/History với DispatcherTimer thật, mode resets approval, progress/cancel/final metrics, shared modal lock, recent uninspected history; PNG operation viewed. docs/CLEAN_DATA_OPERATIONS.md.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded)",
+      "notes": "10.3: thêm cửa sổ Temp thật riêng; checkbox một click/two-way, hai bước cố định danh sách, shared lock, worker/timer, X/N/elapsed/endtime/cancel. 7/7 offscreen QA đạt; chưa human/DPI acceptance. Production paths vẫn blocked. Còn production backup destination/external provider, risk authority integration, keyboard/DPI/operator/Win10-11 acceptance. Interactive example script chưa tự launch.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-04",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Scope guard và revalidation độc lập",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-01",
+        "CD-SCOPE"
+      ],
+      "owner": "Codex",
+      "estimate": "2–3 ngày",
+      "acceptance": "Portable user-only: independent caller/policy/manifest/scope/TTL/risk validation; protected/unknown cannot override. Stable handles/identity/race/file replacement/junction/destination checks; Windows system actions delegated, không elevated helper/bypass.",
+      "evidence": "Guard9 + FixtureExecutor17 baseline; Operations17 PASS: độc lập labels/scope/SID/TTL/policy, frozen payload/content SHA256, held-source hash before mutation, consume under mutex, replay/back/context/destination guards. Native metadata-preserving content swap bị chặn. disk-operations-tests.json.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded)",
+      "notes": "10.3: independent ReviewedTopLevelOwnTemp capability đã hoạt động trên file QA trong Temp thật (12/12). Native root/owner/SID/non-elevated/ancestor/FileID/hash/same-handle delete, no recursive/force/replay. Mọi ứng viên Review; age/type không Safe proof. General finder/appdata authority vẫn khóa, vendor/uninstall production còn thiếu. Đã có independent fixture authority. Production owner/risk/manifest authority chưa triển khai; process-local state/hash không privileged boundary. Mapped writers/filter drivers/multi-instance/VM còn thiếu.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-05",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Journal, executor và backup/restore",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-03",
+        "CD-04"
+      ],
+      "owner": "Codex",
+      "estimate": "2–3 ngày",
+      "acceptance": "Chỉ fixture/VM: hash-verified external backup trước xóa; same-volume gain 0; full disk/destination loss/crash/cancel/restore conflict giữ dữ liệu đúng. Risk gate independent executor, blocked no override, danger final scope approval; empty folder revalidate no new child.",
+      "evidence": "Operations17 + actual Crash3 + OperationUI13 PASS. Same-handle backup/hash/delete, v3 durable header/stages/receipt/Finished, separate restore log; partial-copy+verified rename handle no overwrite, backup retained; actual child exit77 after BackupVerified/DeleteStarted/Committed then inspect/survive/restore. disk-crash-tests.json.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json",
+      "notes": "10.3: Temp riêng là permanent sau hai bước, không Undo/backup; UI ghi rõ. Không dùng capability này để xóa dữ liệu app. Backup/restore production khác volume vẫn chưa triển khai/kiểm chứng; fixtures giữ nguyên. Backup fixture cùng volume gain0. External backup provider/full disk/disconnect/power loss chưa có; no auto replay/overwrite. Windows10/11/filter/mapped-write matrix và production authority còn thiếu.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-06",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Provider Windows và vendor cache",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-04",
+        "CD-05"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Capability Win10/11, servicing/update/reboot guard; DISM không ResetBase, DO supported; Storage Delegated nếu không có API kiểm chứng; không tự xóa repair cache.",
+      "evidence": "WindowsProviders.psm1 + data/schema fixed URI allowlist Storage/Apps/Update; authoritative registry build provenance, Prepared/Delegated/Unavailable/Failed, unknown DeletedBytes.5 provider checks PASS no launch; GUI Dọn bằng Windows + apps buttons/shared lock. Official Learn Settings URI sources in CLEAN_DATA_OPERATIONS.md.",
+      "notes": "Chỉ delegated, không direct servicing/DO/delete/UAC bypass. Launch/cleanup completion chưa interactive verify; CD04/05 production gates chưa done.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-07",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Ma trận VM và nghiệm thu số liệu",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-02",
+        "CD-03",
+        "CD-05",
+        "CD-06",
+        "CD-09"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–2 ngày",
+      "acceptance": "Win10/Win11 disposable VM, data survival/restore/TOCTOU/admin denial, progress/cancel, allocated vs free delta, performance; không xóa dữ liệu làm việc thật.",
+      "evidence": "Current Windows11 client build26200/25H2 (registry provenance), local readiness11 steps PASS; actual fixture crash3 checkpoints và WPF timer workers. artifacts/readiness-20261010-094026-2c5c13f5/readiness.json; operations-session-verification.json. VM flagfalse, no VM proof.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded)",
+      "notes": "10.3: Win11 host26200/25H2 PS5.1.26100.9444, own QA Temp native12 + WPF7 đã đạt; không xóa file có sẵn. User chỉ có Win11. Win10/VM/external faults/mapped writers vẫn unverified. Chưa chạy Win10/Win11 disposable VM matrix, external/full disk/power loss/mapped-write/multi-instance/keyboard/DPI/performance nghiệm thu. Local pass không thay VM.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "CD-08",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Operator acceptance, đóng gói và docs",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-07"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Script PS5.1 self-contained/idempotent cho operator; docs/runbook/trust signing; artifact và nghiệm thu user có evidence.",
+      "evidence": "Verify-Readiness.ps1 self-cd PS5 checks + optional -Package/-OpenApp; Preview-DiskOperations.ps1 interactive fixture sample. Package-Preview.ps1 thêm Memory/Disk plans và verifies new module/policy/script entries. CLEAN_DATA_OPERATIONS.md/runbook; chưa chạy package hoặc operator acceptance.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json",
+      "notes": "10.3: script Verify-OwnTemp.ps1 tự cd, quyền user, chỉ exact GUID files mới tạo; Verify-Readiness có -OwnTempSelfTest, guard-only report riêng. Chưa package/signing/operator acceptance/server CI. Giữ preview/release unverified; chưa signed artifact, package readback/user acceptance hoặc full gates. Không mark done từ script tồn tại.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "HO-10",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "Handoff kết thúc triển khai Clean Data",
+      "priority": "P0",
+      "status": "doing",
+      "deps": [
+        "CD-SCOPE",
+        "CD-01",
+        "CD-02",
+        "CD-03",
+        "CD-04",
+        "CD-05",
+        "CD-06",
+        "CD-07",
+        "CD-08",
+        "CD-09"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25 ngày",
+      "acceptance": "docs/handoffs/PHASE-10-HANDOFF.md theo TEMPLATE.md; tất cả task/gates có evidence, incomplete giữ draft/review.",
+      "evidence": "docs/handoffs/PHASE-10-HANDOFF.md draft10.2; readiness artifacts/readiness-20261010-094026-2c5c13f5/readiness.json executed11 steps PASS: Disk189/13 suites + Clear12 + core14 + checkbox PASS + builders/plan/Disk18/Memory13/runtime-policy5/PS5 parser. operations-session-verification.json giữ source hashes/OS provenance và first failed test count trace. Production/VM/release chưa đạt; không newCI/commit/push.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded); artifacts\\readiness-20261011-020325-f5b9e55a\\readiness.json; artifacts\\readiness-20261011-020956-50571223\\readiness.json",
+      "notes": "Draft10.4: Temp production hẹp12+7 đạt; phase10 còn app/orphan authority, external backup và release matrix. Memory scope đã chốt ở ML-SCOPE; không đóng phase khi còn gate. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp.",
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "CD-DES04",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Policy cảnh báo theo risk, app đã gỡ và file lớn",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-DES01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Safe trực tiếp không popup; danger hai bước, protected không override; verified cache/empty app đã gỡ; large finder age/size/filter chỉ đề xuất.",
+      "evidence": "docs/CLEAN_DATA_ARCHITECTURE.md mục9; plan/clean-data-design.json v2 + schema; safe/review/danger/blocked, verified removed cache/empty, large finder readonly; plan HTML updated.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-DES05",
+      "phase": "09 · Clean Data — thiết kế",
+      "scope": "docs",
+      "title": "Prototype Disk mới và kiểm chứng risk gates",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "CD-DES04",
+        "CD-DES02"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Không warning cho safe; risky selected-only, dangerous typed confirmation, blocked cannot override; file lớn không auto chọn; progress/cancel/history đúng.",
+      "evidence": "node plan/check-clean-data.mjs 18/18 PASS; docs/verification/clean-data-design-checks.json; safe direct/no-popup, selected risky warning, dangerous phrase, large filter/no-auto-select, backup-zero and blocked gates. Visual/native checks unverified.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "CD-09",
+      "phase": "10 · Clean Data — triển khai",
+      "scope": "mvp",
+      "title": "File lớn/cũ và gợi ý ứng viên không auto-delete",
+      "priority": "P0",
+      "status": "review",
+      "deps": [
+        "CD-01",
+        "CD-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Readonly KnownFolder/user-selected scopes, thresholds/age/type, allocated/logical/hardlink dedupe, locked/cloud/source guard; explicit per-file effects, no size→junk inference.",
+      "evidence": "Actual WPF/native finder: default512MB, configurable1–1048576 MB/age0–36500/extensions≤16, scoped local KnownFolder subfolder chooser; filters before matched/page/totals, NeedsReview/no auto-select, reset preview on scope change. Inventory18/18 + UI16 assertions PASS.",
+      "notes": "Review: CD-02 ownership chưa done; custom folder positive/operator dialog/keyboard/DPI/Win10-11 VM and future provider dedupe chưa nghiệm thu. Finder không có deletion authority.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "MB-DES01",
+      "phase": "11 · Memory ba mức — thiết kế",
+      "scope": "docs",
+      "title": "Thiết kế Memory ba mức và task effects",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "HO-09"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Normal/Strong giữ trim; L3 disposable/profile close, force riêng; CPU/commit giải thích, protected/unknown chặn, không auto fallback.",
+      "evidence": "docs/MEMORY_THREE_LEVELS_DESIGN.md; plan/memory-design.json + schema; three profiles, effects/authority/guards. No runtime PS policy change.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "MB-DES02",
+      "phase": "11 · Memory ba mức — thiết kế",
+      "scope": "docs",
+      "title": "Prototype hai tab Memory / Disk chung UI",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "MB-DES01"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Ba level cards cả hai tab; effects/reason/risk, safe direct, review/force scoped confirmation, progress/cancel/history riêng, single-operation lock.",
+      "evidence": "MemoryClear-Memory-Plan.html + shared MemoryClear-CleanData-Prototype.html; three cards each tab, effects/review/typed force, progress/cancel/history/shared lock. No real process or file operation.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "MB-DES03",
+      "phase": "11 · Memory ba mức — thiết kế",
+      "scope": "docs",
+      "title": "Kiểm chứng Memory model, gate và luồng chung",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "MB-DES02"
+      ],
+      "owner": "Codex",
+      "estimate": "0.5–1 ngày",
+      "acceptance": "Fixture: safe no-popup, protected/service/foreground, allowlist/start-time, force typed name, close save prompt no fallback, expiry/cancel/inter-tab lock; no real trim/kill.",
+      "evidence": "node plan/check-memory-design.mjs 13/13 PASS; docs/verification/memory-design-checks.json; schema/model/DOM fixtures/force identity/held save/shared lock. node plan/build-plan.mjs + check-plan PASS revision09.2; PS5.1.26100.9444 launcher parser PASS, not executed. Visual/native/VM unverified.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "HO-11",
+      "phase": "11 · Memory ba mức — thiết kế",
+      "scope": "docs",
+      "title": "Handoff thiết kế Memory ba mức",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "MB-DES01",
+        "MB-DES02",
+        "MB-DES03"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25 ngày",
+      "acceptance": "docs/handoffs/PHASE-11-HANDOFF.md theo template; task/evidence và giới hạn visual/VM/runtime thật rõ.",
+      "evidence": "docs/handoffs/PHASE-11-HANDOFF.md; required design tasks complete,13 Memory +18 Disk fixture checks/plan gates PASS, limitations recorded; Handoff.md updated. Runtime phase12 pending user confirm/gates.",
+      "notes": "Thiết kế/prototype không là evidence hành động thật.",
+      "updated": "2026-10-09"
+    },
+    {
+      "id": "ML-SCOPE",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "Chốt profile task disposable / close / force",
+      "priority": "P0",
+      "status": "done",
+      "deps": [
+        "HO-11"
+      ],
+      "owner": "Người dùng",
+      "estimate": "Chờ người dùng review",
+      "acceptance": "Chốt app cụ thể, effects chấp nhận và quyền close/force riêng; allowlist mặc định trống, không auto chọn từ tên/CPU/RAM.",
+      "evidence": "Trả lời trực tiếp 2026-10-10: Dùng danh sách tôi tự cho phép trong app (đề xuất). docs/MEMORY_TASK_RUNTIME.md.",
+      "notes": "Đã chốt saved Cho đóng gấp executable paths, mặc định trống; chỉ graceful, giữ save prompt/timeout, không tự force. Không infer app từ tên/RAM/CPU. Không hỏi lại phạm vi này.",
+      "updated": "2026-10-10"
+    },
+    {
+      "id": "ML-01",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "Planner ba mức và policy/task identity",
+      "priority": "P0",
+      "status": "doing",
+      "deps": [
+        "ML-SCOPE",
+        "HO-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Giữ Normal/Strong policy, vendor/profile identity/ownership/dependency, risk/effects, manifestTTL/start-time recheck, unknown fail closed.",
+      "evidence": "app/MemoryClear.Tasks.psm1; app/Native.cs; docs/verification/task-release-tests.json (13/13 own-child checks); artifacts\\readiness-20261011-020956-50571223\\readiness.json",
+      "notes": "Native nonempty opt-in/fingerprint, context/ack/settings/TTL/no-replay, fresh missing services/hash/window rejection và graceful timeout/cancel đã có trace trên app QA riêng. Test foreground/service/settings/policy providers synthetic, không là full production safety acceptance. Giữ doing, chưa đủ các phụ thuộc nghiệm thu toàn phase.",
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "ML-02",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "WPF level cards và preview cảnh báo có scope",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ML-01"
+      ],
+      "owner": "Codex",
+      "estimate": "1–2 ngày",
+      "acceptance": "Ba cards/inlineeffects, safe no-popup, selected-risk review/force name confirm, operation lock RAM/Disk, DPI/keyboard/progress/cancel.",
+      "evidence": "app/MemoryTaskView.xaml/.ps1; docs/verification/task-ui-tests.json (6/6 real worker/DispatcherTimer checks); docs/verification/memory-level-tests.json",
+      "notes": "Đã chuẩn bị ack/rescan/progress X/N/elapsed/endtime/cancel và close cleanup, main modal giữ operation lock. Gate sản phẩm vẫn đóng. Human keyboard/DPI và nonempty GUI execution chưa kiểm chứng; chưa nghiệm thu trước ML-01.",
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "ML-03",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "Executor Close / Force độc lập có guards",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ML-01",
+        "ML-02",
+        "SAFE-04",
+        "QA-02"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–2 ngày",
+      "acceptance": "Graceful exit và verify, save prompt/timeout held gain0; force plan mới/quyền riêng/fresh identity; không kill tree/service/auto escalation.",
+      "evidence": "app/MemoryClear.Tasks.psm1; app/Native.cs; memory-operation journal QA; docs/verification/task-release-tests.json",
+      "notes": "Executor graceful-only đã chuẩn bị/test child riêng: verified exit, refusal timeout, cancel sau WaitingForExit, không force/tree/service/escalation. Shipped executionEnabled=false; giữ chưa nghiệm thu vì SAFE-04/QA-02 chưa đủ. Manual Force cũ là thao tác riêng, không fallback tự động.",
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "ML-04",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "VM safety/permissions/metrics và nghiệm thu",
+      "priority": "P0",
+      "status": "todo",
+      "deps": [
+        "ML-03"
+      ],
+      "owner": "Codex",
+      "estimate": "1.5–2 ngày",
+      "acceptance": "PID reuse/critical/foreground/denial/savedprofilechanges, unsaved data/cancel/multi-instance, CPU vs working set/commit, Win10/11, user acceptance có trace.",
+      "evidence": "artifacts\\readiness-20261011-020956-50571223\\readiness.json; docs/verification/task-release-tests.json; docs/verification/task-ui-tests.json",
+      "notes": "Có local Windows11 evidence; không suy ra Win10/VM/CLI parity/human save-dialog/window adversarial race acceptance. Full phase còn thiếu.",
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "HO-12",
+      "phase": "12 · Memory ba mức — triển khai",
+      "scope": "mvp",
+      "title": "Handoff triển khai Memory ba mức",
+      "priority": "P0",
+      "status": "doing",
+      "deps": [
+        "ML-SCOPE",
+        "ML-01",
+        "ML-02",
+        "ML-03",
+        "ML-04"
+      ],
+      "owner": "Codex",
+      "estimate": "0.25 ngày",
+      "acceptance": "docs/handoffs/PHASE-12-HANDOFF.md theo template, mọi gates/tasks/evidence trước done.",
+      "evidence": "docs/handoffs/PHASE-12-HANDOFF.md; artifacts\\readiness-20261011-020956-50571223\\readiness.json; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed)",
+      "notes": "Draft cập nhật 2026-10-11.1; backend/UI QA và chuẩn bị bộ portable, phase12 chưa complete. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance.",
+      "updated": "2026-10-11"
     }
   ],
-  "previousRevision": "2026-10-08.4",
+  "previousRevision": "2026-10-10.3",
   "previousTaskIds": [
     "DOC-01",
     "DOC-02",
@@ -876,7 +1369,34 @@
     "EXT-02",
     "EXT-03",
     "EXT-04",
-    "HO-08"
+    "HO-08",
+    "CD-DES01",
+    "CD-DES02",
+    "CD-DES03",
+    "HO-09",
+    "CD-SCOPE",
+    "CD-01",
+    "CD-02",
+    "CD-03",
+    "CD-04",
+    "CD-05",
+    "CD-06",
+    "CD-07",
+    "CD-08",
+    "HO-10",
+    "CD-DES04",
+    "CD-DES05",
+    "CD-09",
+    "MB-DES01",
+    "MB-DES02",
+    "MB-DES03",
+    "HO-11",
+    "ML-SCOPE",
+    "ML-01",
+    "ML-02",
+    "ML-03",
+    "ML-04",
+    "HO-12"
   ],
   "handoffPolicy": "Cuối mỗi phase bắt buộc tạo docs/handoffs/PHASE-XX-HANDOFF.md theo TEMPLATE.md, cập nhật evidence của HO-XX và gửi link cho người dùng. Phase chỉ hoàn tất khi task và handoff đã hoàn tất. Nếu dừng giữa chừng, viết bản nháp và giữ trạng thái chưa hoàn tất."
 }

@@ -1,0 +1,226 @@
+{
+  "Timestamp": "2026-10-11T02:11:47.819Z",
+  "Revision": "2026-10-11.1",
+  "Readiness": "artifacts\\readiness-20261011-020956-50571223\\readiness.json",
+  "Status": "LocalChecksPassed_ReleaseUnverified",
+  "TaskChecks": 13,
+  "TaskUIChecks": 6,
+  "MemoryTaskExecutionEnabled": false,
+  "ReadinessSourceHashes": [
+    {
+      "Path": "app\\clean-data-policy.json",
+      "Sha256": "164DFF2CCE7BA8B8A5BFD3A2C45401744D5704460A9077A2A4743DE2BA5F135E"
+    },
+    {
+      "Path": "app\\clean-data-policy.schema.json",
+      "Sha256": "90BEE3725BF1BAB91E497E5D5480C74E9216CF6C377CF11DDD47547F2D85A9EE"
+    },
+    {
+      "Path": "app\\clear-policy.json",
+      "Sha256": "D827FB005A252D41D6758B80B24E7C52A089F7F4D7E24DF1869A09C4ECCF8749"
+    },
+    {
+      "Path": "app\\clear-policy.schema.json",
+      "Sha256": "EE97318A3BD0E6A702D2AFDCB12BA80EDE1644C98C69613416C1672A159F0EB6"
+    },
+    {
+      "Path": "app\\disk-app-profiles.json",
+      "Sha256": "4A526BA9E3A7E07E79C404791EDCF9B4CD7A3EA478B9DE1A2CC839C13422FFC5"
+    },
+    {
+      "Path": "app\\disk-app-profiles.schema.json",
+      "Sha256": "A921ED1E7F29344D24A8D8C632EC071E0DAB9A8F46D04BF74D32034A92AE4BF9"
+    },
+    {
+      "Path": "app\\disk-execution-policy.json",
+      "Sha256": "96C737CD17BD472E39915B7569ED1ABD68EE545F2ADA14070B57FBE67B2FE378"
+    },
+    {
+      "Path": "app\\disk-execution-policy.schema.json",
+      "Sha256": "59908D40DE8A358C1F49021362595DC603010E276607AF191142EF0A02DBD3B0"
+    },
+    {
+      "Path": "app\\disk-review-policy.json",
+      "Sha256": "2737A7BB48082138BD5C0E1E097666FC704258B3813C8DAD5FDB2A157F0F4B79"
+    },
+    {
+      "Path": "app\\disk-review-policy.schema.json",
+      "Sha256": "2515FC5C87D39C6EAEEB25DA5596E84BF2A1FA17290A4106B002128F5A6445BA"
+    },
+    {
+      "Path": "app\\MainWindow.xaml",
+      "Sha256": "DBA95ED719608307A9C3E182D0854B7FC935B3A1A2957AC5E6F8F0E079E4C598"
+    },
+    {
+      "Path": "app\\memory-task-policy.json",
+      "Sha256": "54352BB196D629EE3B815246B642ED089E1A1C1366280BA90AE67D4DBB86E87C"
+    },
+    {
+      "Path": "app\\memory-task-policy.schema.json",
+      "Sha256": "5E8E203773D189A7F845A10E4DCF8CE088C730DEF393DA7046F5C4F208111A82"
+    },
+    {
+      "Path": "app\\MemoryClear.Clear.psm1",
+      "Sha256": "9C1ADAF76195F943F39AF5E64383F2076BB31EA7F54ED0878EB277B3451234B3"
+    },
+    {
+      "Path": "app\\MemoryClear.Core.psm1",
+      "Sha256": "B9F29CCD1806913501563DC6D27B2FFF013B2B1C06FA11845489EB4D974C1A4A"
+    },
+    {
+      "Path": "app\\MemoryClear.Tasks.psm1",
+      "Sha256": "684077169A2E71AED84899581599BF8DE7DA2369F9380378A892B634207D86C2"
+    },
+    {
+      "Path": "app\\MemoryTaskView.ps1",
+      "Sha256": "DFB01FC3AA3E7DB1A779330A5323038A7494929811F6E0FFAE7678A6D942282A"
+    },
+    {
+      "Path": "app\\MemoryTaskView.xaml",
+      "Sha256": "26FFD187B562E6CFB37AFBE5A542C62734B599F2F0FE713BA757BE7480F9860C"
+    },
+    {
+      "Path": "app\\Native.cs",
+      "Sha256": "4A4344D256620D9E61F3E66A1572376E07A1DDC0B88CE19157502BAE8906059B"
+    },
+    {
+      "Path": "app\\owner-analysis-policy.json",
+      "Sha256": "98B7A1C2EFFA6AEDDA7BA3B4F8520025F3F50C147111F3DA5C56B6E784DCA868"
+    },
+    {
+      "Path": "app\\owner-analysis-policy.schema.json",
+      "Sha256": "FF3AF24E8EEC63DD40E6A3FEA2A871AFA4957A518C0F417733345928C6F6A917"
+    },
+    {
+      "Path": "app\\owner-history-payload.schema.json",
+      "Sha256": "8656ABECAE0783EB07C8840199F7562D339EA734DC99768094B80C51992CB68B"
+    },
+    {
+      "Path": "app\\owner-history-policy.json",
+      "Sha256": "215128EEE0FC15C133CCA243A913BFF3F01775EF2994DF825A164022463245FB"
+    },
+    {
+      "Path": "app\\owner-history-policy.schema.json",
+      "Sha256": "23B08B9AD8BF514486992021D349360CAE25760983DD85614B635972A6E9A1DE"
+    },
+    {
+      "Path": "app\\temp-cleanup-policy.json",
+      "Sha256": "108FA62B401C27304D84F571A2633D1FE0FA4EFAD08202E16BAB1EEEE7376EEE"
+    },
+    {
+      "Path": "app\\temp-cleanup-policy.schema.json",
+      "Sha256": "2134FE96DDBE1D13D6FBE2DFBF41BD704A140049A32F0A1875282CE4F33387A8"
+    },
+    {
+      "Path": "app\\windows-cleanup-providers.json",
+      "Sha256": "9754085430D10F90ED08A11C940F35ADD74CCE0EBF7D0252937CD27C47D25C12"
+    },
+    {
+      "Path": "app\\windows-cleanup-providers.schema.json",
+      "Sha256": "BBCDD1297722D6576F4A0466019D792FEF3B2602170D1188899A8D11A43EC31C"
+    },
+    {
+      "Path": "app\\CleanData\\AppProfiles.ps1",
+      "Sha256": "390B5A4A7AE252DE472A4DE4785C378605051FC8648DCF0181ACB40912A4885F"
+    },
+    {
+      "Path": "app\\CleanData\\DiskView.ps1",
+      "Sha256": "A0AAF58A21E4679497A8FA1DD25EFC030C685D2A04E045AC72C005288787CFB9"
+    },
+    {
+      "Path": "app\\CleanData\\DiskView.xaml",
+      "Sha256": "B5FD400993BB79D5528B15D6AD475DADEB4BA2FF738FDEBEE68E2E96AF75C1EF"
+    },
+    {
+      "Path": "app\\CleanData\\FileInventory.cs",
+      "Sha256": "50E4738047F0A5BD56472B2A6EFFB78235B99EF23BC4E6533E8D5998480CEBC7"
+    },
+    {
+      "Path": "app\\CleanData\\FixtureExecutor.psm1",
+      "Sha256": "AF4BEE244882ADA6F62588EADD462DE611FCCED7D771BDD3060F0ADF3B25CB99"
+    },
+    {
+      "Path": "app\\CleanData\\MemoryClear.Disk.psm1",
+      "Sha256": "4D3583133431FB8D6D87103E1D24CB1A161D5FC96EFC283394C9A5F0EE9D3E98"
+    },
+    {
+      "Path": "app\\CleanData\\Operations.psm1",
+      "Sha256": "968B9E65DE9BD8CC8408E2538F220443FC49B1D0724EDD20C920CC437030167A"
+    },
+    {
+      "Path": "app\\CleanData\\OperationView.ps1",
+      "Sha256": "1E92DC06726D536C637013A94180A3260B81C3FEBDC5942566C1F5D58251E3D7"
+    },
+    {
+      "Path": "app\\CleanData\\OperationView.xaml",
+      "Sha256": "F7E34A6D44E93521E5C47E8472000B2EB9D9FEF10434D3253A45932B21C41B6C"
+    },
+    {
+      "Path": "app\\CleanData\\OwnerHistory.ps1",
+      "Sha256": "5F14DE7255E6CB75E04098FA2911D1BF3E04F626735E69CD894BEB9D047EA559"
+    },
+    {
+      "Path": "app\\CleanData\\Ownership.ps1",
+      "Sha256": "A035C8A4697C54F2887872FFA50D362F00051B7B87D93A59AB82AC2B4EBA05F2"
+    },
+    {
+      "Path": "app\\CleanData\\Review.psm1",
+      "Sha256": "851FAEDB37C0DD1712DAA7F3A3BAE65FD3DE9399ED1462E23A897C73C856BA59"
+    },
+    {
+      "Path": "app\\CleanData\\ReviewView.ps1",
+      "Sha256": "5BA24CB3FE4F5323D315CF00B788EACB063D0FD8DFED4DE7816CE1C1519552FA"
+    },
+    {
+      "Path": "app\\CleanData\\ReviewView.xaml",
+      "Sha256": "940B70C37BDF81A081D23B8F7DDFC77C40A495344293687375E8E3A916ADA2F8"
+    },
+    {
+      "Path": "app\\CleanData\\TempCleanup.psm1",
+      "Sha256": "05AAB4965A04B49A35E579C009CE8C060FD6B1E9E3D98FC53CF0E47227EC5779"
+    },
+    {
+      "Path": "app\\CleanData\\TempView.ps1",
+      "Sha256": "944A1FBFC69B7D5316169685CAA907F9CFDC8663C4990DA85E9223BCCF5A8216"
+    },
+    {
+      "Path": "app\\CleanData\\TempView.xaml",
+      "Sha256": "9813309EB50EF2A89787F2B34EF12297906B8ADCEEBA89F50DE11BE8D4439449"
+    },
+    {
+      "Path": "app\\CleanData\\WindowsProviders.psm1",
+      "Sha256": "A41B7832B154DB91EA361968610752808D1B00BC8100F34132B06B745EEBAEEB"
+    },
+    {
+      "Path": "MemoryClear.ps1",
+      "Sha256": "80ACCF29B3A5074E5A790FB795C09A77A44358CC4327AF0A3C202919AAC92362"
+    },
+    {
+      "Path": "MemoryClear.Cli.ps1",
+      "Sha256": "3FF6F32D13FCA89269E7E8477929B690D9E41B4CB1D5B34498B9310D2E7E2B8E"
+    }
+  ],
+  "MissingEvidence": [
+    "Verified orphan/app-data production authority",
+    "Windows10 and Windows11 VM matrix",
+    "External backup/full disk/disconnect and power loss",
+    "Mapped writers/filter drivers/multi-instance",
+    "Keyboard/DPI/operator acceptance"
+  ],
+  "BuildResult": "See docs/verification/portable-build.json; packaging is separate from release acceptance",
+  "Build": {
+    "Timestamp": "2026-10-11T02:11:57.2012767Z",
+    "Version": "2026.10.11.1-preview",
+    "Folder": "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear",
+    "Launcher": "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear\\Start-MemoryClear.cmd",
+    "Archive": "E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\artifacts\\releases\\20261011-111149-936015\\MemoryClear-2026.10.11.1-preview.zip",
+    "Sha256": "B9914C4DFF4B48837E261B60F3E5A10E4FBEB35F2DB4EF97AE68333BFE6B9AD7",
+    "FileCount": 55,
+    "PackagedControlsSmoke": "Passed",
+    "ArchiveEntryHashes": "Passed",
+    "ReleaseAcceptance": "Unverified",
+    "MemoryTaskExecutionEnabled": false
+  },
+  "PostBuildRuntimeHashes": "Match latest readiness",
+  "Shortcut": "artifacts/portable-desktop-shortcut.json"
+}

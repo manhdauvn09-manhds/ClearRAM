@@ -1,0 +1,8 @@
+{
+ "$schema":"./clean-data-policy.schema.json",
+ "governs":"product_runtime","schemaVersion":1,
+ "executionEnabled":false,"privilegedWrites":false,"followReparsePoints":false,
+ "maxRows":1000,"maxEntries":50000,"maxSeconds":30,"largeMinimumMB":512,
+ "levels":[{"id":1,"tempDays":7,"logDays":30},{"id":2,"tempDays":7,"logDays":14},{"id":3,"tempDays":3,"logDays":7}],
+ "orphanVendorRules":[],"backupRequiredForUserData":true,"systemProviderMode":"WindowsDelegated"
+}

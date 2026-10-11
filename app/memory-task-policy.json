@@ -1,0 +1,15 @@
+{
+ "$schema": "memory-task-policy.schema.json",
+ "governs": "product_runtime",
+ "schemaVersion": 1,
+ "profileMode": "UserOptInExecutablePaths",
+ "executionEnabled": false,
+ "forceEnabled": false,
+ "ttlSeconds": 60,
+ "maximumItems": 10,
+ "closeTimeoutSeconds": 20,
+ "defaultAllowlistEmpty": true,
+ "foregroundBlocked": true,
+ "serviceBlocked": true,
+ "autoForceAfterTimeout": false
+}

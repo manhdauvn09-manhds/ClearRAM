@@ -1,0 +1,13 @@
+{
+  "$schema": "./disk-execution-policy.schema.json",
+  "governs": "product_runtime",
+  "schemaVersion": 1,
+  "productionExecutionEnabled": false,
+  "maximumItems": 100,
+  "ttlSeconds": 600,
+  "maximumHistoryRows": 200,
+  "maximumJournalBytes": 16777216,
+  "fixtureRules": { ".tmp": "Safe", ".log": "Review", ".db": "Danger" },
+  "blockedNames": [".memoryclear-fixture"],
+  "systemProviderMode": "WindowsDelegated"
+}

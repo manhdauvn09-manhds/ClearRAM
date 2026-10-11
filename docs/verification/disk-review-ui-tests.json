@@ -1,0 +1,12 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:24.2471503Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  16,
+    "Failed":  0,
+    "Scope":  "Offscreen WPF event handlers, actual checkbox binding, native marked fixtures; no visible app/user-data changes",
+    "Images":  [
+                   "artifacts/disk-review-step1.png",
+                   "artifacts/disk-review-step2.png"
+               ],
+    "DeletionEnabled":  false
+}

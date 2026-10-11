@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-10-11T02:51:48.509Z",
+  "passed": 9,
+  "results": [
+    {
+      "name": "app/disk-execution-policy.json",
+      "status": "passed"
+    },
+    {
+      "name": "app/windows-cleanup-providers.json",
+      "status": "passed"
+    },
+    {
+      "name": "app/temp-cleanup-policy.json",
+      "status": "passed"
+    },
+    {
+      "name": "app/memory-task-policy.json",
+      "status": "passed"
+    },
+    {
+      "name": "production toggle and unknown fields rejected",
+      "status": "passed"
+    },
+    {
+      "name": "non-Settings URI rejected",
+      "status": "passed"
+    },
+    {
+      "name": "general finder/app-data cleanup stays disabled; Temp is a separate reviewed capability",
+      "status": "passed"
+    },
+    {
+      "name": "Temp unsafe policy expansion rejected",
+      "status": "passed"
+    },
+    {
+      "name": "Memory3 preview cannot enable task execution or force fallback",
+      "status": "passed"
+    }
+  ],
+  "scope": "local config schemas; no native actions"
+}

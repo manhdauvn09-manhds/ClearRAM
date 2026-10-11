@@ -1,0 +1,101 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:13.6562325Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  17,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Safe fixture runs directly with flushed chained write-ahead journal",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Danger cannot run before review and exact per-run confirmation",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Tampered manifest rejected before any write/delete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Backup same volume yields zero gain and restores exact fixture data",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancellation leaves source and reports cancelled",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed source is skipped instead of forced or stale-delete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Held source file and ancestor refuse writes/renames on a competing thread",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancel after backup flush retains source and reports no delete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Backup cannot overwrite an existing destination and keeps source",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Backup parent replacement between preview and copy aborts",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Journal failure before delete intent keeps original source",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Interrupted journal is inspected without automatic replay",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Malformed or modified journal refuses trusted recovery state",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Backup receipt identity and hash are checked during recovery inspection",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Recomputed local digest cannot authorize a protected marker item",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Existing per-run journal cannot be replayed or overwritten",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Empty fixture run and empty journal do not report cleanup success",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Marked fixtures only; exclusive same-source-handle backup/hash/delete, competing thread and readonly journal recovery inspection",
+    "RealUserCleanupExecuted":  false,
+    "Unverified":  [
+                       "Actual process/power loss and crash replay",
+                       "External volume removal/full disk",
+                       "Pre-existing writable memory maps and filesystem/filter-driver matrix",
+                       "Production policy, backup authority and Windows10/11 VM"
+                   ]
+}

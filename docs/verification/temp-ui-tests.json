@@ -1,0 +1,45 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:57.8983985Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  7,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Shared lock blocks Temp alongside RAM and scanner",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Twelve controls; real background scan and DispatcherTimer completion",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "WPF checkbox single click updates source in both directions",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "First review freezes exact list; second acknowledgment is required",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Back clears approval and re-scans only own QA paths",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Offscreen review visual can render without showing native window",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Permanent Run worker deletes only exact own QA files and reports finish",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Offscreen WPF, real DispatcherTimer/background workers, only exact own newly created QA Temp files deleted; no human/DPI acceptance",
+    "Image":  "artifacts/temp-ui-preview.png"
+}

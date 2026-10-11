@@ -1,0 +1,13 @@
+{
+  "$schema": "owner-analysis-policy.schema.json",
+  "schemaVersion": 1,
+  "governs": "product_runtime",
+  "mode": "Readonly",
+  "executionEnabled": false,
+  "maximumEntriesPerSource": 5000,
+  "cimTimeoutSeconds": 10,
+  "freshnessSeconds": 60,
+  "maximumRows": 1000,
+  "inferRemovalFromAbsence": false,
+  "collectCommandLine": false
+}

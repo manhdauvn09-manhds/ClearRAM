@@ -1,0 +1,39 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:52.1597775Z",
+    "Runtime":  "5.1.26100.9444",
+    "Elevated":  false,
+    "OwnTempSelfTestExecuted":  false,
+    "Passed":  5,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Narrow policy; no recursion, elevation or automatic permanent cleanup",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Closed/unknown sessions cannot approve or execute",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Returned policy does not grant permission through a GUI flag",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Native journal rejects malformed identifiers",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Journal create-new, flush and no overwrite",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Policy/session/journal/elevated guards only; real Temp delete path unverified",
+    "RemainingOwnQaFiles":  {
+
+                            }
+}

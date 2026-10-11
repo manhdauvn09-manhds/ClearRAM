@@ -42,7 +42,7 @@ function Write-MCEvent {
 }
 function Get-MCContext {
     $services = @{}; $servicesKnown = $false
-    try { Get-CimInstance Win32_Service -OperationTimeoutSec 5 -ErrorAction Stop | ForEach-Object { if ($_.ProcessId -gt 0) { $services[[int]$_.ProcessId] = $true } }; $servicesKnown = $true } catch {}
+    try { Get-CimInstance -Query 'SELECT ProcessId FROM Win32_Service WHERE ProcessId > 0' -OperationTimeoutSec 5 -ErrorAction Stop | ForEach-Object { if ($_.ProcessId -gt 0) { $services[[int]$_.ProcessId] = $true } }; $servicesKnown = $true } catch {}
     [pscustomobject]@{ UserSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value; SessionId=[Diagnostics.Process]::GetCurrentProcess().SessionId; SelfId=$PID; WindowsRoot=[IO.Path]::GetFullPath($env:windir).TrimEnd('\') + '\'; Services=$services; ServicesKnown=$servicesKnown }
 }
 function Test-MCPolicy {

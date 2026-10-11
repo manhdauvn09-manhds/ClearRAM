@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "governs", "mode", "executionEnabled", "maximumEntriesPerSource", "cimTimeoutSeconds", "freshnessSeconds", "maximumRows", "inferRemovalFromAbsence", "collectCommandLine"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schemaVersion": {"const": 1},
+    "governs": {"const": "product_runtime"},
+    "mode": {"const": "Readonly"},
+    "executionEnabled": {"const": false},
+    "maximumEntriesPerSource": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "cimTimeoutSeconds": {"type": "integer", "minimum": 1, "maximum": 30},
+    "freshnessSeconds": {"type": "integer", "minimum": 1, "maximum": 300},
+    "maximumRows": {"type": "integer", "minimum": 1, "maximum": 1000},
+    "inferRemovalFromAbsence": {"const": false},
+    "collectCommandLine": {"const": false}
+  }
+}

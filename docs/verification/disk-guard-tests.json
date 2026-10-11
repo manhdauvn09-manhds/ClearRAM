@@ -1,0 +1,60 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:10.5130693Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  9,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Guard deletes only unchanged disposable fixture through stable handle",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed content/timestamp rejected and preserved",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Replaced file identity rejected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Locked fixture rejected without killing owner",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Path/parent junction swap rejected; target preserved",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Hardlink created after preview rejects deletion",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Parent replacement rejected even with the original file identity",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Outside root and protected fixture marker cannot delete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "General scanner deletion disabled; Temp entry uses separate reviewed capability",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Native destructive guard invoked exclusively on test-owned marked disk-fixture directories under workspace artifacts",
+    "RealUserCleanupExecuted":  false,
+    "Unverified":  [
+                       "Production deletion authority/manifest/backup/journal",
+                       "Win10/Win11 VM matrix",
+                       "Concurrent parent swap during held-handle operation"
+                   ]
+}

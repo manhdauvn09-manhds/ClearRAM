@@ -1,0 +1,99 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:08.7950766Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  17,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "History policy bounded readonly and own-metadata storage",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "First observed install records provenance and version under marked fixture only",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Later missing metadata surfaces prior observation without verifying uninstall",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Missing from first observation never manufactures historical install evidence",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Incomplete inventory and dependency evidence still block lifecycle promotion",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Active reference overrides historical missing metadata",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Corrupted history stays untouched and reports unavailable rather than empty/green",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed catalog starts new baseline, never carries previous installed evidence",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Different SID and future timestamp reject history without overwriting it",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Expired installed observation is displayed but cannot promote a residual",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changed root identity clears previous installed association",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Root changed after scan reports partial and cannot use old identity",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Concurrent history handle causes unavailable, with file bytes preserved",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "History hardlink and data-directory junction are rejected before writing",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancellation and fixture-default analysis do not create a production or fixture history",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Fixture history cannot write to arbitrary directory or non-fixture scan",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "App data unchanged and history never grants deletion",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Marked native fixtures and synthetic metadata; writes only fixture own history, no real user data/history changes",
+    "Unverified":  [
+                       "Actual install/uninstall events and native live coverage",
+                       "Crash/power-loss VM and multi-user deployment",
+                       "Production deletion authority"
+                   ]
+}

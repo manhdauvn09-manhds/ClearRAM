@@ -1,0 +1,5 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
+ "required":["governs","schemaVersion","mode","providers"],
+ "properties":{"$schema":{"type":"string"},"governs":{"const":"product_runtime"},"schemaVersion":{"const":1},"mode":{"const":"WindowsDelegated"},"providers":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"object","additionalProperties":false,"required":["id","label","uri","minimumBuild","effect"],"properties":{"id":{"enum":["Storage","Apps","Update"]},"label":{"type":"string","minLength":1},"uri":{"enum":["ms-settings:storagesense","ms-settings:appsfeatures","ms-settings:windowsupdate"]},"minimumBuild":{"const":10240},"effect":{"type":"string","minLength":1}}}}}
+}

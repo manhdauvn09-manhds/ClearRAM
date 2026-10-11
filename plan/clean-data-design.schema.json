@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "governs",
+    "artifactStatus",
+    "executionEnabled",
+    "version",
+    "updated",
+    "target",
+    "levels",
+    "executionContract",
+    "fixtureRows",
+    "warningPolicy"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "governs": {
+      "const": "product_runtime"
+    },
+    "artifactStatus": {
+      "const": "design_only"
+    },
+    "executionEnabled": {
+      "const": false
+    },
+    "version": {
+      "const": 2
+    },
+    "updated": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    },
+    "levels": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "short",
+          "tempMinAgeDays",
+          "logMinAgeDays",
+          "defaultPolicy"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "name": {
+            "type": "string"
+          },
+          "short": {
+            "type": "string"
+          },
+          "tempMinAgeDays": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "logMinAgeDays": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "defaultPolicy": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "executionContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifestTtlMinutes",
+        "quarantineRetentionDays",
+        "maxConcurrentOperations",
+        "scanThreads",
+        "scanMemoryBudgetMB",
+        "followReparsePoints",
+        "alterAcl",
+        "bypassUac",
+        "autoKillApps"
+      ],
+      "properties": {
+        "manifestTtlMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "quarantineRetentionDays": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxConcurrentOperations": {
+          "const": 1
+        },
+        "scanThreads": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "scanMemoryBudgetMB": {
+          "type": "integer",
+          "minimum": 50
+        },
+        "followReparsePoints": {
+          "const": false
+        },
+        "alterAcl": {
+          "const": false
+        },
+        "bypassUac": {
+          "const": false
+        },
+        "autoKillApps": {
+          "const": false
+        }
+      }
+    },
+    "fixtureRows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "path",
+          "level",
+          "mb",
+          "kind",
+          "admin",
+          "review",
+          "default",
+          "method",
+          "risk",
+          "dataClass"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "mb": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "kind": {
+            "enum": [
+              "cache",
+              "rebuild",
+              "system",
+              "personal",
+              "appdata",
+              "rollback",
+              "protected"
+            ]
+          },
+          "admin": {
+            "type": "boolean"
+          },
+          "review": {
+            "type": "boolean"
+          },
+          "default": {
+            "type": "boolean"
+          },
+          "method": {
+            "enum": [
+              "delete",
+              "windows",
+              "quarantine",
+              "blocked"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          },
+          "skipMb": {
+            "type": "number",
+            "minimum": 0
+          },
+          "busy": {
+            "enum": [
+              "browser",
+              "update"
+            ]
+          },
+          "blocked": {
+            "type": "string"
+          },
+          "risk": {
+            "enum": [
+              "safe",
+              "review",
+              "danger",
+              "blocked"
+            ]
+          },
+          "dataClass": {
+            "enum": [
+              "cache",
+              "empty",
+              "userdata",
+              "protected"
+            ]
+          },
+          "verifiedUninstalled": {
+            "type": "boolean"
+          },
+          "discovery": {
+            "enum": [
+              "large"
+            ]
+          },
+          "ageDays": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "warningPolicy": {
+      "const": {
+        "safe": 0,
+        "review": 1,
+        "danger": 2,
+        "blocked": "deny"
+      }
+    }
+  }
+}

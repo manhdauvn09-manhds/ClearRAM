@@ -1,0 +1,80 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:11:32.9744494Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  13,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Nonempty opt-in binds live PID/start/window/executable fingerprint",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Confirmation and context cannot be bypassed",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Graceful close verifies exit, journals outcome and cannot replay",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Save-prompt refusal stays alive after timeout, zero force",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Cancellation before action preserves QA child",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Changed opt-in permission invalidates before close",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Stale start-time and protected target cannot become eligible",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "TTL expiry and closed session never execute",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Wrong window identity is skipped without force or broadcast",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Fresh missing service inventory preserves already-approved QA child",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Changed frozen executable fingerprint cannot close target",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Cancellation during close wait keeps unresponsive QA child alive",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Unknown foreground after approval keeps QA child alive",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Only disposable test-owned hidden QA child executables; synthetic foreground/service inventory/opt-in/policy providers isolated to test module; no real app closed/settings modified",
+    "Unverified":  [
+                       "Windows10",
+                       "Human save-dialog/DPI",
+                       "Adversarial window races/mapped exe writers",
+                       "Full historic phase gates/CLI matrix"
+                   ]
+}

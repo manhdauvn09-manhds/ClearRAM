@@ -1,0 +1,33 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:45.0626639Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  3,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Checkpoint":  "BackupVerified",
+                        "Passed":  true,
+                        "Error":  "",
+                        "ChildExit":  77,
+                        "Journal":  "artifacts\\disk-fixture-3284f2a116bc4c1e8d28987e7b7e9695\\journal-701ef9b6bb454bc49b3e90440a60347e.jsonl"
+                    },
+                    {
+                        "Checkpoint":  "DeleteStarted",
+                        "Passed":  true,
+                        "Error":  "",
+                        "ChildExit":  77,
+                        "Journal":  "artifacts\\disk-fixture-46c34589875f4f2398b833a40f88f6da\\journal-d020887801de4821b7b018d6e8147cc0.jsonl"
+                    },
+                    {
+                        "Checkpoint":  "Committed",
+                        "Passed":  true,
+                        "Error":  "",
+                        "ChildExit":  77,
+                        "Journal":  "artifacts\\disk-fixture-0602ccba843c4f1c875408c97c3cb248\\journal-b0974b2b2fdc48b98d899fc94659f180.jsonl"
+                    }
+                ],
+    "Scope":  "Actual child-process abrupt exits; marked fixtures only",
+    "PowerLossVerified":  false,
+    "ExternalDiskLossVerified":  false,
+    "ProductionExecutionEnabled":  false
+}

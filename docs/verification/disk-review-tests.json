@@ -1,0 +1,88 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:20.8867213Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  15,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Review policy is bounded preview only",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "User rows remain blocked regardless of their proposed risk label",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Risky items cannot reach final step until each is reviewed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Danger requires final acknowledgment plus exact session-specific phrase, without execution",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Safe-only fixture needs no risk acknowledgment or final confirmation step",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Review-only fixture needs final acknowledgment but no danger phrase",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Blocked items excluded from totals and cannot be passed as reviewed items",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Review state is detached from returned view objects",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Changing scope invalidates all prior approvals and cannot be reset to valid",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Expired or changed policy binding invalidates session",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Back clears per-item approval; cancellation cannot be revived",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Duplicate selection and fixture risks on non-fixture scan are refused",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Closing session destroys approval state",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native file content change between steps invalidates review and preserves file",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "All selected fixture files still exist, review module has no executor import",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Readonly in-memory review sessions and native marked fixtures; no deletion or user-data access",
+    "Unverified":  [
+                       "Production risk/authority and cleanup integration",
+                       "Windows10/11 UI keyboard/DPI/operator acceptance"
+                   ]
+}

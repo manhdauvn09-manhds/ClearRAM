@@ -1,0 +1,88 @@
+{
+  "executedAt": "2026-10-11T02:51:47.498Z",
+  "runtime": "v24.16.0",
+  "command": "node plan/check-clean-data.mjs",
+  "scope": "design schema + pure fixture model + generated HTML + DOM-fixture event handlers (not real browser)",
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Design schema valid; invalid execution/admin/unknown fields rejected",
+      "status": "passed"
+    },
+    {
+      "name": "Generated HTML embeds exact config; unique IDs and valid JS",
+      "status": "passed"
+    },
+    {
+      "name": "All levels keep protected/risky items out of defaults",
+      "status": "passed"
+    },
+    {
+      "name": "Admin denial, running browser and update providers skip independently",
+      "status": "passed"
+    },
+    {
+      "name": "Review is mandatory for orphan/personal/rollback; unknown ownership blocked",
+      "status": "passed"
+    },
+    {
+      "name": "Same-volume quarantine recovers zero; external/permanent after review recover fixture bytes",
+      "status": "passed"
+    },
+    {
+      "name": "Unknown Windows size is not reclaim; busy/locked sample yields partial below estimate",
+      "status": "passed"
+    },
+    {
+      "name": "Manifest expiry, tamper, changed settings/selection and phase invalidate",
+      "status": "passed"
+    },
+    {
+      "name": "Prototype has no filesystem/native/network bridge and no real execution",
+      "status": "passed"
+    },
+    {
+      "name": "Roadmap HTML includes every design/implementation task and status",
+      "status": "passed"
+    },
+    {
+      "name": "Safe deletion starts without warning popup; progress, complete, lock and export",
+      "status": "passed"
+    },
+    {
+      "name": "UI cancel scan/partial clean then rescan retains measured sample only",
+      "status": "passed"
+    },
+    {
+      "name": "Reviewed quarantine has one final approval and zero same-volume gain",
+      "status": "passed"
+    },
+    {
+      "name": "Permanent app data danger requires item review and final phrase; downgrade tamper rejected",
+      "status": "passed"
+    },
+    {
+      "name": "Verified uninstalled cache/empty safe; mixed userdata reviewed and unknown blocked",
+      "status": "passed"
+    },
+    {
+      "name": "Large files are opt-in discovered, never auto selected; protected files stay blocked",
+      "status": "passed"
+    },
+    {
+      "name": "Large-file UI size filter/sort/effects; selected-risk modal lists only risky items",
+      "status": "passed"
+    },
+    {
+      "name": "Safe-only action excludes selected risky files without warning",
+      "status": "passed"
+    }
+  ],
+  "unverified": [
+    "Actual Windows filesystem scanner/executor/UAC/backup/restore",
+    "Win10/Win11 VM safety and performance",
+    "Visual browser QA blocked: browser policy disallows file://; no workaround attempted"
+  ],
+  "executionEnabled": false
+}

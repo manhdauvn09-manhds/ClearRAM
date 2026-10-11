@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "governs", "schemaVersion", "capability", "minimumDays", "extensions", "maximumItems", "maximumEntries", "maximumSeconds", "ttlSeconds", "permanentRequiresTwoSteps", "allowElevation", "recursive"],
+  "properties": {
+    "$schema": {"const": "temp-cleanup-policy.schema.json"},
+    "governs": {"const": "product_runtime"},
+    "schemaVersion": {"const": 1},
+    "capability": {"const": "ReviewedTopLevelOwnTemp"},
+    "minimumDays": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 3, "maximum": 365}},
+    "extensions": {"const": [".tmp", ".log"]},
+    "maximumItems": {"type": "integer", "minimum": 1, "maximum": 100},
+    "maximumEntries": {"type": "integer", "minimum": 1, "maximum": 5000},
+    "maximumSeconds": {"type": "integer", "minimum": 1, "maximum": 15},
+    "ttlSeconds": {"type": "integer", "minimum": 1, "maximum": 600},
+    "permanentRequiresTwoSteps": {"const": true},
+    "allowElevation": {"const": false},
+    "recursive": {"const": false}
+  }
+}

@@ -1,0 +1,80 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:01.9355988Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  13,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Runtime policy is readonly with schema and explicit budgets",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Installed path metadata is positive evidence but never delete authority",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Sibling path and matching app name do not prove data ownership",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Duplicate 32/64 metadata does not create a false shared-app warning",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Overlapping locations from different applications remain shared/protected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Process service and task references protect adjacent data, including portable apps",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Stale and future dependency snapshots do not masquerade as current evidence",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Complete empty uninstall inventory and incomplete dependency inventory never prove removal",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Only unambiguous executable paths parsed; arguments are not retained",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Dependency collector handles inaccessible and ambiguous sources with no false completeness",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Complete synthetic collector handles task executable paths with spaces without logging arguments",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Page analysis preserves snapshot/data; injected inventory cannot analyze user paths",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancellation returns cancelled state without inventing cleanup or removing scan rows",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Readonly ownership/dependency classification with synthetic inventory and marked files; CIM collector uses injected providers, no real app inventory scanned",
+    "RealUserCleanupExecuted":  false,
+    "Unverified":  [
+                       "Native CIM/registry/MSIX live coverage and cancellation latency",
+                       "Vendor/historical uninstall/cache-empty positive proofs",
+                       "Windows10/11 VM/operator DPI/keyboard"
+                   ]
+}

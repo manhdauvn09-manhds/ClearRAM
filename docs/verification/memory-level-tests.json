@@ -1,0 +1,72 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:11:11.8835120Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  11,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Three visible level controls, Normal default and hidden legacy selector",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Level2 preserves Strong trim and explains reload cost",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Level3 explicitly previews opt-in effects; no executor shortcut",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Shared operation lock disables every level and Temp entry",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Opt-in exact executable only; no names or RAM CPU inference",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Opt-in cannot override critical, unknown, self, service or unavailable inventory",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Different SID/session, Windows path and user protected path remain blocked",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Foreground PID, same executable and unknown foreground keep tasks",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Native current-host preview has no process action capability",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Task window loads readonly grid and disabled execute action",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Offscreen three-level main view renders",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Memory3 policy pure fixtures/readonly current-host preview/level bindings/offscreen WPF; no close/force/trim execution",
+    "TaskExecutionEnabled":  false,
+    "Image":  "artifacts/memory-levels-preview.png",
+    "Unverified":  [
+                       "Live nonempty opt-in native exe fingerprint branch",
+                       "Task modal worker/DispatcherTimer human interaction",
+                       "Level3 close/save prompt/timeout/native races and safety gates",
+                       "Win10/DPI acceptance"
+                   ]
+}

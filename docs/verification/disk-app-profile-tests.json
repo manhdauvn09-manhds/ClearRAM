@@ -1,0 +1,95 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:04.5713353Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  16,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Catalog readonly/provenance and three scoped roots",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Recognizes cache under exact browser profile and VS Code root",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Browser sensitive and offline branches stay protected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "VS Code settings history workspace state and unsaved backups stay protected",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Unknown/custom layouts and cache-like sibling paths never become cache",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Missing complete inventory only labels residual candidate, never verified uninstall",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Name plus publisher metadata protects installed product; display name alone does not prove ownership",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Incomplete or stale dependencies cannot be called an unreferenced residual",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Possible process/service/task references protect catalog data even at portable executable paths",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native marked catalog scan returns class and identity with no delete authority",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Analysis attaches lifecycle to catalog data without losing classification",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native directory observation distinguishes empty, absent and nonempty without deleting",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Junction catalog root is unavailable and outside data never scanned",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Absent default app roots are normal absence, not a false failed scan",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Scope combination rejected and pre-cancelled scan visits no files",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "All fixture data hashes and paths unchanged after scan/analysis",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Scope":  "Native marked fixtures; synthetic install/dependency evidence; readonly app catalog",
+    "RealUserCleanupExecuted":  false,
+    "Unverified":  [
+                       "Version-specific vendor cache semantics and custom profiles",
+                       "Historical uninstall positive proofs",
+                       "Live provider coverage and Windows10/11 VM matrix"
+                   ]
+}

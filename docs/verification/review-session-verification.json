@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-10",
+  "timezone": "Asia/Tokyo",
+  "revision": "2026-10-10.1",
+  "source": "Observed local tool executions in this session; summary, not a server CI trace",
+  "runtime": "Windows PowerShell 5.1.26100.9444",
+  "disk": {
+    "command": "powershell -NoProfile -File E:\\SourceCode\\NEW_APPLICATION\\MemoryClear\\scripts\\Verify-Phase10.ps1",
+    "exitCode": 0,
+    "passed": 151,
+    "failed": 0,
+    "reports": ["disk-inventory-tests.json", "disk-ownership-tests.json", "disk-app-profile-tests.json", "disk-owner-history-tests.json", "disk-guard-tests.json", "disk-fixture-executor-tests.json", "disk-ui-tests.json", "disk-review-tests.json", "disk-review-ui-tests.json"]
+  },
+  "ramClear": {"passed": 12, "failed": 0, "report": "artifacts/clear-tests.json", "timestampUtc": "2026-10-09T22:35:41.5365693Z"},
+  "ramCheckbox": {
+    "firstRun": "Failed: own disposable fixtures blocked by Service inventory unavailable; ServicesKnown=False. Failed report was overwritten by the subsequent test, so this entry preserves the observed failure from tool output.",
+    "diagnostic": "Standalone Get-CimInstance Win32_Service -OperationTimeoutSec 5 -ErrorAction Stop returned 304 services",
+    "rerun": "Passed unchanged tests/Check-Checkboxes.ps1; no production guard changes",
+    "timestampUtc": "2026-10-09T22:40:40.9870312Z",
+    "report": "artifacts/checkbox-tests.json",
+    "rootCause": "Unverified; rerun success does not prove live provider reliability"
+  },
+  "previewScript": {"path": "scripts/Preview-DiskReview.ps1", "ps51Parse": "passed", "interactiveRun": "not run"},
+  "planChecks": [
+    {"command": "node plan/build-plan.mjs", "exitCode": 0, "tasks": 71, "done": 27},
+    {"command": "node plan/check-plan.mjs", "exitCode": 0},
+    {"command": "node plan/build-clean-data.mjs", "exitCode": 0},
+    {"command": "node plan/check-clean-data.mjs", "exitCode": 0, "passed": 18},
+    {"command": "node plan/check-memory-design.mjs", "exitCode": 0, "passed": 13},
+    {"command": "git diff --check", "exitCode": 0}
+  ],
+  "reviewImages": {"viewed": ["artifacts/disk-review-step1.png", "artifacts/disk-review-step2.png"], "mode": "offscreen WPF; not interactive/DPI acceptance"},
+  "productionDeletionEnabled": false,
+  "newServerCI": "unproven; not pushed/run",
+  "windowsVMMatrix": "not run",
+  "phase10": "incomplete; HO-10 doing/draft"
+}

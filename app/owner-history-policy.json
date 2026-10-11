@@ -1,0 +1,10 @@
+{
+  "$schema": "owner-history-policy.schema.json",
+  "schemaVersion": 1,
+  "governs": "product_runtime",
+  "executionEnabled": false,
+  "maximumBytes": 262144,
+  "maximumProfiles": 20,
+  "maximumMatches": 8,
+  "maximumAgeDays": 180
+}

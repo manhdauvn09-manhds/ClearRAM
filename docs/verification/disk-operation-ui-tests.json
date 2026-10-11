@@ -1,0 +1,77 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:10:49.9191799Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  13,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "Operation window loads 27 controls and defaults to backup",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Main Windows delegation and example controls obey shared operation lock",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Mode change creates a new plan and clears prior review",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Next rejects missing acknowledgments and keeps blocked item unreviewable",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Item review moves to final confirmation; missing phrase cannot run",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Back clears both item reviews and final fields",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Correct second review enables only the selected frozen operation",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Actual background run disables edits and close, reports measured completion",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Inspect runs in worker and displays three verified restore candidates",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Restore requires explicit target selection and acknowledgment",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Background restore returns exact file and keeps backup; invalidates displayed history",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Journal/restore failures release worker and preserve honest error status",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Recent journal listing is bounded and uninspected, selection does not claim success",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Image":  "artifacts/disk-operation-preview.png",
+    "Scope":  "Offscreen WPF actual background run/inspect/restore on marked fixtures",
+    "InteractiveAcceptance":  false,
+    "ProductionExecutionEnabled":  false
+}

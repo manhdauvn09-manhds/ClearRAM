@@ -1,0 +1,10 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "type":"object","additionalProperties":false,
+ "required":["$schema","governs","schemaVersion","profileMode","executionEnabled","forceEnabled","ttlSeconds","maximumItems","closeTimeoutSeconds","defaultAllowlistEmpty","foregroundBlocked","serviceBlocked","autoForceAfterTimeout"],
+ "properties":{
+  "$schema":{"const":"memory-task-policy.schema.json"},"governs":{"const":"product_runtime"},"schemaVersion":{"const":1},"profileMode":{"const":"UserOptInExecutablePaths"},
+  "executionEnabled":{"const":false},"forceEnabled":{"const":false},"ttlSeconds":{"type":"integer","minimum":1,"maximum":60},"maximumItems":{"type":"integer","minimum":1,"maximum":10},"closeTimeoutSeconds":{"type":"integer","minimum":1,"maximum":20},
+  "defaultAllowlistEmpty":{"const":true},"foregroundBlocked":{"const":true},"serviceBlocked":{"const":true},"autoForceAfterTimeout":{"const":false}
+ }
+}

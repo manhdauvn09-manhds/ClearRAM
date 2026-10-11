@@ -37,7 +37,7 @@ function harness({stored=null,denyStorage=false}={}){
 const h=harness();
 assert(h.element('tracker-list').innerHTML.includes('REL-03'));
 assert(h.element('tracker-kpis').innerHTML.includes('0 / '+base.tasks.filter(t=>t.scope==='mvp').length),'MVP must start at zero completed tasks');
-assert.equal(base.tasks.filter(t=>t.id.startsWith('HO-')).length,9);
+assert.equal(base.tasks.filter(t=>t.id.startsWith('HO-')).length,new Set(base.tasks.map(t=>t.phase)).size);
 for(const phase of new Set(base.tasks.map(t=>t.phase))){const handoff=base.tasks.find(t=>t.id==='HO-'+phase.slice(0,2));assert(handoff);for(const t of base.tasks.filter(t=>t.phase===phase&&t.id!==handoff.id))assert(handoff.deps.includes(t.id));}
 assert.equal(h.change('BASE-01','status','doing').value,'todo','Phase start requires previous handoff');
 // Evidence and dependencies are enforced before done.
@@ -85,7 +85,7 @@ legacy.tasks.find(t=>t.id==='BASE-01').evidence='Legacy evidence';
 const migrated=harness();await migrated.importData(legacy);
 assert.equal(migrated.state().tasks.find(t=>t.id==='BASE-01').status,'review');
 assert(migrated.state().tasks.find(t=>t.id==='BASE-01').notes.includes('Preserved legacy note'));
-assert.equal(migrated.state().tasks.filter(t=>t.id.startsWith('HO-')).length,9);
+assert.equal(migrated.state().tasks.filter(t=>t.id.startsWith('HO-')).length,new Set(base.tasks.map(t=>t.phase)).size);
 const unavailable=harness({denyStorage:true});unavailable.change('BASE-01','notes','test');
 assert(unavailable.element('tracker-storage').textContent.includes('Không lưu được'));
 console.log('PASS: source/embedded sync, unique IDs, JS syntax, initial status, done/dependency/block gates, escaping, filters, export/import, invalid import rollback, storage reload/failure. Browser visual rendering not tested by this harness.');

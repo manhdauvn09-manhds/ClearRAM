@@ -1,0 +1,69 @@
+{
+  "executedAt": "2026-10-11T02:51:47.866Z",
+  "runtime": "v24.16.0",
+  "command": "node plan/check-memory-design.mjs",
+  "scope": "design schema + pure fixture model + code-level DOM handlers/shared lock; no actual browser",
+  "passed": 13,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Memory schema and immutable no-auto-kill/no-fallback contract",
+      "status": "passed"
+    },
+    {
+      "name": "Generated Memory plan/prototype sync, IDs/scripts valid, roadmap statuses",
+      "status": "passed"
+    },
+    {
+      "name": "L1/L2 only trim; L3 safe disposable only, no default force or review tasks",
+      "status": "passed"
+    },
+    {
+      "name": "Critical/foreground/unknown and non-allowlisted close cannot override",
+      "status": "passed"
+    },
+    {
+      "name": "Force requires item review, exact task name and final ack; no downgrade tamper",
+      "status": "passed"
+    },
+    {
+      "name": "Manifest stale scope/selection/PID-start-time rejects execution",
+      "status": "passed"
+    },
+    {
+      "name": "Graceful save prompt holds app with zero RAM/CPU gain; trim CPU unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "Per-step PID/start-time change skips task even after run begins",
+      "status": "passed"
+    },
+    {
+      "name": "Safe Memory UI runs without warning, shows effects/progress/completed",
+      "status": "passed"
+    },
+    {
+      "name": "Force UI remains disabled until reviewed/name typed; uses selected effects only",
+      "status": "passed"
+    },
+    {
+      "name": "Close-save-prompt UI completes with held task, no forced fallback",
+      "status": "passed"
+    },
+    {
+      "name": "Shared lock prevents inter-tab scan/clear; cancel releases lock",
+      "status": "passed"
+    },
+    {
+      "name": "No memory filesystem/native bridge; app policies/runtime remain two-level",
+      "status": "passed"
+    }
+  ],
+  "unverified": [
+    "Actual trim/close/kill on Windows processes",
+    "Saved profile/dependency/critical detection and PID race native guards",
+    "Win10/11 VM data survival/performance",
+    "Visual browser rendering; file:// policy restriction previously observed"
+  ],
+  "executionEnabled": false
+}

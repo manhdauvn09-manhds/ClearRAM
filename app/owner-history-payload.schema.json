@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Local observation payload, not proof of uninstall or deletion authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "SchemaVersion",
+    "Sid",
+    "CatalogHash",
+    "UpdatedUtc",
+    "Records"
+  ],
+  "properties": {
+    "SchemaVersion": {
+      "const": 1
+    },
+    "Sid": {
+      "type": "string",
+      "pattern": "^S-1-[0-9-]{1,180}$"
+    },
+    "CatalogHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "UpdatedUtc": {
+      "type": "string"
+    },
+    "Records": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ProfileId",
+          "Root",
+          "RootIdentity",
+          "LastObservedUtc",
+          "LastInstalledUtc",
+          "LastInstalledMatches"
+        ],
+        "properties": {
+          "ProfileId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{1,39}$"
+          },
+          "Root": {
+            "type": "string",
+            "maxLength": 32767
+          },
+          "RootIdentity": {
+            "type": "string",
+            "pattern": "^[A-F0-9]{8}:[A-F0-9]{16}$"
+          },
+          "LastObservedUtc": {
+            "type": "string"
+          },
+          "LastInstalledUtc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "LastInstalledMatches": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "Source",
+                "InstallationId",
+                "Version"
+              ],
+              "properties": {
+                "Source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "InstallationId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "Version": {
+                  "type": "string",
+                  "maxLength": 512
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

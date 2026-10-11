@@ -1,0 +1,107 @@
+﻿{
+    "Timestamp":  "2026-10-11T02:09:59.6099260Z",
+    "Runtime":  "5.1.26100.9444",
+    "Passed":  18,
+    "Failed":  0,
+    "Results":  [
+                    {
+                        "Name":  "PS5 sources parse and runtime policy stays readonly",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native file identity, allocated size and metadata from handle",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Native scan nested fixtures and readonly data survives",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Age differs from deletion authority; all rows have deletion disabled",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Overlapping roots dedupe file IDs and allocated bytes",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Row/entry budget reports partial instead of silent completeness",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Paged scan gives distinct next-page file IDs within bounded rows",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cancelled scan returns no success claim",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Missing/inaccessible root has issue instead of zero-green",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "UNC/ADS/outside snapshot paths refused",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Hard links are excluded; junction recursion skipped",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Large-file mode filters threshold without content read or deletion",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Finder age/type filters are applied before pagination and totals",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Invalid finder extension and custom protected scope fail closed",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "App removal absence never marks unknown data safe",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Denied fixture directory reported as partial with original ACL restored",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Long path is either reported or safely skipped, never false-complete",
+                        "Passed":  true,
+                        "Error":  ""
+                    },
+                    {
+                        "Name":  "Cloud/protected/root boundaries block scan scope",
+                        "Passed":  true,
+                        "Error":  ""
+                    }
+                ],
+    "Mode":  "Readonly native file scan on marked fixtures only",
+    "WorkingSetMB":  150.1,
+    "FixtureRelative":  "artifacts\\disk-fixture-80eedff9bbd24c1c895e84e83cef9591",
+    "RealCleanupExecuted":  false,
+    "Unverified":  [
+                       "Windows10/11 VM matrix",
+                       "Real app ownership/vendor rules",
+                       "Large-scale streaming/soak benchmark"
+                   ]
+}

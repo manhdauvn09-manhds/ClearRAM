@@ -1,0 +1,8 @@
+{
+ "$schema":"./windows-cleanup-providers.schema.json","governs":"product_runtime","schemaVersion":1,
+ "mode":"WindowsDelegated","providers":[
+  {"id":"Storage","label":"Windows Storage / Temporary files","uri":"ms-settings:storagesense","minimumBuild":10240,"effect":"Windows sẽ quét temp, update cache và các nhóm hỗ trợ. Chọn nhóm cần dọn trong Windows; xem kỹ Downloads và bản cài Windows cũ."},
+  {"id":"Apps","label":"Ứng dụng đã cài","uri":"ms-settings:appsfeatures","minimumBuild":10240,"effect":"Xem ứng dụng lớn hoặc không dùng và gỡ bằng Windows. Gỡ app có thể mất dữ liệu; không tự xóa thư mục cài đặt."},
+  {"id":"Update","label":"Windows Update","uri":"ms-settings:windowsupdate","minimumBuild":10240,"effect":"Kiểm tra cập nhật/restart trước khi dọn hệ thống. MemoryClear không dừng update hoặc sửa servicing store."}
+ ]
+}
