@@ -154,3 +154,11 @@ TempLedger thêm prefix memory-operation, temp-operation cũ giữ nguyên. Full
 ## Hồi quy native journal — 2026-10-11
 
 TempLedger thêm prefix memory-operation, temp-operation cũ giữ nguyên. Full Disk/OwnTemp/UI readiness đạt: artifacts\readiness-20261011-020956-50571223\readiness.json. General finder/appdata deletion vẫn khóa. Phase10 giữ draft và các OPEN/AVOID cũ còn hiệu lực.
+
+## GitHub publication — 2026-10-11
+
+- Source commit: [57fb2d2](https://github.com/manhdauvn09-manhds/ClearRAM/commit/57fb2d2638ab9c10f579aacaa49bf2dd42c42c17), 143 file; đã push main của manhdauvn09-manhds/ClearRAM. git ls-remote và GitHub commit API khớp local SHA.
+- Source CI: [run 38106638093](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093) completed/success; mọi step plan/Disk fixture/policy/WPF/Clear/checkbox được quan sát success. Evidence docs/verification/github-actions-portable.json.
+- Đây là CI của source commit trên; không suy ra full Windows10/VM/release hoặc mở Memory3. Task child13/UI6 là local Win11 trace, không là step native task execution trên server.
+- .data, ZIP/artifacts, harness riêng và các file user không thuộc app không được commit. GitHub Download ZIP chứa source chạy bằng Start-MemoryClear.cmd; portable ZIP local chưa publish thành GitHub Release.
+- Commit tiếp theo chỉ ghi publication/CI evidence và plan/handoff; không đổi runtime.

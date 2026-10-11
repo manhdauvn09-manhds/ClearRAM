@@ -114,3 +114,7 @@ Mở `MemoryClear-Plan.html`; nguồn trạng thái ở `plan/tasks.json`. Kết
 Bằng chứng được chọn cho repo công khai nằm ở `docs/verification/` (bản snapshot, không phải CI mới). `artifacts/` và `.data/` là dữ liệu local do app/test tạo, không commit. Log process, settings cá nhân, shortcut và harness cài riêng cũng không được đưa lên repo. CI chạy các kiểm tra hiện có; xem kết quả thực tế trong GitHub Actions, không suy ra CI đã đạt từ báo cáo local.
 
 CI của commit source đầu tiên `a53e87e` đã đạt: [execution trace](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/37747840494), snapshot tại `docs/verification/github-actions-initial.json`. Các nghiệm thu Windows/VM/overhead còn thiếu vẫn giữ nguyên trạng thái trong kế hoạch.
+
+## GitHub checkpoint
+
+Source [57fb2d2](https://github.com/manhdauvn09-manhds/ClearRAM/commit/57fb2d2638ab9c10f579aacaa49bf2dd42c42c17) đã push main. [GitHub Actions](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093) đã completed/success với source đó; [execution trace](docs/verification/github-actions-portable.json). Windows10/full release và Memory3 rollout vẫn chưa nghiệm thu.

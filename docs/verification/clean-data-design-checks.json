@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-11T02:51:47.498Z",
+  "executedAt": "2026-10-11T02:56:32.692Z",
   "runtime": "v24.16.0",
   "command": "node plan/check-clean-data.mjs",
   "scope": "design schema + pure fixture model + generated HTML + DOM-fixture event handlers (not real browser)",

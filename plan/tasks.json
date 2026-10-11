@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "MemoryClear",
-  "revision": "2026-10-11.1",
+  "revision": "2026-10-11.2",
   "updated": "2026-10-11",
   "assumption": "Windows11/PS5.1 portable preview. Clear Normal/Strong và Dọn Temp có duyệt đã có chức năng thật; không tự kill hoặc xóa dữ liệu app tùy ý. Memory3: saved executable opt-in, native PID/start/window/exe fingerprint, frozen plan/TTL/permission revalidation, graceful-only executor và worker/progress/cancel/journal đã chuẩn bị. QA chỉ đóng app thử nghiệm mới tạo; không sửa settings hoặc đóng app người dùng. Shipped executionEnabled=false giữ gate SAFE-04/QA-02 chưa đủ; không tự force. Windows10/VM, human DPI/save-dialog, orphan appdata production và backup khác ổ chưa nghiệm thu. Bộ portable có script build/checksum/manifest, không kèm .data. Phase10/12 chưa hoàn tất; mọi handoff/status phản ánh giới hạn thực tế.",
   "tasks": [
@@ -677,8 +677,8 @@
       "owner": "Codex",
       "estimate": "1–2 ngày",
       "acceptance": "Có artifact theo kiến trúc đã chốt, version/checksum, README chạy/quyền/giới hạn, đường dẫn settings/log; không tự thêm startup/service.",
-      "evidence": "scripts/Build-Portable.ps1; docs/verification/portable-build.json khi build hoàn tất; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed)",
-      "notes": "Portable preview được user yêu cầu build trực tiếp. Không là nghiệm thu release/gates/phụ thuộc hoặc binary signing/Win10. Không chứa .data/harness/secrets. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance.",
+      "evidence": "scripts/Build-Portable.ps1; docs/verification/portable-build.json khi build hoàn tất; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed); source 57fb2d2 main + GitHub Actions 38106638093 success, docs/verification/github-actions-portable.json",
+      "notes": "Portable preview được user yêu cầu build trực tiếp. Không là nghiệm thu release/gates/phụ thuộc hoặc binary signing/Win10. Không chứa .data/harness/secrets. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance. Publication/CI verified; status phase/full release không đổi vì các dependency/nghiệm thu còn thiếu.",
       "updated": "2026-10-11"
     },
     {
@@ -1086,8 +1086,8 @@
       "owner": "Codex",
       "estimate": "0.25 ngày",
       "acceptance": "docs/handoffs/PHASE-10-HANDOFF.md theo TEMPLATE.md; tất cả task/gates có evidence, incomplete giữ draft/review.",
-      "evidence": "docs/handoffs/PHASE-10-HANDOFF.md draft10.2; readiness artifacts/readiness-20261010-094026-2c5c13f5/readiness.json executed11 steps PASS: Disk189/13 suites + Clear12 + core14 + checkbox PASS + builders/plan/Disk18/Memory13/runtime-policy5/PS5 parser. operations-session-verification.json giữ source hashes/OS provenance và first failed test count trace. Production/VM/release chưa đạt; không newCI/commit/push.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded); artifacts\\readiness-20261011-020325-f5b9e55a\\readiness.json; artifacts\\readiness-20261011-020956-50571223\\readiness.json",
-      "notes": "Draft10.4: Temp production hẹp12+7 đạt; phase10 còn app/orphan authority, external backup và release matrix. Memory scope đã chốt ở ML-SCOPE; không đóng phase khi còn gate. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp.",
+      "evidence": "docs/handoffs/PHASE-10-HANDOFF.md draft10.2; readiness artifacts/readiness-20261010-094026-2c5c13f5/readiness.json executed11 steps PASS: Disk189/13 suites + Clear12 + core14 + checkbox PASS + builders/plan/Disk18/Memory13/runtime-policy5/PS5 parser. operations-session-verification.json giữ source hashes/OS provenance và first failed test count trace. Production/VM/release chưa đạt; không newCI/commit/push.; docs/CLEAN_DATA_TEMP.md; docs/verification/temp-cleanup-tests.json; docs/verification/temp-ui-tests.json; docs/verification/temp-session-verification.json (Win11 readiness14steps + postchange Temp12/UI7, limits recorded); artifacts\\readiness-20261011-020325-f5b9e55a\\readiness.json; artifacts\\readiness-20261011-020956-50571223\\readiness.json; source 57fb2d2 main + GitHub Actions 38106638093 success, docs/verification/github-actions-portable.json",
+      "notes": "Draft10.4: Temp production hẹp12+7 đạt; phase10 còn app/orphan authority, external backup và release matrix. Memory scope đã chốt ở ML-SCOPE; không đóng phase khi còn gate. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp. Native TempLedger overload memory-operation đã được hồi quy cùng toàn bộ Disk/Temp. Publication/CI verified; status phase/full release không đổi vì các dependency/nghiệm thu còn thiếu.",
       "updated": "2026-10-11"
     },
     {
@@ -1319,8 +1319,8 @@
       "owner": "Codex",
       "estimate": "0.25 ngày",
       "acceptance": "docs/handoffs/PHASE-12-HANDOFF.md theo template, mọi gates/tasks/evidence trước done.",
-      "evidence": "docs/handoffs/PHASE-12-HANDOFF.md; artifacts\\readiness-20261011-020956-50571223\\readiness.json; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed)",
-      "notes": "Draft cập nhật 2026-10-11.1; backend/UI QA và chuẩn bị bộ portable, phase12 chưa complete. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance.",
+      "evidence": "docs/handoffs/PHASE-12-HANDOFF.md; artifacts\\readiness-20261011-020956-50571223\\readiness.json; docs/verification/portable-build.json (55 files, packaged WPF/native smoke + ZIP SHA256 entries Passed); source 57fb2d2 main + GitHub Actions 38106638093 success, docs/verification/github-actions-portable.json",
+      "notes": "Draft cập nhật 2026-10-11.1; backend/UI QA và chuẩn bị bộ portable, phase12 chưa complete. Bộ portable preview 2026.10.11.1 đã build; shortcut Desktop readback verified, chưa launch GUI từ shortcut; không là full release acceptance. Publication/CI verified; status phase/full release không đổi vì các dependency/nghiệm thu còn thiếu.",
       "updated": "2026-10-11"
     }
   ],

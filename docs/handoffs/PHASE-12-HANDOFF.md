@@ -4,9 +4,9 @@
 - Người thực hiện: Codex
 - Trạng thái bàn giao: **Nháp — phase chưa hoàn tất**
 - Task handoff: HO-12 (doing)
-- Kế hoạch: 2026-10-11.1
-- Branch / commit: main; source mới chưa commit/push.
-- Publication mới đang thực hiện theo yêu cầu user 2026-10-11; proof sẽ ghi sau khi remote/CI được quan sát. Phase vẫn draft.
+- Kế hoạch: 2026-10-11.2
+- Branch / source commit: main / 57fb2d2638ab9c10f579aacaa49bf2dd42c42c17; push và source CI verified. Publication evidence follow-up chỉ đổi docs/plan.
+- Publication đã xác minh theo yêu cầu user 2026-10-11; phase vẫn draft, CI không thay full nghiệm thu.
 
 ## 1. Mục tiêu và phạm vi đã chốt
 
@@ -80,3 +80,11 @@ Giữ product gate false cho đến khi đủ SAFE-04/QA-02; source backend pass
 - 55 file, 192168 bytes ZIP; manifest entry hashes và packaged WPF/native compilation smoke Passed. SHA256 B9914C4DFF4B48837E261B60F3E5A10E4FBEB35F2DB4EF97AE68333BFE6B9AD7. Checksum sidecar cùng ZIP.
 - Desktop MemoryClear Portable 2026-10-11.lnk đã trỏ đúng folder mới và readback verified; chưa launch qua shortcut. Proof artifacts/portable-desktop-shortcut.json. Bản package trước bị supersede; chỉ dùng đường dẫn này.
 - Runtime source hashes sau build khớp latest readiness; docs/verification/portable-session-verification.json. Memory3 execution gate vẫn false; full phase/release chưa complete. Không kèm settings/history cá nhân.
+
+## GitHub publication — 2026-10-11
+
+- Source commit: [57fb2d2](https://github.com/manhdauvn09-manhds/ClearRAM/commit/57fb2d2638ab9c10f579aacaa49bf2dd42c42c17), 143 file; đã push main của manhdauvn09-manhds/ClearRAM. git ls-remote và GitHub commit API khớp local SHA.
+- Source CI: [run 38106638093](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093) completed/success; mọi step plan/Disk fixture/policy/WPF/Clear/checkbox được quan sát success. Evidence docs/verification/github-actions-portable.json.
+- Đây là CI của source commit trên; không suy ra full Windows10/VM/release hoặc mở Memory3. Task child13/UI6 là local Win11 trace, không là step native task execution trên server.
+- .data, ZIP/artifacts, harness riêng và các file user không thuộc app không được commit. GitHub Download ZIP chứa source chạy bằng Start-MemoryClear.cmd; portable ZIP local chưa publish thành GitHub Release.
+- Commit tiếp theo chỉ ghi publication/CI evidence và plan/handoff; không đổi runtime.

@@ -2,11 +2,11 @@
 
 ## NOW — 2026-10-11 (Asia/Tokyo)
 
-- User yêu cầu đưa bản mới lên GitHub trong lượt này. Đã xác minh origin ClearRAM/default main/push permission và remote HEAD0f44426052d6077da171d464b9feb9a32113a480. Chuẩn bị commit source/app/tests/plan/evidence; publication/CI mới chưa coi là pass trước khi quan sát. Không stage harness/local data.
+- User đã yêu cầu publication. Source 57fb2d2 push main và remote SHA verified; source CI completed/success, proof docs/verification/github-actions-portable.json. Chỉ source/app/tests/plan/evidence được stage; không harness/local data.
 
-- Plan 2026-10-11.1; phase10/12 còn draft, không giả complete. 16 readiness steps pass, trace artifacts\readiness-20261011-020956-50571223\readiness.json; task child 13 / UI 6 checks. Native/core/Temp journal source hồi quy đầy đủ.
+- Plan 2026-10-11.2; phase10/12 còn draft, không giả complete. 16 readiness steps pass, trace artifacts\readiness-20261011-020956-50571223\readiness.json; task child 13 / UI 6 checks. Native/core/Temp journal source hồi quy đầy đủ.
 - Memory3 executor graceful-only đã chuẩn bị; shipped executionEnabled=false vì SAFE-04/QA-02 chưa đủ. Không force fallback. Clear Normal/Strong + reviewed Temp thực thi được.
-- User đã ủy quyền build portable. scripts/Build-Portable.ps1 tạo curated folder/ZIP/manifest/checksum và packaged controls/native smoke. Kết quả chỉ theo docs/verification/portable-build.json, không fake build trước khi chạy. Source chưa commit/push; server CI source mới chưa quan sát.
+- User đã ủy quyền build portable. scripts/Build-Portable.ps1 tạo curated folder/ZIP/manifest/checksum và packaged controls/native smoke. Kết quả chỉ theo docs/verification/portable-build.json, không fake build trước khi chạy. Source 57fb2d2 đã push; server CI source này đã quan sát success (https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093).
 
 ## NEXT
 
@@ -30,6 +30,14 @@ Không toggle gate để né dependencies; không real user app kill/cleanup QA;
 - 55 file, 192168 bytes ZIP; manifest entry hashes và packaged WPF/native compilation smoke Passed. SHA256 B9914C4DFF4B48837E261B60F3E5A10E4FBEB35F2DB4EF97AE68333BFE6B9AD7. Checksum sidecar cùng ZIP.
 - Desktop MemoryClear Portable 2026-10-11.lnk đã trỏ đúng folder mới và readback verified; chưa launch qua shortcut. Proof artifacts/portable-desktop-shortcut.json. Bản package trước bị supersede; chỉ dùng đường dẫn này.
 - Runtime source hashes sau build khớp latest readiness; docs/verification/portable-session-verification.json. Memory3 execution gate vẫn false; full phase/release chưa complete. Không kèm settings/history cá nhân.
+
+## GitHub publication — 2026-10-11
+
+- Source commit: [57fb2d2](https://github.com/manhdauvn09-manhds/ClearRAM/commit/57fb2d2638ab9c10f579aacaa49bf2dd42c42c17), 143 file; đã push main của manhdauvn09-manhds/ClearRAM. git ls-remote và GitHub commit API khớp local SHA.
+- Source CI: [run 38106638093](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093) completed/success; mọi step plan/Disk fixture/policy/WPF/Clear/checkbox được quan sát success. Evidence docs/verification/github-actions-portable.json.
+- Đây là CI của source commit trên; không suy ra full Windows10/VM/release hoặc mở Memory3. Task child13/UI6 là local Win11 trace, không là step native task execution trên server.
+- .data, ZIP/artifacts, harness riêng và các file user không thuộc app không được commit. GitHub Download ZIP chứa source chạy bằng Start-MemoryClear.cmd; portable ZIP local chưa publish thành GitHub Release.
+- Commit tiếp theo chỉ ghi publication/CI evidence và plan/handoff; không đổi runtime.
 
 ---
 

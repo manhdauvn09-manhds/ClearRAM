@@ -222,5 +222,17 @@
     "MemoryTaskExecutionEnabled": false
   },
   "PostBuildRuntimeHashes": "Match latest readiness",
-  "Shortcut": "artifacts/portable-desktop-shortcut.json"
+  "Shortcut": "artifacts/portable-desktop-shortcut.json",
+  "Publication": {
+    "SourceCommit": "57fb2d2638ab9c10f579aacaa49bf2dd42c42c17",
+    "CommitUrl": "https://github.com/manhdauvn09-manhds/ClearRAM/commit/57fb2d2638ab9c10f579aacaa49bf2dd42c42c17",
+    "RemoteHeadVerified": "57fb2d2638ab9c10f579aacaa49bf2dd42c42c17",
+    "CI": {
+      "Id": 38106638093,
+      "Url": "https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093",
+      "Status": "completed",
+      "Conclusion": "success"
+    },
+    "SourceCIOnly": true
+  }
 }

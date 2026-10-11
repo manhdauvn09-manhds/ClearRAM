@@ -1,5 +1,5 @@
 {
-  "executedAt": "2026-10-11T02:51:47.866Z",
+  "executedAt": "2026-10-11T02:56:33.355Z",
   "runtime": "v24.16.0",
   "command": "node plan/check-memory-design.mjs",
   "scope": "design schema + pure fixture model + code-level DOM handlers/shared lock; no actual browser",
