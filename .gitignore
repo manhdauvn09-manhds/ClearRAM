@@ -24,3 +24,7 @@ artifacts/
 
 # Shipped copies the installer leaves beside a file you own or edited - resolve, then delete
 *.new
+
+# Python bytecode cache
+__pycache__/
+*.pyc
