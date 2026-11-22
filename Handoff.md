@@ -10,8 +10,11 @@
 ## OPEN (từ đợt chuyển thư mục)
 
 - Desktop `MemoryClear.lnk`: ĐÃ tạo lại 2026-11-23 (xóa lnk hỏng cũ, chạy `scripts\Create-DesktopShortcut.ps1` trên PS 5.1.26100.9818). Readback COM: target powershell.exe, `-File "E:\Develop\OthersApplication\MemoryClear\MemoryClear.ps1"`, WorkingDirectory mới; proof `artifacts\desktop-shortcut.json` (Launched=false, chưa double-click thử). until: user mở GUI từ shortcut và xác nhận.
-- Desktop `MemoryClear Portable 2026-10-11.lnk` (trỏ vào ZIP folder đã xóa) đã bị xóa theo yêu cầu user 2026-11-23. Hiện không có shortcut portable; khi build portable mới thì chạy `scripts\Create-PortableShortcut.ps1`.
-- Portable ZIP 20261011-111149-936015 và trace `artifacts\readiness-*` đã mất cùng thư mục cũ; mục "Package delivery: đã đạt" bên dưới không còn file để giao. until: build lại bằng `scripts\Build-Portable.ps1` ở vị trí mới và có portable-build.json mới. Evidence JSON trong `docs/verification/` vẫn còn (đã commit).
+- Portable ĐÃ build lại 2026-11-23 theo yêu cầu user (thay bản 20261011-111149-936015 đã mất cùng thư mục cũ; mục "Bộ chạy đã build — 2026-10-11" bên dưới là lịch sử). Runtime source không đổi kể từ 57fb2d2 (diff chỉ ở plan HTML) nên giữ version 2026.10.11.1-preview.
+  - Folder chạy: `E:\Develop\OthersApplication\MemoryClear\artifacts\releases\20261123-012134-a2d615\MemoryClear\Start-MemoryClear.cmd`.
+  - ZIP: `...\20261123-012134-a2d615\MemoryClear-2026.10.11.1-preview.zip`, 192596 bytes, 55 file, SHA256 1C42AAC45188808E007C841C1A92649A02D52D71B79087E5523A80DEDF57E16E (sidecar .sha256 khớp Get-FileHash). Packaged WPF controls smoke Passed, ZIP entry hashes Passed, không có .data/.git/.harness. Proof `docs/verification/portable-build.json`; ReleaseAcceptance=Unverified, Memory3 execution=false.
+  - Desktop `MemoryClear Portable 2026-10-11.lnk` đã tạo lại trỏ vào folder trên (lnk hỏng cũ đã xóa trước đó), COM readback Verified, Launched=false. until: user mở thử từ shortcut và xác nhận.
+- Trace `artifacts\readiness-*` cũ đã mất cùng thư mục cũ, chưa chạy lại readiness ở vị trí mới; evidence JSON trong `docs/verification/` vẫn còn. until: chạy `scripts\Verify-Readiness.ps1` nếu cần trace mới.
 
 ## NOW — 2026-10-11 (Asia/Tokyo)
 
