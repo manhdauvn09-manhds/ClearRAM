@@ -1,5 +1,17 @@
 # MemoryClear — Handoff hiện tại
 
+## NOW — 2026-11-23 (Asia/Tokyo): dự án đã chuyển thư mục
+
+- Vị trí mới duy nhất: `E:\Develop\OthersApplication\MemoryClear` (git clone từ origin, main = bb1aa17 "Add governance harness bundle", đã push). Thư mục cũ `E:\SourceCode\NEW_APPLICATION\MemoryClear` đã bị xóa (operator chạy script, đã verify không còn tồn tại).
+- Trước khi xóa: repo chỉ có 1 nhánh main, không worktree, không stash; commit bb1aa17 thêm 218 file harness (scripts/policies/schemas/agents/skills, AGENTS.md); `.gitignore` thêm `__pycache__/`, `*.pyc`.
+- Đã chép sang chỗ mới các file gitignore cục bộ: `.data/` (101 file settings/history), `.harness/local/`, `.harness/portal-sync.key`. KHÔNG chép: `artifacts/` (~110MB fixture + portable ZIP/readiness traces), `.tools/`.
+- Mọi đường dẫn `E:\SourceCode\NEW_APPLICATION\MemoryClear\...` ở các mục bên dưới là lịch sử, đã chết; thay bằng đường dẫn mới.
+
+## OPEN (từ đợt chuyển thư mục)
+
+- Desktop shortcut (MemoryClear.lnk, MemoryClear Portable 2026-10-11.lnk) trỏ vào thư mục cũ đã xóa → hỏng. until: operator chạy lại `powershell -File "E:\Develop\OthersApplication\MemoryClear\scripts\Create-DesktopShortcut.ps1"` và readback target mới.
+- Portable ZIP 20261011-111149-936015 và trace `artifacts\readiness-*` đã mất cùng thư mục cũ; mục "Package delivery: đã đạt" bên dưới không còn file để giao. until: build lại bằng `scripts\Build-Portable.ps1` ở vị trí mới và có portable-build.json mới. Evidence JSON trong `docs/verification/` vẫn còn (đã commit).
+
 ## NOW — 2026-10-11 (Asia/Tokyo)
 
 - User đã yêu cầu publication. Source 57fb2d2 push main và remote SHA verified; source CI completed/success, proof docs/verification/github-actions-portable.json. Chỉ source/app/tests/plan/evidence được stage; không harness/local data.
