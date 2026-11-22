@@ -10,7 +10,7 @@
 ## OPEN (từ đợt chuyển thư mục)
 
 - Desktop `MemoryClear.lnk`: ĐÃ tạo lại 2026-11-23 (xóa lnk hỏng cũ, chạy `scripts\Create-DesktopShortcut.ps1` trên PS 5.1.26100.9818). Readback COM: target powershell.exe, `-File "E:\Develop\OthersApplication\MemoryClear\MemoryClear.ps1"`, WorkingDirectory mới; proof `artifacts\desktop-shortcut.json` (Launched=false, chưa double-click thử). until: user mở GUI từ shortcut và xác nhận.
-- Desktop `MemoryClear Portable 2026-10-11.lnk` vẫn trỏ vào ZIP folder đã xóa → hỏng, chưa đụng. until: build portable mới rồi chạy `scripts\Create-PortableShortcut.ps1`, hoặc user xóa lnk này.
+- Desktop `MemoryClear Portable 2026-10-11.lnk` (trỏ vào ZIP folder đã xóa) đã bị xóa theo yêu cầu user 2026-11-23. Hiện không có shortcut portable; khi build portable mới thì chạy `scripts\Create-PortableShortcut.ps1`.
 - Portable ZIP 20261011-111149-936015 và trace `artifacts\readiness-*` đã mất cùng thư mục cũ; mục "Package delivery: đã đạt" bên dưới không còn file để giao. until: build lại bằng `scripts\Build-Portable.ps1` ở vị trí mới và có portable-build.json mới. Evidence JSON trong `docs/verification/` vẫn còn (đã commit).
 
 ## NOW — 2026-10-11 (Asia/Tokyo)
