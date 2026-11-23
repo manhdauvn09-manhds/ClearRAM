@@ -32,7 +32,7 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 ## NEXT
 
-1. Operator: các việc bảo mật máy dev còn lại (hardening, cập nhật Office) theo report local `docs/security/Security-Report-2026-11-23.html` mục 6.
+1. Operator: xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now). Hardening máy dev đã xong 23/11 và assistant đã đo lại; chi tiết trong report local `docs/security/Security-Report-2026-11-23.html` mục 6.
 2. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
 3. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
@@ -40,7 +40,6 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 - Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. until: người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
 - Security report + Harden-RdpSmb.ps1 chỉ ở local (`docs/security/`, untracked), Ops review đã xong. until: operator chọn giữ local hoặc commit (push từng bị auto-mode chặn vì chứa chi tiết lỗ hổng chưa vá).
-- Hardening máy dev: một phần đã xong 23/11, phần còn lại chờ operator (chi tiết chỉ trong report local). until: report mục 6 không còn mục chờ.
 - CyberAlert: Office update đã kích hoạt 23/11. until: đo lại build sau khi cập nhật. Starlette (Python 3.14, không liên quan app) đã vá 23/11.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
 - Shortcut Desktop (source + portable) chưa launch thử. until: user mở GUI từ từng shortcut và xác nhận.
