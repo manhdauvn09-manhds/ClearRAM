@@ -38,7 +38,7 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 ## OPEN
 
-- Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. until: người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
+- Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. HarnessAIToolKIT đã nhận 23/11, xếp P1 và sẽ sửa trong bundle tiếp theo. until: có bundle mới từ HarnessAIToolKIT; người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
 - Security report + Harden-RdpSmb.ps1 chỉ ở local (`docs/security/`, untracked), Ops review đã xong. until: operator chọn giữ local hoặc commit (push từng bị auto-mode chặn vì chứa chi tiết lỗ hổng chưa vá).
 - CyberAlert: Office update đã kích hoạt 23/11. until: đo lại build sau khi cập nhật. Starlette (Python 3.14, không liên quan app) đã vá 23/11.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
