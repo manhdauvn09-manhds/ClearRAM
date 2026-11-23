@@ -26,7 +26,7 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 **Ops review (OPS-MCP-80, 2026-11-23)** — bản đầy đủ `E:\Develop\ClaudeMCPServer\docs\Security\ops-review-20261123.md` mục B; đã đưa vào report mục 5.
 - Ops không đo PC nên không xác nhận "không xâm nhập". Một số cổng remote/chia sẻ của máy dev cần siết lại (chi tiết trong report local) ⇒ owner tự làm. Script đã soạn, CHƯA chạy: `docs/security/Harden-RdpSmb.ps1` (local, untracked).
-- `ClaudeMCPServer/ops/test_ops_residue.py` là fixture của Ops ⇒ cảnh báo Defender 21/11 là báo nhầm. File SecAegis: đã hỏi session SecAegis.
+- Cả 2 cảnh báo Defender (21/11, 23/11) là dương tính giả: fixture có chủ đích của Ops (`ops/test_ops_residue.py`) và SecAegis (`agent/test_secaegis_agent.py`, đã đổi sang ghép chuỗi ở commit 4a7dccf). Còn file transcript .jsonl của SecAegis bị Defender đánh dấu — operator tự quyết xóa/khôi phục/loại trừ.
 - Starlette 0.41.3 (Py3.14): không dịch vụ server nào dùng ⇒ P3. Outlook: Ops không có nguồn bản vá kênh M365 ⇒ owner Update Now.
 - H1/H2 Medium hợp lý; người sửa là team HarnessAIToolKIT — đã chuyển chi tiết cho session HarnessAIToolKIT.
 
@@ -41,7 +41,6 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. until: người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
 - Security report + Harden-RdpSmb.ps1 chỉ ở local (`docs/security/`, untracked), Ops review đã xong. until: operator chọn giữ local hoặc commit (push từng bị auto-mode chặn vì chứa chi tiết lỗ hổng chưa vá).
 - Siết cổng remote/chia sẻ máy dev (chi tiết report local). until: operator chạy Harden-RdpSmb.ps1 và script báo DONE (rule active trong ActiveStore).
-- Defender trên `SecAegis/agent/test_secaegis_agent.py`. until: session SecAegis xác nhận fixture (đã hỏi 2026-11-23).
 - CyberAlert: Outlook M365 16.0.20625.20108 (CVE-2026-124194, KEV hạn 24/11) chưa xác định bản vá kênh M365; Starlette 0.41.3 trong Python 3.14 (CVE-2026-48710, KEV) — không liên quan app. until: operator cập nhật Office và nâng/gỡ Starlette, đo lại phiên bản.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
 - Shortcut Desktop (source + portable) chưa launch thử. until: user mở GUI từ từng shortcut và xác nhận.
