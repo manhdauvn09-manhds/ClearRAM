@@ -1,5 +1,8 @@
 # Handoff — Phase 10 · Clean Data — triển khai
 
+> Ghi chú 2026-11-23: dự án đã chuyển sang `E:\Develop\OthersApplication\MemoryClear`; các đường dẫn `E:\SourceCode\NEW_APPLICATION\MemoryClear` trong file này là lịch sử.
+
+
 - Ngày cập nhật: 2026-10-10 (Asia/Tokyo)
 - Người thực hiện: Codex
 - Trạng thái bàn giao: **Nháp — đang triển khai, chưa kết thúc phase**

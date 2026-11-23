@@ -43,7 +43,7 @@ Tuổi chỉ là điều kiện bổ sung, không là bằng chứng file rác. 
 | Store | Manifest immutable + append journal JSONL trước từng side effect; bounded history; preview lớn phân trang. Không ghi full user path vào export mặc định |
 | Recovery | Backup inventory, hash/copy verification, restore preview/collision handling; mỗi mục biết recoverable hay permanent |
 
-Dự kiến `app/CleanData/*.psm1`, `app/clean-data-policy.json` + schema, Native FileIdentity helper C#/.NET Framework tương thích PS5.1, `app/CleanDataView.xaml`, `scripts/Run-CleanData-Acceptance.ps1`, `tests/Check-CleanData.ps1`. Đây là cấu trúc đề xuất; chưa tạo executor. Không đọc `.harness/` cho product.
+Dự kiến `app/CleanData/*.psm1`, `app/clean-data-policy.json` + schema, Native FileIdentity helper C#/.NET Framework tương thích PS5.1, `app/CleanDataView.xaml`, `scripts/Run-CleanData-Acceptance.ps1`, `tests/Check-CleanData.ps1` (hai script này vẫn chưa tạo tính đến 2026-11-23; nghiệm thu hiện dùng `scripts/Verify-Readiness.ps1`). Đây là cấu trúc đề xuất; chưa tạo executor. Không đọc `.harness/` cho product.
 
 ## 4. Scan / preview không tạo false positive
 

@@ -41,6 +41,6 @@ Nhánh cache phải là **thư mục tổ tiên đúng vị trí**, không khớ
 
 `tests/Check-DiskAppProfiles.ps1`: 16/16 trên PS5.1.26100.9444, marked fixtures, inventory/dependency synthetic. Có exact boundary/protected data, stale/unknown, portable possible reference, absent/empty/junction, cancelled/scope, native scan + analysis và hash dữ liệu trước/sau. `Check-DiskUI.ps1`: 30 assertions/25 controls; worker AppData thật trên fixture, mode switching/shared lock/no selection/no deletion và offscreen render. Evidence: `docs/verification/disk-app-profile-tests.json`, `disk-ui-tests.json`.
 
-Lệnh tái lập tự cd đúng project: `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Phase10.ps1"`.
+Lệnh tái lập tự cd đúng project: `powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Phase10.ps1"`.
 
 CD-02/03 vẫn review: đã lưu provenance/phiên bản quan sát; còn cần bằng chứng gỡ độc lập và kiểm chứng ngữ nghĩa cache theo version; kiểm tra native coverage/cancellation trên máy/VM; UI frozen manifest/two-step/restore và production safety trước khi mở xóa. Không có live inventory/Windows10/11 VM proof hay CI mới trong lượt này.

@@ -8,7 +8,7 @@ Windows11/PS5.1 portable preview. Clear Normal/Strong và Dọn Temp có duyệt
 
 **Quy định bắt buộc:** Cuối mỗi phase bắt buộc tạo docs/handoffs/PHASE-XX-HANDOFF.md theo TEMPLATE.md, cập nhật evidence của HO-XX và gửi link cho người dùng. Phase chỉ hoàn tất khi task và handoff đã hoàn tất. Nếu dừng giữa chừng, viết bản nháp và giữ trạng thái chưa hoàn tất.
 
-Mẫu: [TEMPLATE.md](docs/handoffs/TEMPLATE.md). Bàn giao hiện có: [Phase 00](docs/handoffs/PHASE-00-HANDOFF.md). Quy trình tiếp tục: [AGENTS.md](AGENTS.md). Các phase chưa hoàn thành chỉ có task handoff; không tạo báo cáo giả cho công việc chưa làm.
+Mẫu: [TEMPLATE.md](docs/handoffs/TEMPLATE.md). Bàn giao hiện có: [Phase 00](docs/handoffs/PHASE-00-HANDOFF.md), [Phase 01](docs/handoffs/PHASE-01-HANDOFF.md), [Phase 02](docs/handoffs/PHASE-02-HANDOFF.md), [Phase 03](docs/handoffs/PHASE-03-HANDOFF.md), [Phase 09](docs/handoffs/PHASE-09-HANDOFF.md), [Phase 10](docs/handoffs/PHASE-10-HANDOFF.md), [Phase 11](docs/handoffs/PHASE-11-HANDOFF.md), [Phase 12](docs/handoffs/PHASE-12-HANDOFF.md). Quy trình tiếp tục: [AGENTS.md](AGENTS.md). Các phase chưa hoàn thành chỉ có task handoff; không tạo báo cáo giả cho công việc chưa làm.
 
 - Tài liệu: 14/14 task hoàn tất.
 - MVP Windows: 14/52 task hoàn tất.

@@ -34,7 +34,7 @@ Mọi row và lịch sử vẫn `DeletionAllowed=false`; production Clean còn k
 
 `tests/Check-DiskOwnerHistory.ps1` kiểm tra fixtures native/synthetic metadata: seen→missing, no-history, incomplete/reference overrides, corrupt/future/SID/catalog/root identity/expired, exclusive lock/hardlink/junction, cancellation/scope và giữ nguyên dữ liệu. `Check-DiskUI.ps1` thực hiện hai lượt phân tích nền trên fixture (có metadata rồi thiếu), hiển thị trạng thái và provenance, vẫn khóa nút xóa. Báo cáo kết quả đã chạy nằm trong `docs/verification/disk-owner-history-tests.json`, `disk-ui-tests.json`; số mới nhất ở handoff phase10.
 
-Tái lập bằng script tự cd project: `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Phase10.ps1"`.
+Tái lập bằng script tự cd project: `powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Phase10.ps1"`.
 
 Chưa chứng minh live registry/CIM/MSIX coverage, sự kiện uninstall thật, ngữ nghĩa cache theo vendor version, crash/power-loss/multi-user Windows10/11. Việc lưu version không tự xác nhận cache của version đó disposable. Không dùng lịch sử local như gate xóa app data. CD-02 và phase10 chưa hoàn tất.
 

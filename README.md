@@ -4,15 +4,17 @@
 
 Clear Normal/Strong và Dọn Temp có duyệt dùng được trên Windows11 đã kiểm tra local. Memory mức3 có planner/executor đóng nhẹ, xác minh thoát, timeout, cancel và journal; bản portable vẫn khóa thực thi mức3 theo gate an toàn. Không tự force hoặc xóa dữ liệu app cũ. Local readiness16 bước đạt, gồm13 checks đóng app QA riêng và6 checks worker/DispatcherTimer. Các provider foreground/service/settings/policy trong test child là synthetic; không là nghiệm thu ứng dụng người dùng hoặc Windows10.
 
-Để chạy source tải từ GitHub, giải nén toàn bộ repo và nhấp đúp `Start-MemoryClear.cmd`. Để dựng bộ portable gọn, chạy `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Build-Portable.ps1"`; script tự cd project. Ở checkout khác, đổi đường dẫn script cho phù hợp. Bản build đã tạo local: version `2026.10.11.1-preview`, checksum/manifest và packaged GUI smoke đạt; [bằng chứng build](docs/verification/portable-build.json). ZIP local không tự trở thành GitHub Release; giới hạn vẫn theo [handoff phase12](docs/handoffs/PHASE-12-HANDOFF.md).
+Để chạy source tải từ GitHub, giải nén toàn bộ repo và nhấp đúp `Start-MemoryClear.cmd`. Để dựng bộ portable gọn, chạy `powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Build-Portable.ps1"`; script tự cd project. Ở checkout khác, đổi đường dẫn script cho phù hợp. Bản build local gần nhất (dựng lại 2026-11-23 ở thư mục mới, runtime không đổi): version `2026.10.11.1-preview`, checksum/manifest và packaged GUI smoke đạt; [bằng chứng build](docs/verification/portable-build.json). ZIP local không tự trở thành GitHub Release; giới hạn vẫn theo [handoff phase12](docs/handoffs/PHASE-12-HANDOFF.md).
 
 <!-- TEMP-CAPABILITY-10.3 -->
 Đã có **Disk → Dọn Temp có duyệt...** chạy thật với quyền user trên Windows11: .tmp/.log cũ ngay trong Temp, hai bước duyệt, progress/Dừng/kết thúc/nhật ký. Không Undo; không tự xóa dữ liệu app hoặc file lớn. [Cách dùng và giới hạn](docs/CLEAN_DATA_TEMP.md). Self-test12 + WPF7 đạt trên file QA mới tạo riêng, không xóa file có sẵn. Memory đã có3cards: hai mức trim hoạt động, mức3 preview opt-in; executor còn safety/QA gates. User đã chốt danh sách tự cho phép, không tự force. [Contract Memory3](docs/MEMORY_TASK_RUNTIME.md). Những đoạn readonly/fixture bên dưới mô tả scanner/app-data và transaction mẫu, không phải capability Temp riêng.
 
 
-## Disk — đang triển khai (2026-10-09)
+## Disk — đang triển khai (2026-10-09; lịch sử)
 
-App đã có hai tab RAM/CPU và Clean dữ liệu ổ Windows. Tab Disk mới **chỉ quét, không xóa**: temp theo retention ba mức; tìm file lớn/cũ trong Known Folders, mặc định512MB và cho chỉnh MB/tuổi/đuôi file hoặc chọn thư mục con cá nhân trên ổ Windows. Có search, phân trang1000 dòng và cancel/progress nền. Junction/cloud/hardlink/unknown ownership được giữ; hạn mức/lỗi quyền được báo rõ. Size/tuổi không chứng minh rác; đổi bộ lọc sẽ bỏ preview cũ, không tự chọn file.
+> Mục này mô tả trạng thái 2026-10-09. Từ 2026-10-10 (bản 10.3) Disk đã có **Dọn Temp có duyệt** chạy thật (xem đoạn phía trên); phần dưới vẫn đúng cho scanner/app-data/file lớn.
+
+App đã có hai tab RAM/CPU và Clean dữ liệu ổ Windows. Khi đó tab Disk **chỉ quét, không xóa**: temp theo retention ba mức; tìm file lớn/cũ trong Known Folders, mặc định512MB và cho chỉnh MB/tuổi/đuôi file hoặc chọn thư mục con cá nhân trên ổ Windows. Có search, phân trang1000 dòng và cancel/progress nền. Junction/cloud/hardlink/unknown ownership được giữ; hạn mức/lỗi quyền được báo rõ. Size/tuổi không chứng minh rác; đổi bộ lọc sẽ bỏ preview cũ, không tự chọn file.
 
 User chốt portable quyền user, Windows xử lý mục hệ thống; cho xóa vĩnh viễn app data sau hai bước duyệt. Production guards/backup/VM chưa nghiệm thu nên **Dọn an toàn đang khóa**. [Handoff phase10 (nháp)](docs/handoffs/PHASE-10-HANDOFF.md) và `plan/tasks.json` ghi tiến độ thật. FixtureExecutor đã có cùng source handle cho backup/hash/delete và đọc nhật ký sau gián đoạn; đây vẫn là module phát triển, không dùng để dọn dữ liệu người dùng. [Contract và giới hạn transaction](docs/CLEAN_DATA_TRANSACTION.md).
 
@@ -22,7 +24,7 @@ Sau quét AppData, Phân tích ứng dụng còn lưu **lịch sử quan sát lo
 
 Sau khi quét, **Phân tích ứng dụng** đối chiếu trang hiện tại với thông tin cài đặt và process/service/task, thêm cột ứng dụng/tham chiếu và tìm kiếm theo tên app. Dữ liệu thiếu/không rõ hoặc shared được giữ; thiếu uninstall key không chứng minh app đã gỡ. Có worker/cancel/shared lock, không tự chọn/xóa và không thu CommandLine. [Contract ownership và giới hạn](docs/CLEAN_DATA_OWNERSHIP.md).
 
-Mở lại app qua shortcut Desktop hoặc `powershell -NoProfile -STA -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\MemoryClear.ps1"`; script tự cd project. Kiểm chứng local bằng một script `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Phase10.ps1"`; chỉ test fixture tự tạo trong artifacts, không clean user data.
+Mở lại app qua shortcut Desktop hoặc `powershell -NoProfile -STA -ExecutionPolicy Bypass -File "E:\Develop\OthersApplication\MemoryClear\MemoryClear.ps1"`; script tự cd project. Kiểm chứng local bằng một script `powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Phase10.ps1"`; chỉ test fixture tự tạo trong artifacts, không clean user data.
 
 Bản portable cho Windows 10/11 x64, dùng Windows PowerShell 5.1 và WPF có sẵn. Không cần .NET SDK, npm hoặc quyền admin để mở giao diện.
 
@@ -33,7 +35,7 @@ Source preview: https://github.com/manhdauvn09-manhds/ClearRAM. Tải Code → D
 Giải nén toàn bộ thư mục rồi mở **Start-MemoryClear.cmd**. Hoặc:
 
 ```powershell
-powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\MemoryClear.ps1"
+powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "E:\Develop\OthersApplication\MemoryClear\MemoryClear.ps1"
 ```
 
 `Bypass` chỉ áp dụng cho process PowerShell được mở, không thay execution policy của máy. Chính sách doanh nghiệp/AppLocker có thể vẫn chặn script; app sẽ không tự vượt qua chúng.
@@ -41,7 +43,7 @@ powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_
 Để tạo **MemoryClear.lnk** trên Desktop của bạn, chạy script bên dưới. Shortcut dùng Windows PowerShell 5.1/STA, ẩn cửa sổ console và chạy từ thư mục project. Shortcut trỏ tới source hiện tại nên các lần cập nhật script sẽ được nạp khi mở lại app. Máy phát triển đã tạo và xác minh shortcut; mỗi máy/đường dẫn mới cần tạo riêng. Script tự xác định Desktop (kể cả OneDrive):
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Create-DesktopShortcut.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\Develop\OthersApplication\MemoryClear\scripts\Create-DesktopShortcut.ps1"
 ```
 
 ## Dùng
@@ -93,20 +95,20 @@ powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Check-Clear
 
 Đây là bản thử nghiệm. Ma trận Windows 10/11, kiểm tra layout/DPI, hộp thoại dữ liệu chưa lưu, áp lực RAM trong VM và soak test vẫn phải nghiệm thu trước phát hành chính thức. Xem trạng thái mới nhất trong `IMPLEMENTATION_PLAN.md`.
 
-Source trong workspace đã có Clear. ZIP `MemoryClear-PowerShell-preview.zip` cũ được tạo trước thay đổi Clear. Nếu cần đóng gói source mới, script sau tự chuyển tới đúng thư mục, tạo ZIP tên theo thời điểm và kiểm tra entry/checksum; không đóng gói dữ liệu `.data`:
+Bộ chạy khuyến nghị là portable từ `scripts/Build-Portable.ps1` (mục đầu trang). Nếu chỉ cần ZIP source, script sau tự chuyển tới đúng thư mục, tạo ZIP tên theo thời điểm và kiểm tra entry/checksum; không đóng gói dữ liệu `.data`:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Package-Preview.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "E:\Develop\OthersApplication\MemoryClear\scripts\Package-Preview.ps1"
 ```
 
 ## Kế hoạch và handoff
 
-Tab Disk thêm **Dọn bằng Windows**, **Ứng dụng đã cài**, **Thử giao dịch / phục hồi**. Giao dịch mẫu có background progress/cancel, content hash, backup/journal/history và restore không ghi đè. Production dữ liệu thật vẫn khóa; Memory runtime2mức. [Runbook và giới hạn](docs/CLEAN_DATA_OPERATIONS.md). Nghiệm thu tự cd: `powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Readiness.ps1"`. Source preview chưa là release; không suy ra Windows10/11 VM từ local host pass.
+Tab Disk thêm **Dọn bằng Windows**, **Ứng dụng đã cài**, **Thử giao dịch / phục hồi**. Giao dịch mẫu có background progress/cancel, content hash, backup/journal/history và restore không ghi đè. Production dữ liệu thật vẫn khóa; Memory runtime2mức. [Runbook và giới hạn](docs/CLEAN_DATA_OPERATIONS.md). Nghiệm thu tự cd: `powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1"`. Source preview chưa là release; không suy ra Windows10/11 VM từ local host pass.
 
 Tab Disk hiện có **Duyệt danh sách...**: chọn dòng để xem file/path/tác động. Production vẫn chặn xóa; luồng duyệt hai bước chạy thử bằng dữ liệu mẫu, không xóa file. [Chi tiết và giới hạn](docs/CLEAN_DATA_REVIEW.md). Script sau tự cd project, tạo fixture riêng, mở cửa sổ và kiểm hash khi đóng:
 
 ```powershell
-powershell -NoProfile -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Preview-DiskReview.ps1"
+powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Preview-DiskReview.ps1"
 ```
 
 Mở `MemoryClear-Plan.html`; nguồn trạng thái ở `plan/tasks.json`. Kết thúc mọi phase phải có tài liệu trong `docs/handoffs/` theo `TEMPLATE.md`.

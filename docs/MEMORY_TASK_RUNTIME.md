@@ -33,13 +33,13 @@ PowerShell5.1/WPF portable Windows11 hiện có. Mức3 chỉ saved Cho đóng g
 
 ## 4. Cách chạy và kiểm chứng
 
-PS5.1 / Win11 build 26200. Lệnh: powershell -NoProfile -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest.
+PS5.1 / Win11 build 26200. Lệnh: powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest.
 
 16 bước readiness đã đạt; trace artifacts\readiness-20261011-020956-50571223\readiness.json. Task release 13/13; Task UI 6/6; toàn bộ source hashes trong report. Own Temp tests chỉ xóa file QA mới tạo, task tests chỉ đóng executable QA tự biên dịch. Foreground/service/opt-in/policy providers của test child là synthetic và private; không sửa settings thực. Offscreen dispatcher QA không thay nghiệm thu con người.
 
 Các lần fail được giữ ở artifacts/task-release-first-failed.json, task-release-service-unavailable.json, task-release-cancel-timing-failed.json, task-release-foreground-unavailable.json. Hidden WinForms/utility window và timed cancellation đã làm fixture không đúng; fixture mới offscreen no-activate, cancel khi nhận WaitingForExit. Positive child tests dùng foreground provider riêng; production vẫn Native foreground và unknown fail closed. Không xóa trace lỗi.
 
-Build: powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Build-Portable.ps1". Chỉ khi docs/verification/portable-build.json ghi Passed mới coi package đạt. User chạy Start-MemoryClear.cmd trong toàn bộ folder đã giải nén.
+Build: powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Build-Portable.ps1". Chỉ khi docs/verification/portable-build.json ghi Passed mới coi package đạt. User chạy Start-MemoryClear.cmd trong toàn bộ folder đã giải nén.
 
 Chưa kiểm chứng: Windows10/VM, human save-dialog/keyboard/DPI, adversarial window races, full historical safety/action/CLI gates, release signing/server CI source mới. General appdata deletion chưa mở.
 

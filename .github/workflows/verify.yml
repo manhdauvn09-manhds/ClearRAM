@@ -1,5 +1,7 @@
 ﻿name: Verify PowerShell preview
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   verify:
     runs-on: windows-latest

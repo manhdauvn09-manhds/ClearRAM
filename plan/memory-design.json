@@ -7,7 +7,7 @@
   "levels": [
     {"id":1,"name":"Tiêu chuẩn","action":"Trim nhẹ","description":"Chỉ giảm working set của process đủ điều kiện; giữ app và dữ liệu.","effect":"RAM có thể nạp lại; không bảo đảm giảm CPU hay commit.","maxProcesses":12,"seconds":30,"cooldownSeconds":60},
     {"id":2,"name":"Chuyên sâu","action":"Trim rộng hơn","description":"Mở rộng ứng viên theo policy Strong; bảo vệ foreground, hệ thống và app đang bận.","effect":"Có thể chậm lần dùng lại vì page faults; vẫn không đóng app.","maxProcesses":32,"seconds":60,"cooldownSeconds":120},
-    {"id":3,"name":"Giải phóng tác vụ","action":"Trim + đóng có kiểm soát","description":"Đóng task đã xác minh và được duyệt; force kill chỉ chọn riêng, không tự nâng cấp.","effect":"Có thể ngừng âm thanh, thông báo, tải xuống hoặc mất dữ liệu chưa lưu nếu force kill.","maxProcesses":8,"seconds":60,"cooldownSeconds":120}
+    {"id":3,"name":"Giải phóng tác vụ","action":"Trim + đóng có kiểm soát","description":"Đóng task đã xác minh và được duyệt; force kill chỉ chọn riêng, không tự nâng cấp.","effect":"Có thể ngừng âm thanh, thông báo, tải xuống hoặc mất dữ liệu chưa lưu nếu force kill.","maxProcesses":10,"seconds":60,"cooldownSeconds":120}
   ],
   "contract":{"autoKill":false,"autoEscalateCloseToForce":false,"killTree":false,"protectForeground":true,"protectCriticalServices":true,"requireFreshIdentity":true,"productionAllowlistDefaultEmpty":true,"maxConcurrentOperations":1},
   "fixtureRows":[

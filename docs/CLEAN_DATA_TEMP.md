@@ -25,11 +25,11 @@ Mọi ứng viên trong capability này là **Review**: có thể mất log ch�
 
 Trên Windows11 Client build26200/25H2, PS5.1.26100.9444, đã chạy:
 
-`powershell -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-OwnTemp.ps1"`
+`powershell -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-OwnTemp.ps1"`
 
 12/12 check đạt: chỉ file QA tên GUID mới tạo, chọn scope chính xác, hai bước, native owner/age/type/root, commit/journal/no replay, content change, locked file, cancel. Report `docs/verification/temp-cleanup-tests.json`. Không xóa dữ liệu có sẵn. Các file QA còn lại được liệt kê và giữ để kiểm tra; không tự dọn Temp sau test.
 
-`powershell -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\tests\Check-TempUI.ps1"`
+`powershell -STA -File "E:\Develop\OthersApplication\MemoryClear\tests\Check-TempUI.ps1"`
 
 7/7 check đạt: worker/DispatcherTimer thật, checkbox template click cập nhật source hai chiều, Back bỏ approval, shared lock, native QA deletion/end status và render content. Report `docs/verification/temp-ui-tests.json`, ảnh `artifacts/temp-ui-preview.png` đã xem. Chưa thay thế nghiệm thu thao tác người dùng/keyboard/DPI.
 

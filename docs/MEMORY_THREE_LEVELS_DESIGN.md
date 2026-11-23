@@ -8,7 +8,7 @@
 |---|---|---|
 | Tiêu chuẩn | Normal policy hiện có: ≥64 MB, CPU≤0.1%, tối đa12/30s, cooldown60s | Clear trực tiếp, không popup cảnh báo; giữ tiến trình, RAM có thể nạp lại |
 | Chuyên sâu | Strong policy hiện có: ≥32 MB, CPU≤1%, tối đa32/60s, cooldown120s | Clear trực tiếp, không popup cảnh báo; giữ bảo vệ/foreground/identity, có thể thêm page faults khi dùng lại |
-| Giải phóng tác vụ | Trim + graceful exit task đã có profile/allowlist và điều kiện đủ; tối đa8 close/force,60s,cooldown120s đề xuất | Disposable đã duyệt chạy trực tiếp; app có tác động cần duyệt; force riêng từng app, hai bước, không tự fallback |
+| Giải phóng tác vụ | Trim + graceful exit task đã có profile/allowlist và điều kiện đủ; tối đa10 task, TTL60s, close timeout20s, force tắt (theo runtime `app/memory-task-policy.json` từ 2026-10-10; cooldown120s còn là đề xuất) | Disposable đã duyệt chạy trực tiếp; app có tác động cần duyệt; force riêng từng app, hai bước, không tự fallback |
 
 CPU không phải vùng nhớ để xóa. Trim giảm working set, không bảo đảm giảm CPU/commit. Close/Kill có thể giảm CPU/private allocation khi tiến trình **thật sự thoát**, nhưng RAM/CPU toàn máy thay đổi bởi workload khác. Không cộng toàn working set/shared/private để cam kết thu hồi. [Working Set](https://learn.microsoft.com/en-us/windows/win32/memory/working-set).
 

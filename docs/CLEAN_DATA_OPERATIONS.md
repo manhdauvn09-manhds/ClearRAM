@@ -19,7 +19,7 @@ Cập nhật 2026-10-10 (Asia/Tokyo). Revision10.2. Bộ thực thi này chỉ n
 Trong app: tab Disk → **Thử giao dịch / phục hồi**. Hoặc script tự cd/tạo mẫu/mở cửa sổ:
 
 ```powershell
-powershell -NoProfile -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Preview-DiskOperations.ps1"
+powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Preview-DiskOperations.ps1"
 ```
 
 Giữ Backup mặc định, đánh dấu Đã đọc cho log/database, duyệt cuối và gõ phrase riêng của phiên, rồi Chạy trên file mẫu. Tab Nhật ký và phục hồi: kiểm tra journal, chọn đích, xác nhận đúng đích rồi phục hồi. Safe-only không yêu cầu cảnh báo rủi ro; Blocked không override.
@@ -43,7 +43,7 @@ Chưa hoàn tất: independent **production** owner/risk authority, external bac
 Script sau tự cd, chạy13 Disk suites + RAM/core + plan/design/parser, ghi transcript/evidence/hash source. Không cần đứng trong project. Không tự mở GUI/đóng gói nếu không truyền switch.
 
 ```powershell
-powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Readiness.ps1"
+powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1"
 ```
 
 Trong VM Windows10/11 riêng, dùng lần lượt `-ExpectedFamily Windows10 -DisposableVM` hoặc `-ExpectedFamily Windows11 -DisposableVM`; VM flag là lời khai operator, được ghi provenance, không giả là đã độc lập xác minh. Báo cáo của một máy không đại diện máy còn lại. `-Package` đóng gói source preview và xác minh entries/checksum; `-OpenApp` mở GUI sau checks. Script không mở cổng production chỉ vì tests local đạt.

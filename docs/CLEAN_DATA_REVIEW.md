@@ -30,7 +30,7 @@ UI hiển thị thời điểm hết hạn; kiểm tra hết hạn diễn ra khi
 Script tự cd tới project, tạo hai file mới trong root fixture riêng, mở cửa sổ duyệt, rồi kiểm tra hash và sự tồn tại của các file sau khi đóng. Không xóa, không yêu cầu admin, không tự dọn fixture.
 
 ```powershell
-powershell -NoProfile -STA -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Preview-DiskReview.ps1"
+powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Preview-DiskReview.ps1"
 ```
 
 Agent đã parse script bằng PowerShell và kiểm tra cùng luồng qua WPF offscreen; **chưa chạy phiên interactive cho operator**. Không coi ảnh render/test sự kiện là bằng chứng đã bấm trên máy người dùng.
@@ -38,7 +38,7 @@ Agent đã parse script bằng PowerShell và kiểm tra cùng luồng qua WPF o
 Tái lập bộ kiểm tra tự cd:
 
 ```powershell
-powershell -NoProfile -File "E:\SourceCode\NEW_APPLICATION\MemoryClear\scripts\Verify-Phase10.ps1"
+powershell -NoProfile -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Phase10.ps1"
 ```
 
 ## Bằng chứng và phần còn lại

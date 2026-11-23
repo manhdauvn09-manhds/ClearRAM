@@ -1,5 +1,8 @@
 # Handoff nháp — Phase 03 · Quan sát
 
+> Ghi chú 2026-11-23: dự án đã chuyển sang `E:\Develop\OthersApplication\MemoryClear`; các đường dẫn `E:\SourceCode\NEW_APPLICATION\MemoryClear` trong file này là lịch sử.
+
+
 - Ngày: 2026-10-08 (Asia/Tokyo). Người thực hiện: Codex.
 - Trạng thái: **Chờ kiểm tra; phase chưa hoàn tất**.
 - Task handoff: HO-03 / review. Revision: 2026-10-08.5. Branch main; lịch sử commit tại repository ClearRAM. Chưa phát hành MVP.
