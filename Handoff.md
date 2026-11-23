@@ -18,29 +18,23 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Desktop: `MemoryClear.lnk` → source mới; `MemoryClear Portable 2026-10-11.lnk` → folder portable trên. Cả hai COM readback Verified, Launched=false.
 - `scripts/Create-PortableShortcut.ps1` (sửa 2026-11-23) giờ đặt tên shortcut theo version trong `package-manifest.json` → lần build sau sẽ tạo `MemoryClear Portable 2026.10.11.1-preview.lnk`; bản trong ZIP 20261123 vẫn là script cũ (tên 2026-10-11).
 
-**Audit 2026-11-23** — report `docs/security/Security-Report-2026-11-23.html` (chỉ local, chưa commit: auto-mode chặn push vì chứa chi tiết lỗ hổng harness chưa vá; đã gửi OPS-MCP-80 review).
-- Code sản phẩm: 0 Critical/High/Medium. Low: journal hash không khóa (Operations.psm1:140, FileInventory.cs:334), `-ExecutionPolicy Bypass` + Add-Type lúc chạy. Low thứ ba (workflow thiếu `permissions:`) đã sửa: `permissions: contents: read`.
-- CyberAlert (bảng cập nhật 21/11): Git 2.56.1, Node 24.22.3, Chrome 158.0.8127.36 đã vá; Edge/Windows/PS5.1/.NET không có mục. Không có dấu hiệu xâm nhập trong nguồn đã xem (Defender, cổng, tài khoản local).
-- Docs/HTML đã đồng bộ lại 2026-11-23: đổi đường dẫn live trong README + 6 docs; ghi chú "lịch sử" ở 5 file PHASE-*; README bỏ ZIP cũ và đánh dấu mục "chỉ quét" 2026-10-09 là lịch sử; `plan/build-plan.mjs` sinh danh sách handoff từ `docs/handoffs/`; `plan/memory-design.json` mức 3 maxProcesses 8→10 khớp runtime; CLEAN_DATA_ARCHITECTURE ghi rõ 2 script dự kiến chưa tạo.
-- Checks chạy 2026-11-23 (node v24.22.3): check-plan PASS, check-clean-data 18/18, check-memory-design 13/13, check-runtime-policies 9/9 (evidence JSON trong `docs/verification/` được ghi lại).
-
-**Ops review (OPS-MCP-80, 2026-11-23)** — bản đầy đủ `E:\Develop\ClaudeMCPServer\docs\Security\ops-review-20261123.md` mục B; đã đưa vào report mục 5.
-- Ops không đo PC nên không xác nhận "không xâm nhập". Một số cổng remote/chia sẻ của máy dev cần siết lại (chi tiết trong report local) ⇒ owner tự làm. Script đã soạn, CHƯA chạy: `docs/security/Harden-RdpSmb.ps1` (local, untracked).
-- Cả 2 cảnh báo Defender (21/11, 23/11) là dương tính giả: fixture có chủ đích của Ops (`ops/test_ops_residue.py`) và SecAegis (`agent/test_secaegis_agent.py`, đã đổi sang ghép chuỗi ở commit 4a7dccf). Còn file transcript .jsonl của SecAegis bị Defender đánh dấu — operator tự quyết xóa/khôi phục/loại trừ.
-- Starlette 0.41.3 (Py3.14): không dịch vụ server nào dùng ⇒ P3. Outlook: Ops không có nguồn bản vá kênh M365 ⇒ owner Update Now.
-- H1/H2 Medium hợp lý; người sửa là team HarnessAIToolKIT — đã chuyển chi tiết cho session HarnessAIToolKIT.
+**Audit bảo mật 2026-11-23** — report local `docs/security/Security-Report-2026-11-23.html` (untracked; Ops/OPS-MCP-80 đã review, bản Ops ở `E:\Develop\ClaudeMCPServer\docs\Security\ops-review-20261123.md` mục B).
+- Code sản phẩm: 0 Critical/High/Medium; Low còn lại ở OPEN; workflow đã có `permissions: contents: read` (9b2d8b4).
+- CyberAlert (bảng 21/11): Git 2.56.1, Node 24.22.3, Chrome 158 đã vá; Starlette Python 3.14 nâng lên 1.10.0 (fastapi 0.165.0) theo lựa chọn operator.
+- Máy dev: hardening do operator chạy `docs/security/Harden-RdpSmb.ps1` (admin), assistant đo lại xong 23/11. 2 cảnh báo Defender là fixture test của Ops và SecAegis (đã xác nhận) — dương tính giả.
+- Docs/HTML đồng bộ lại (9b2d8b4): đường dẫn mới, README, danh sách handoff tự sinh, Memory L3 max10. Checks 23/11: check-plan PASS, clean-data 18/18, memory-design 13/13, runtime-policies 9/9.
 
 ## NEXT
 
-1. Operator: xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now). Hardening máy dev đã xong 23/11 và assistant đã đo lại; chi tiết trong report local `docs/security/Security-Report-2026-11-23.html` mục 6.
+1. Việc dở của phiên 2026-11-23: operator xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now; KEV hạn 24/11), rồi assistant đo `VersionToReport` trong `HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration` và cập nhật report mục 6. Chờ bundle harness mới từ HarnessAIToolKIT.
 2. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
 3. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
 ## OPEN
 
-- Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. HarnessAIToolKIT đã nhận 23/11, xếp P1 và sẽ sửa trong bundle tiếp theo. until: có bundle mới từ HarnessAIToolKIT; người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
-- Security report + Harden-RdpSmb.ps1 chỉ ở local (`docs/security/`, untracked), Ops review đã xong. until: operator chọn giữ local hoặc commit (push từng bị auto-mode chặn vì chứa chi tiết lỗ hổng chưa vá).
-- CyberAlert: Office update đã kích hoạt 23/11. until: đo lại build sau khi cập nhật. Starlette (Python 3.14, không liên quan app) đã vá 23/11.
+- Bản harness cập nhật nằm chưa commit trong working tree (một phần đã stage; không do phiên app tạo) có 2 lỗi Medium H1/H2 trong `harnessd.py` (chi tiết chỉ ở report local). HarnessAIToolKIT nhận 23/11, sửa ở bundle sau. until: có bundle mới đã sửa; phiên app chỉ commit file của mình (`git commit -- <paths>`).
+- `docs/security/` (report + Harden-RdpSmb.ps1) chỉ ở local. until: operator chọn giữ local hoặc commit.
+- Office (CyberAlert KEV): update kích hoạt 23/11 nhưng lần đo cuối build chưa đổi (16.0.20625.20108). until: build mới hơn được đo và đối chiếu advisory.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
 - Shortcut Desktop (source + portable) chưa launch thử. until: user mở GUI từ từng shortcut và xác nhận.
 - Trace readiness ở vị trí mới chưa có. until: chạy Verify-Readiness (NEXT 3) và có `artifacts\readiness-*\readiness.json` mới.
@@ -61,4 +55,6 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Không coi tên/CPU/RAM/size/tuổi/thiếu uninstall key là bằng chứng rác hoặc app không cần; không cộng size unknown/quarantine cùng ổ vào reclaim.
 - Không hứa dọn toàn bộ RAM; trim không decommit, không giảm CPU chắc chắn.
 - Không biến unverified thành green: giữ trace failed, ghi "chưa kiểm được" khi không đo được (C12/C14). Firewall: đọc ActiveStore (GPO), đừng báo tắt theo local store.
+- Không đưa chi tiết lỗ hổng chưa vá hay cấu hình bảo mật máy dev vào repo (public): auto-mode chặn push; giữ trong `docs/security/` local, Handoff chỉ ghi chung.
+- Sửa text có đường dẫn `E:\…` hoặc tiếng Việt: `sed` trong Git Bash không khớp backslash và heredoc Python lỗi Unicode — dùng file script Python trong `.harness/tmp/` chạy với `python -X utf8`, hoặc Edit tool.
 - Giữ UTF-8 BOM cho .ps1 có tiếng Việt; test bằng `powershell.exe` 5.1, không thay bằng `pwsh`.
