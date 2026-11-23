@@ -24,18 +24,26 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Docs/HTML đã đồng bộ lại 2026-11-23: đổi đường dẫn live trong README + 6 docs; ghi chú "lịch sử" ở 5 file PHASE-*; README bỏ ZIP cũ và đánh dấu mục "chỉ quét" 2026-10-09 là lịch sử; `plan/build-plan.mjs` sinh danh sách handoff từ `docs/handoffs/`; `plan/memory-design.json` mức 3 maxProcesses 8→10 khớp runtime; CLEAN_DATA_ARCHITECTURE ghi rõ 2 script dự kiến chưa tạo.
 - Checks chạy 2026-11-23 (node v24.22.3): check-plan PASS, check-clean-data 18/18, check-memory-design 13/13, check-runtime-policies 9/9 (evidence JSON trong `docs/verification/` được ghi lại).
 
+**Ops review (OPS-MCP-80, 2026-11-23)** — bản đầy đủ `E:\Develop\ClaudeMCPServer\docs\Security\ops-review-20261123.md` mục B; đã đưa vào report mục 5.
+- Ops không đo PC nên không xác nhận "không xâm nhập". Một số cổng remote/chia sẻ của máy dev cần siết lại (chi tiết trong report local) ⇒ owner tự làm. Script đã soạn, CHƯA chạy: `docs/security/Harden-RdpSmb.ps1` (local, untracked).
+- `ClaudeMCPServer/ops/test_ops_residue.py` là fixture của Ops ⇒ cảnh báo Defender 21/11 là báo nhầm. File SecAegis: đã hỏi session SecAegis.
+- Starlette 0.41.3 (Py3.14): không dịch vụ server nào dùng ⇒ P3. Outlook: Ops không có nguồn bản vá kênh M365 ⇒ owner Update Now.
+- H1/H2 Medium hợp lý; người sửa là team HarnessAIToolKIT — đã chuyển chi tiết cho session HarnessAIToolKIT.
+
 ## NEXT
 
-1. Chờ phản hồi review của OPS-MCP-80; sửa report theo góp ý, rồi operator quyết commit report hay giữ local.
+1. Operator: Office Update Now (KEV hạn 24/11); chạy (PowerShell Run as administrator) `powershell -ExecutionPolicy Bypass -File "E:\Develop\OthersApplication\MemoryClear\docs\security\Harden-RdpSmb.ps1"` — thêm `-DisableRdp` nếu không dùng RDP; script tự verify ActiveStore, exit 1 nếu GPO bỏ qua rule local.
 2. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
 3. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
 ## OPEN
 
 - Harness update đang nằm chưa commit trong working tree (harnessd http hooks, write-scope, installer…; không do các phiên MemoryClear tạo). Có 2 phát hiện Medium (H1, H2) trong `harnessd.py`, đã verify; chi tiết chỉ nằm trong report local, không ghi vào repo. until: người duy trì harness sửa và tự commit; phiên app chỉ commit file của mình (`git commit -- <paths>`).
-- Security report chưa commit/push. until: Ops review xong và operator chọn giữ local hoặc commit.
+- Security report + Harden-RdpSmb.ps1 chỉ ở local (`docs/security/`, untracked), Ops review đã xong. until: operator chọn giữ local hoặc commit (push từng bị auto-mode chặn vì chứa chi tiết lỗ hổng chưa vá).
+- Siết cổng remote/chia sẻ máy dev (chi tiết report local). until: operator chạy Harden-RdpSmb.ps1 và script báo DONE (rule active trong ActiveStore).
+- Defender trên `SecAegis/agent/test_secaegis_agent.py`. until: session SecAegis xác nhận fixture (đã hỏi 2026-11-23).
 - CyberAlert: Outlook M365 16.0.20625.20108 (CVE-2026-124194, KEV hạn 24/11) chưa xác định bản vá kênh M365; Starlette 0.41.3 trong Python 3.14 (CVE-2026-48710, KEV) — không liên quan app. until: operator cập nhật Office và nâng/gỡ Starlette, đo lại phiên bản.
-- Security log (4624/4625) chưa đọc được (cần admin). Defender 21/11 + 23/11: Backdoor:PHP trong file test của ClaudeMCPServer/SecAegis, không active/không execute. until: chạy kiểm Security log elevated và chủ 2 dự án xác nhận fixture.
+- Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
 - Shortcut Desktop (source + portable) chưa launch thử. until: user mở GUI từ từng shortcut và xác nhận.
 - Trace readiness ở vị trí mới chưa có. until: chạy Verify-Readiness (NEXT 3) và có `artifacts\readiness-*\readiness.json` mới.
 - Memory3 rollout. until: ML01 nonempty/revalidate + SAFE-04/QA-02 và human/nonempty checks đạt; execution=false, không force fallback.
