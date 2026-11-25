@@ -310,6 +310,65 @@ handoff:
     - ".harness/local/"
     - ".harness/context/"
 
+# C16 "Worktree budget": at most `max_extra` git worktrees besides the main
+# checkout. Each is a full copy of the source (B-91: 92,196 files under
+# .claude/worktrees hung the Portal sync). Read by harness_worktree.py:
+#   PreToolUse guard   denies EnterWorktree / Agent(isolation: worktree) /
+#                      `git worktree add` when the budget is full (Claude Code only);
+#   Stop hook          once per HEAD in a finished worktree: "merge it now";
+#   SessionStart       notes an over-budget, merged-but-kept or abandoned one;
+#   doctor             WARN (never FAIL) for the same;
+#   git post-checkout  warns Codex / a person (cannot undo the add) -- install
+#                      with `harness-worktree install-git-hook`.
+# `harness-worktree finish` = merge into merge_target, push, remove, branch -d.
+# Missing section = these defaults; only `enabled: false` turns it off (C10:
+# local defense-in-depth, not a boundary).
+# 12-11 (operator: "triet de"): one worktree, merged ones are finished AUTOMATICALLY
+# (SessionStart, Stop for the other worktrees of the repo, and the daily sweep task
+# `harness-worktree sweep -Base E:\Develop`), doctor grades a breach FAIL.
+worktrees:
+  enabled: true
+  max_extra: 1                              # worktrees allowed besides main, per repo
+  merge_target: "main"
+  push_after_merge: true                    # finish pushes merge_target when it tracks a remote
+  remind_on_stop: true
+  merged_idle_hours: 2                      # merged + clean + untouched this long -> finish it
+  stale_after_days: 1                       # untouched this long -> "abandoned" (reported, never auto-merged)
+  auto_finish_merged: true                  # SessionStart / Stop / sweep run `finish` on merged+clean+idle worktrees
+  doctor_grade: fail                        # fail | warn
+
+# C17 "Write scope" (15-11-2026, owner's ruling after 17 repo copies -- ~11 GB --
+# were written to the root of E:\ by a session granted one project): a session
+# writes ONLY inside the project folder it was granted, plus that project's own
+# Claude memory dir. Not %TEMP%, not the session scratchpad, not a sibling project.
+# harnessd decides (harness_write_scope.py): file tools exactly; shell commands by
+# pattern (verb table: .harness/control/write-scope.json); after each shell command
+# a new entry in the drive root / beside the project is reported + logged. The
+# granted folder comes from the session's transcript path, not from `cwd`.
+# Missing section = these defaults; only `enabled: false` turns it off. C10: local
+# defense-in-depth -- the hard boundary is a restricted OS account.
+write_scope:
+  enabled: true
+  allow_claude_memory: true                 # ~/.claude/projects/<this project's key>/memory
+  detect_new_entries: true                  # report entries that appear in the drive root / beside the project
+  extra_allowed: []                         # more folders this project may write (absolute, or relative to the project)
+
+# Harness v3 Dot A: the resident daemon (.harness/scripts/lib/harnessd.py) that
+# serves the PreToolUse / PostToolUse hooks over http (Claude Code `type: http`),
+# so no PowerShell/bash process is spawned per tool call (measured 12-11: 970-1290 ms
+# and 60-95 MB each, twice per call). `port` must match the URLs in
+# .claude/settings.json + settings.posix.json. `on_failure` is what settings.json
+# should carry: continue = a dead daemon lets the call through until `ensure`
+# revives it at the next prompt (C10, documented); block = fail-closed (needs
+# Claude Code >= 2.1.295). Missing section = these defaults.
+daemon:
+  enabled: true
+  port: 47631
+  idle_exit_minutes: 480                    # exit after this long with no hook request
+  pre_tool_use_timeout_s: 20                # the `timeout` the http hook entries should carry
+  on_failure: continue                      # continue | block
+  ledger_queue_max: 10000                   # queued ledger entries before one is recorded as lost
+
 # ------------------------------------------------------------ H6 AgentOps
 agentops:
   enforced_at: portal_and_hooks             # portal computes; hooks emit signals
@@ -331,6 +390,16 @@ agentops:
   # fallback. Slack-compatible payload {"text": ...}.
   webhook_url: ""
   alert_routing: ["portal", "email", "webhook", "agentops.log"]
+  # `harness doctor` counts hook-errors.log entries NEWER than this mark as live; the
+  # ones at or before it were read and handled and STAY in the log (C14: never delete a
+  # diagnostic to quiet a file). Move the mark forward only after reading what it retires.
+  # 12-11-2026 22:00 JST: end of the pre-daemon era -- the OOM / ledger-append lines
+  # before it are explained (B-97, perf03; harnessd serves the hooks since 1.8.25).
+  # 15-11-2026 21:15 JST: the two "C17 write-scope check failed (fail-open): name
+  # '_executed_scripts' is not defined" lines (21:14:05, 21:14:22) -- the daemon loaded
+  # harness_write_scope.py while it was being edited (B-104 work); the function exists
+  # since, test_write_scope.py 43/43 (read 16-11), no newer line.
+  hook_errors_acknowledged_through: "2026-11-15T21:15:00+09:00"
 
 # ------------------------------------------------------ H7 Orchestration
 orchestration:
