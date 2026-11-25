@@ -80,6 +80,20 @@ try:
 except Exception:
     facts = {}
 auth = facts.pop("auth", None) or {}
+# portal-url-khong-ep-https: portal-sync.json is committed, so a PR could point it anywhere.
+# Nothing is sent (no credential, no legacy key) to a URL that is not https or not the origin
+# this machine enrolled against. Parity with push-telemetry.ps1.
+if _fm is not None:
+    _ok, _why = _fm.check_portal_url(root, url)
+else:
+    _ok, _why = bool(re.match(r"(?i)^(https://[^/@\s]+|http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$))", url)), "portal_url is not https:// (plain http only to a loopback host)"
+if not _ok:
+    try:
+        _w = _fm.blocked_warning("push-telemetry", _why) if _fm else ""
+    except Exception:
+        _w = ""
+    print(_w or ("[push-telemetry] NOT sending: %s" % _why), file=sys.stderr)
+    sys.exit(0)
 if auth.get("checkout_id") and auth.get("checkout_credential"):
     # Bound push: the credential names the checkout; the legacy key is not sent.
     auth_headers = {"X-Checkout-Id": auth["checkout_id"], "X-Checkout-Credential": auth["checkout_credential"]}

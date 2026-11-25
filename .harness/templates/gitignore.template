@@ -1,0 +1,41 @@
+# Machine-local state and runtime data the harness writes inside a project.
+# None of it is source: it describes ONE machine, ONE person or ONE session.
+# Source of the list: .harness/control/machine-state-paths.yaml (machine_local), plus
+# the scratch and backup names below. The harness installer rewrites this block on
+# every install (B-107) -- put your own rules OUTSIDE the BEGIN/END markers.
+# Ignoring never untracks a file git already tracks: tools/harness-bundle/
+# fix-untrack-machine-state does that (the live ledger only with -IncludeLedger).
+#
+# What stays committable on purpose: .harness/portal-sync.json (project-wide fields
+# only), .harness/.bundle-manifest.json (the install receipt), sealed ledger
+# segments (.harness/ledger/chain-NNN.jsonl) and every shipped harness file.
+
+# credentials / identity (C5)
+.harness/local/
+.harness/portal-sync.key
+.harness/active-account.local.json
+.claude/settings.local.json
+
+# Claude Code worktrees -- a full second checkout each (C16)
+.claude/worktrees/
+
+# telemetry the hooks write, and the push/sync cursors
+.harness/telemetry/*
+!.harness/telemetry/.gitkeep
+
+# the live ledger of THIS machine (C9 evidence stays on disk, just not in git)
+.harness/ledger/chain.jsonl
+.harness/ledger/chain.lock
+.harness/ledger/.chain.genesis.tmp
+.harness/ledger/append-failures.jsonl
+.harness/ledger/append-failures-handled-*.jsonl
+
+# generated per session (H1 pointer store, RAG index) and scratch (C17)
+.harness/context/
+.harness/tmp/
+.pytest-tmp/
+
+# backups and installer leftovers (a <file>.new is a shipped copy to resolve, then delete)
+*.bak-*
+*.pre-migration.bak
+*.new

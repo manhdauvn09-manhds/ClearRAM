@@ -1,14 +1,20 @@
 {
   "$schema": "https://harness.internal/schemas/injection-patterns.schema.json",
   "description": "SSOT for prompt injection scanning patterns — guard scripts read this, not hardcoded patterns (C2)",
+  "handback_prefixes": [
+    "^\\s*<agent-message\\b",
+    "^\\s*<task-notification>"
+  ],
+  "handback_note": "A prompt starting with one of these is a subagent's report or a background-task notice that Claude Code queues into the session -- model-written text, often quoting code and file names. Its findings are LOGGED (excerpt tagged [agent-handback]) and shown, never hard-blocked: a block drops the report with no legitimate way to get it back (B-103, 15-11). Someone pasting this prefix only downgrades their own prompt to warn-only; C10 -- the scanner is defense-in-depth, not a boundary.",
   "patterns": [
     { "pattern": "(?i)ignore\\s+(all\\s+)?previous\\s+instructions", "severity": "high", "category": "instruction-override" },
     { "pattern": "(?i)ignore\\s+(all\\s+)?prior\\s+(instructions|directives)", "severity": "high", "category": "instruction-override" },
     { "pattern": "(?i)forget\\s+(everything|all\\s+(previous|prior)\\s+instructions)", "severity": "high", "category": "instruction-override" },
-    { "pattern": "(?i)\\bDAN\\b", "severity": "high", "category": "role-jailbreak" },
+    { "pattern": "(?i:\\byou\\s+are\\s+(?:now\\s+)?)DAN(?![\\w-]|\\.\\w)", "severity": "high", "category": "role-jailbreak", "note": "the persona only when it is ASSIGNED ('you are (now) DAN'); DAN itself stays case-sensitive. A bare \\bDAN\\b matched the Vietnamese 'dan' under (?i) (B-101, 13-11) and, case-sensitive, still matched unaccented capitals where \\b treats '-' as a word edge: HUONG-DAN-SU-DUNG.md blocked subagent reports (B-103, 15-11)" },
     { "pattern": "(?i)reset\\s+(your\\s+)?(instructions|context|memory|personality)", "severity": "high", "category": "instruction-override" },
     { "pattern": "(?i)you\\s+(are\\s+)?(now|are\\s+free)\\s+(to\\s+)?(ignore|disregard|bypass)", "severity": "high", "category": "role-jailbreak" },
-    { "pattern": "(?i)DAN\\s*:|do\\s+anything\\s+now|jail\\s*break", "severity": "high", "category": "role-jailbreak" },
+    { "pattern": "(?<![\\w-])(?<!\\w\\.)DAN(?![\\w-]|\\.\\w)\\s*:", "severity": "high", "category": "role-jailbreak", "note": "'DAN:' as a speaker label; not inside a hyphenated or dotted name such as 'HUONG-DAN:' (B-103)" },
+    { "pattern": "(?i)do\\s+anything\\s+now|jail\\s*break", "severity": "high", "category": "role-jailbreak" },
     { "pattern": "(?i)you\\s+are\\s+now\\s+a\\s+Linux\\s+terminal", "severity": "high", "category": "role-jailbreak" },
     { "pattern": "(?i)(system|security|admin)?\\s*(prompt|instruction|directive)s?\\s*:\\s*(ignore|override|bypass)", "severity": "high", "category": "system-prompt-override" },
     { "pattern": "(?:[A-Za-z0-9+/]{40,}={0,2})", "severity": "medium", "category": "encoded-payload" },

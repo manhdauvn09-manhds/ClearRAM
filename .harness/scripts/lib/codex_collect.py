@@ -71,45 +71,10 @@ def _norm_path(p: str) -> str:
     return os.path.normcase(os.path.normpath(p)).rstrip("\\/")
 
 
-def _load_pricing(path: str) -> dict:
-    """Pricing comes from data, never from this file (C2). Unreadable pricing is
-    NOT fatal: tokens are the primary measurement and must still be collected.
-    Cost degrades to unpriced, which is visible, rather than to a guess."""
-    try:
-        with open(path, "r", encoding="utf-8-sig") as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-
-def _rates_for(pricing: dict, model: str):
-    models = pricing.get("models") or {}
-    rates = models.get(model)
-    if rates is None:
-        rates = pricing.get("default") or {}
-    return rates or {}
-
-
-def estimate_cost(pricing: dict, model: str, new_input: int, cached_input: int, output: int):
-    """-> (cost_usd, basis). basis is why the number is what it is.
-
-    Returns cost 0.0 with basis "unpriced" when the rate is genuinely unknown.
-    That is deliberate: a plausible-looking invented cost is worse than a
-    visible gap, because nobody audits a number that looks fine (C13/C14).
-    """
-    r = _rates_for(pricing, model)
-    r_in, r_out = r.get("input"), r.get("output")
-    if r_in is None or r_out is None:
-        return 0.0, "unpriced"
-    r_cached = r.get("cached_input")
-    basis = "priced"
-    if r_cached is None:
-        # No cache rate: charge cache reads at the full input rate and SAY SO.
-        # On real data that overstates by roughly an order of magnitude.
-        r_cached = r_in
-        basis = "priced_no_cache_rate"
-    cost = (new_input * r_in + cached_input * r_cached + output * r_out) / 1_000_000.0
-    return round(cost, 6), basis
+# Rate lookup moved to harness_token_rates.py (13-11-2026) so the Claude sampler
+# costs tokens through the SAME code; the names below stay for callers and tests.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from harness_token_rates import load_pricing as _load_pricing, rates_for as _rates_for, estimate_cost  # noqa: E402,F401
 
 
 def iter_session_files(codex_sessions_dir: str):

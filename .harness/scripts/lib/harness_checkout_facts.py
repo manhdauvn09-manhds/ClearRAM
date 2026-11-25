@@ -194,15 +194,21 @@ def _fingerprint(root: str) -> dict:
         return {"identified": False, "reason": type(e).__name__}
 
 
-def facts(root: str) -> dict:
+def facts(root: str, portal_url=None) -> dict:
+    """With portal_url given and refused by check_portal_url: no `auth`, and `portal_blocked`
+    says why -- the caller must then send nothing (no legacy key either)."""
     root = os.path.abspath(root)
     parent = parent_of_worktree(root)
     ident_root = parent or root          # a worktree speaks as its parent checkout
     out = {"worktree": bool(parent), "path_hash": path_hash(ident_root)}
+    if portal_url is not None:
+        ok, why = check_portal_url(root, portal_url)
+        if not ok:
+            out["portal_blocked"] = why
     cred = read_credential(ident_root)
     if cred["device_id"]:
         out["device_id"] = cred["device_id"]
-    if cred["checkout_id"] and cred["checkout_credential"]:
+    if cred["checkout_id"] and cred["checkout_credential"] and "portal_blocked" not in out:
         out["checkout_id"] = cred["checkout_id"]
         out["auth"] = {"checkout_id": cred["checkout_id"], "checkout_credential": cred["checkout_credential"]}
     try:
@@ -264,8 +270,96 @@ def checkout_auth(root: str) -> dict:
     return {}
 
 
-def auth_headers(root: str, legacy_key: str = ""):
-    """-> (headers, source) with source in checkout | legacy-key | none."""
+# ---- where a credential may go (handoff portal-url-khong-ep-https, 22-11) --------------
+#
+# `portal_url` comes from .harness/portal-sync.json, a COMMITTED file: a pull request that
+# edits it used to be enough to send every machine's credential somewhere else. Two rules,
+# applied before any header leaves this machine:
+#   1. https only; plain http only to a loopback host (local dev). No user:pass@ in the URL.
+#   2. the origin must equal the one this credential was enrolled against: `portal_url` in
+#      the git-ignored .harness/local/checkout.json (enroll-checkout writes it), or env
+#      HARNESS_PORTAL_ORIGIN (CI / env-only credentials). A PR cannot edit either.
+# No pin on file (a legacy, pre-enroll machine) -> rule 1 alone, said in the reason (C13).
+# Re-enrolling against a moved Portal rewrites the pin; nothing else does.
+_LOOPBACK = ("localhost", "127.0.0.1", "::1")
+BLOCKED_STAMP = "portal-url-blocked-warn.stamp"
+BLOCKED_TEXT = ("[%s] NOT sending the Portal credential: %s. Server-side enforcement is NOT active "
+                "for this call. Fix .harness/portal-sync.json, or re-enrol if the Portal really moved. "
+                "Shown once a day.")
+
+
+def portal_origin(url: str) -> str:
+    """scheme://host[:port] lower-cased, default port dropped; "" when not an http(s) URL."""
+    from urllib.parse import urlsplit
+    try:
+        u = urlsplit(str(url or "").strip())
+        host = (u.hostname or "").lower()
+        port = u.port
+    except ValueError:
+        return ""
+    scheme = (u.scheme or "").lower()
+    if scheme not in ("http", "https") or not host:
+        return ""
+    if port is None or (scheme, port) in (("https", 443), ("http", 80)):
+        port_s = ""
+    else:
+        port_s = ":%d" % port
+    if ":" in host:
+        host = "[%s]" % host
+    return "%s://%s%s" % (scheme, host, port_s)
+
+
+def _pinned_origin(root: str):
+    """-> (origin, source) of the origin this machine's credential belongs to."""
+    env = os.environ.get("HARNESS_PORTAL_ORIGIN", "").strip()
+    if env:
+        return portal_origin(env), "env HARNESS_PORTAL_ORIGIN"
+    try:
+        with open(os.path.join(cred_root_for(root), LOCAL_REL), encoding="utf-8-sig") as f:
+            d = json.load(f) or {}
+        pinned = str(d.get("portal_url") or "").strip()
+    except (OSError, ValueError, AttributeError):
+        pinned = ""
+    return (portal_origin(pinned), LOCAL_REL.replace(os.sep, "/")) if pinned else ("", "")
+
+
+def check_portal_url(root: str, url: str):
+    """-> (ok, reason). ok=False means: send NOTHING to this URL (no credential, no legacy key)."""
+    from urllib.parse import urlsplit
+    raw = str(url or "").strip()
+    try:
+        u = urlsplit(raw)
+        host = (u.hostname or "").lower()
+    except ValueError:
+        return False, "portal_url is not a valid URL"
+    scheme = (u.scheme or "").lower()
+    if scheme not in ("http", "https") or not host:
+        return False, "portal_url is not an http(s) URL"
+    if u.username or u.password or "@" in (u.netloc or ""):
+        return False, "portal_url carries user info (user@host)"
+    if scheme == "http" and not (host in _LOOPBACK or host.endswith(".localhost")):
+        return False, "portal_url is plain http:// to a non-loopback host (%s)" % host
+    origin = portal_origin(raw)
+    pinned, source = _pinned_origin(root)
+    if pinned and origin != pinned:
+        return False, "portal_url origin %s differs from %s pinned in %s" % (origin, pinned, source)
+    if not pinned:
+        return True, "https ok; no pinned origin on this machine"
+    return True, "matches %s" % source
+
+
+def blocked_warning(who: str, reason: str, now=None) -> str:
+    """The once-a-day "credential not sent" line, or "". Names the URL problem, never a header."""
+    return _throttled(BLOCKED_STAMP, BLOCKED_TEXT, who, now, reason)
+
+
+def auth_headers(root: str, legacy_key: str = "", portal_url=None):
+    """-> (headers, source) with source in checkout | legacy-key | none | blocked.
+    With portal_url given, nothing at all is returned for a URL check_portal_url refuses."""
+    if portal_url is not None:
+        ok, _why = check_portal_url(root, portal_url)
+        if not ok:
+            return {}, "blocked"
     a = checkout_auth(root)
     if a:
         return ({"X-Checkout-Id": a["checkout_id"],
@@ -297,7 +391,7 @@ def rejected_warning(who: str, now=None) -> str:
     return _throttled(REJECTED_STAMP, REJECTED_TEXT, who, now)
 
 
-def _throttled(stamp_name: str, text: str, who: str, now=None) -> str:
+def _throttled(stamp_name: str, text: str, who: str, now=None, detail=None) -> str:
     import time
     try:
         d = _state_dir()
@@ -311,7 +405,7 @@ def _throttled(stamp_name: str, text: str, who: str, now=None) -> str:
         os.makedirs(d, exist_ok=True)
         with open(stamp, "w", encoding="utf-8") as f:
             f.write(str(int(t)) + "\n")
-        return text % who
+        return text % ((who,) if detail is None else (who, detail))
     except Exception:  # noqa: BLE001
         return ""
 
@@ -322,13 +416,28 @@ def main(argv) -> int:
         sys.stdout.write(path_hash(argv[2] if len(argv) > 2 else ".") + "\n")
         return 0
     if len(argv) > 1 and argv[1] == "--auth":
-        # `--auth <root>`: the credential for the request HEADERS only, as one JSON line
-        # ({} when none).  Stdout is meant to be captured by the caller, never shown.
+        # `--auth <root> [portal_url]`: the credential for the request HEADERS only, as one JSON
+        # line ({} when none).  With a portal_url that check_portal_url refuses:
+        # {"blocked": "<reason>"} and the caller sends nothing.  Stdout is meant to be captured
+        # by the caller, never shown.
         try:
-            sys.stdout.write(json.dumps(checkout_auth(argv[2] if len(argv) > 2 else "."),
-                                        separators=(",", ":")) + "\n")
+            r = argv[2] if len(argv) > 2 else "."
+            out = None
+            if len(argv) > 3:
+                ok, why = check_portal_url(r, argv[3])
+                if not ok:
+                    out = {"blocked": why}
+            if out is None:
+                out = checkout_auth(r)
+            sys.stdout.write(json.dumps(out, separators=(",", ":")) + "\n")
         except Exception:  # noqa: BLE001
             sys.stdout.write("{}\n")
+        return 0
+    if len(argv) > 1 and argv[1] == "--blocked-warning":
+        # `--blocked-warning <who> <reason>`: the throttled "credential not sent" line, or nothing.
+        w = blocked_warning(argv[2] if len(argv) > 2 else "harness", argv[3] if len(argv) > 3 else "")
+        if w:
+            sys.stdout.write(w + "\n")
         return 0
     if len(argv) > 1 and argv[1] == "--rejected-warning":
         w = rejected_warning(argv[2] if len(argv) > 2 else "harness")
@@ -342,8 +451,11 @@ def main(argv) -> int:
             sys.stdout.write(w + "\n")
         return 0
     root = argv[1] if len(argv) > 1 else "."
+    purl = None
+    if len(argv) > 3 and argv[2] == "--portal-url":
+        purl = argv[3]
     try:
-        sys.stdout.write(json.dumps(facts(root), separators=(",", ":"), ensure_ascii=True) + "\n")
+        sys.stdout.write(json.dumps(facts(root, purl), separators=(",", ":"), ensure_ascii=True) + "\n")
     except Exception:  # noqa: BLE001 - print nothing rather than a half-truth
         pass
     return 0

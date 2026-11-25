@@ -25,10 +25,14 @@ LOG_FILE="$TELEMETRY_DIR/agentops.log"
 
 # Hook JSON via env — NEVER string-interpolate untrusted JSON into a python
 # literal (breaks on quotes/backslashes and is a code-injection hole).
+PY="$(command -v python3 || command -v python || true)"
+[ -n "$PY" ] || exit 0
 HARNESS_HOOK_INPUT="$INPUT_JSON" \
 HARNESS_AGENTOPS_LOG="$LOG_FILE" \
 HARNESS_SESSION="${HARNESS_SESSION_ID:-}" \
-python3 - <<'PY' 2>&1 || true
+HARNESS_LIB="$(cd "$(dirname "$0")/../lib" && pwd)" \
+HARNESS_PRICING="$HARNESS_ROOT/.harness/control/token-pricing.json" \
+"$PY" - <<'PY' 2>&1 || true
 import json, os, sys
 from datetime import datetime, timezone
 
@@ -133,8 +137,18 @@ if first_ts and last_ts:
     except ValueError:
         pass
 
-# Rough public-list-price estimate (non-cache rates); it is labeled estimated.
-cost = (tokens_in / 1_000_000 * 3.0) + (tokens_out / 1_000_000 * 15.0)
+# List-price equivalent from .harness/control/token-pricing.json through the shared
+# harness_token_rates (C2: data, not a literal). Exact key match on the recorded model
+# id; an unknown model is UNPRICED -> 0 and cost_basis says so (C13/C14). Cache reads
+# are not in tokens_in (see above), so no cached rate applies.
+cost, cost_basis = 0.0, "unpriced"
+try:
+    sys.path.insert(0, os.environ.get("HARNESS_LIB", ""))
+    from harness_token_rates import load_pricing, estimate_cost
+    cost, cost_basis = estimate_cost(load_pricing(os.environ.get("HARNESS_PRICING", "")),
+                                     model, tokens_in, 0, tokens_out)
+except Exception:
+    cost, cost_basis = 0.0, "unpriced"
 
 # --- Attribution stamps: WHICH Claude account, WHICH human. Two independent axes --
 # one human can hold two accounts; two humans can in principle share a machine -- so
@@ -178,6 +192,7 @@ record = {
     # own value; the ingest defaults a MISSING stamp to claude-code, so an
     # un-upgraded machine still lands in the right bucket.
     "assistant": "claude-code",
+    "cost_basis": cost_basis,   # priced | unpriced (ignored by the ingest, kept for audit)
 }
 
 with open(log_file, "a", encoding="utf-8") as f:

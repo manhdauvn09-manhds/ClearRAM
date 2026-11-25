@@ -12,7 +12,11 @@
                       from inside the worktree, or pass -Path <worktree>.
     install-git-hook  write a post-checkout hook that warns Codex / a person when
                       `git worktree add` goes over budget (git cannot undo the add)
-    start | stop      hook modes (read the hook JSON on stdin; always exit 0)
+    sweep             every harness checkout under -Base (";"-separated): finish merged+idle
+                      worktrees, remove a dead session's detached scratch copy, report the rest.
+                      -DryRun touches nothing. Run daily by the HarnessWorktreeSweepDaily task.
+    start | stop      hook modes (read the hook JSON on stdin; always exit 0). Since 12-11 both
+                      also auto-finish the repo's merged+idle worktrees (not the one in use).
 
   Local defense-in-depth (C10): Claude Code's PreToolUse guard denies creating a
   worktree over budget; for tools without hooks this only detects and warns.
@@ -25,7 +29,9 @@ param(
     [Parameter(Position = 0)][string]$Mode = "status",
     [string]$Path = "",
     [switch]$NoPush,
-    [switch]$Json
+    [switch]$Json,
+    [string]$Base = "E:\Develop",
+    [switch]$DryRun
 )
 
 $Root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
@@ -58,5 +64,6 @@ $cliArgs = @($Lib, $Mode, $Root)
 if ($Path) { $cliArgs += @("--path", $Path) }
 if ($NoPush) { $cliArgs += "--no-push" }
 if ($Json) { $cliArgs += "--json" }
+if ($Mode -eq "sweep") { $cliArgs += @("--base", $Base); if ($DryRun) { $cliArgs += "--dry-run" } }
 & $py.Source @cliArgs
 exit $LASTEXITCODE

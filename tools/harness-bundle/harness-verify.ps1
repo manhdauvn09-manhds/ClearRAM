@@ -110,6 +110,16 @@ if (-not (Test-Path $settingsPath)) {
     $pre = $s.hooks.PreToolUse
     if ($null -eq $pre) { $hookMsg = "no PreToolUse hook" }
     elseif ($pre -is [string]) { $hookMsg = "OLD bare-path format -> hooks will NOT fire (re-install settings.json)" }
+    elseif ("$($pre[0].hooks[0].type)" -eq "http") {
+        # 1.8.25: PreToolUse is an http hook served by the resident daemon (harnessd). Wired when the
+        # URL points at loopback /hook/pre-tool-use and the daemon lib ships with the project.
+        $cmd = $pre[0].hooks[0]
+        $lib = Join-Path $TargetDir ".harness\scripts\lib\harnessd.py"
+        $urlOk = ("$($cmd.url)" -match '^http://127\.0\.0\.1:\d+/hook/pre-tool-use$')
+        $libOk = Test-Path $lib
+        $hooksWired = ($urlOk -and $libOk)
+        $hookMsg = "http schema; url='$($cmd.url)' $(if($urlOk){'OK'}else{'UNEXPECTED'}); harnessd.py $(if($libOk){'found'}else{'MISSING'})"
+    }
     else {
         # Check the referenced script exists (resolve ${CLAUDE_PROJECT_DIR}).
         $cmd = $pre[0].hooks[0]

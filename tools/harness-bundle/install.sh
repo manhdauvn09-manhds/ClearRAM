@@ -395,6 +395,79 @@ def hook_matcher(e):
     return "" if m is None else str(m)
 
 
+def _is_list(v):
+    return isinstance(v, list)
+
+
+def merge_permission_lists(ship, disk, extra):
+    """B-106 (twin of Merge-PermissionLists in install.ps1): deny/ask are UNIONED --
+    shipped rules first, then the project's own (disk), then `extra` (the rules of
+    .harness/project/deny-rules.json). Other lists (allow) stay the bundle's; a
+    project-only entry there comes back in `dropped` so the caller names it."""
+    out = dict(ship)
+    kept, proj, dropped = [], [], []
+    disk_ok = isinstance(disk, dict)
+    for sub in ("deny", "ask"):
+        lst, seen = [], set()
+        ship_has = _is_list(ship.get(sub)) if sub in ship else False
+        if ship_has:
+            for r in ship[sub]:
+                lst.append(r)
+                if isinstance(r, str):
+                    seen.add(r)
+        added = False
+        if disk_ok and _is_list(disk.get(sub)):
+            for r in disk[sub]:
+                if isinstance(r, str) and r not in seen:
+                    seen.add(r); lst.append(r); kept.append("%s:%s" % (sub, r)); added = True
+        if extra is not None and sub in extra:
+            for r in extra[sub]:
+                if isinstance(r, str) and r not in seen:
+                    seen.add(r); lst.append(r); proj.append("%s:%s" % (sub, r)); added = True
+        if ship_has or added:
+            out[sub] = lst
+    if disk_ok:
+        for k, v in disk.items():
+            if k in ("deny", "ask") or not _is_list(v):
+                continue
+            have = out[k] if _is_list(out.get(k)) else []
+            for r in v:
+                if isinstance(r, str) and r not in have:
+                    dropped.append("%s:%s" % (k, r))
+    return out, kept, proj, dropped
+
+
+def read_project_permissions(root):
+    """B-106 option C (twin of Read-ProjectPermissions): (rules|None, warnings)."""
+    p = os.path.join(root, ".harness", "project", "deny-rules.json")
+    if not os.path.isfile(p):
+        return None, []
+    warns = []
+    try:
+        with open(p, "r", encoding="utf-8-sig") as fh:
+            doc = json.load(fh)
+    except Exception:
+        return None, ["could not parse .harness/project/deny-rules.json -- no project rule applied"]
+    if not isinstance(doc, dict):
+        return None, [".harness/project/deny-rules.json is not a JSON object -- no project rule applied"]
+    rules = {"deny": [], "ask": []}
+    for k, v in doc.items():
+        if k in ("deny", "ask"):
+            if not _is_list(v):
+                warns.append("IGNORED .harness/project/deny-rules.json '%s': not a list" % k)
+                continue
+            for e in v:
+                rule = e.get("rule") if isinstance(e, dict) else None
+                why = e.get("reason") if isinstance(e, dict) else None
+                if isinstance(rule, str) and rule.strip() and isinstance(why, str) and why.strip():
+                    rules[k].append(rule)
+                else:
+                    warns.append("IGNORED a '%s' entry in .harness/project/deny-rules.json: needs non-empty 'rule' and 'reason'" % k)
+        elif k == "allow":
+            warns.append("IGNORED .harness/project/deny-rules.json 'allow': this file can only add deny/ask rules")
+    return rules, warns
+
+
 def merge_hook_settings_file(disk_bytes, ship_bytes, hooks_key):
     """Matcher-entry merge of a Claude Code settings file (bundle-ownership
     merge_hook_settings). `hooks` is {event: [ {matcher, hooks: [...]}, ... ]},
@@ -425,7 +498,7 @@ def merge_hook_settings_file(disk_bytes, ship_bytes, hooks_key):
     ship_hooks = ship[hooks_key]
     disk_hooks = disk.get(hooks_key) if isinstance(disk.get(hooks_key), dict) else None
     st = {"added": [], "updated": 0, "yours": [], "replaced": [],
-          "extra_top": [], "top_wins": []}
+          "extra_top": [], "top_wins": [], "perm_kept": [], "perm_dropped": []}
 
     merged_hooks = {}
     for ev, ship_list in ship_hooks.items():
@@ -472,6 +545,13 @@ def merge_hook_settings_file(disk_bytes, ship_bytes, hooks_key):
     for k, v in ship.items():
         if k == hooks_key:
             root[k] = merged_hooks
+            continue
+        if k == "permissions" and isinstance(v, dict):
+            pv, pk, _pp, pd = merge_permission_lists(v, disk.get(k), None)
+            root[k] = pv
+            st["perm_kept"].extend(pk); st["perm_dropped"].extend(pd)
+            if k in disk and disk[k] != pv:
+                st["top_wins"].append(k)
             continue
         root[k] = v
         if k in disk and disk[k] != v:
@@ -635,11 +715,16 @@ for f in b["files"]:
                 if st["replaced"]:
                     print("             bundle version replaces %d hook entry(ies) you had edited: %s"
                           % (len(st["replaced"]), ", ".join(st["replaced"])))
+                if st["perm_kept"]:
+                    print("             kept your permission rule(s): %s" % ", ".join(st["perm_kept"]))
+                if st["perm_dropped"]:
+                    print("             bundle drops permission rule(s) you had: %s (only deny/ask are kept; allow stays the bundle's)"
+                          % ", ".join(st["perm_dropped"]))
                 if st["top_wins"]:
-                    print("             bundle value wins on top-level key(s) you had changed: %s (hold local overrides in .claude/settings.local.json)"
+                    print("             bundle value wins on top-level key(s) you had changed: %s (hold local overrides in .claude/settings.local.json; deny/ask rules in .harness/project/deny-rules.json)"
                           % ", ".join(st["top_wins"]))
-                merges.append("%s: %d project hook entry(ies) kept, %d extra top-level key(s) kept"
-                              % (f["path"], len(st["yours"]), len(st["extra_top"])))
+                merges.append("%s: %d project hook entry(ies) kept, %d extra top-level key(s) kept, %d project deny/ask rule(s) kept"
+                              % (f["path"], len(st["yours"]), len(st["extra_top"]), len(st["perm_kept"])))
                 merged += 1
                 clean_stale_new(dest, f["path"])
                 outcome[f["path"]] = ("installed", None)
@@ -723,6 +808,40 @@ for f in b["files"]:
     print("  [WRITE] %s" % f["path"]); written += 1
     clean_stale_new(dest, f["path"])
     outcome[f["path"]] = ("installed", None)
+
+# B-106 option C (twin of install.ps1): the project's own deny/ask rules from
+# .harness/project/deny-rules.json go into every settings file the bundle merges,
+# whatever the loop did with it -- a file identical to the shipped one never reaches
+# the merge, so this runs after it.
+_pp_rules, _pp_warns = read_project_permissions(target)
+for _w in _pp_warns:
+    print("  [PROJECT] %s" % _w)
+if _pp_rules is not None and (len(_pp_rules["deny"]) + len(_pp_rules["ask"])) > 0:
+    for _sp in sorted(hook_settings):
+        _sdest = os.path.join(target, *_sp.split("/"))
+        if not os.path.isfile(_sdest):
+            continue
+        try:
+            with open(_sdest, "r", encoding="utf-8-sig") as fh:
+                _sobj = json.load(fh)
+        except Exception:
+            print("  [PROJECT] %s: could not parse it -- project permission rules NOT applied" % _sp)
+            continue
+        if not isinstance(_sobj, dict):
+            print("  [PROJECT] %s: not a JSON object -- project permission rules NOT applied" % _sp)
+            continue
+        _cur = _sobj.get("permissions") if isinstance(_sobj.get("permissions"), dict) else {}
+        _pv, _pk, _pj, _pd = merge_permission_lists(_cur, None, _pp_rules)
+        if not _pj:
+            print("  [PROJECT] %s: project permission rule(s) already present" % _sp)
+            continue
+        _sobj["permissions"] = _pv
+        if not dry_run:
+            with open(_sdest, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(json.dumps(_sobj, indent=2, ensure_ascii=False) + "\n")
+        print("  [PROJECT] %s: added %d rule(s) from .harness/project/deny-rules.json: %s"
+              % (_sp, len(_pj), ", ".join(_pj)))
+        merges.append("%s: %d rule(s) added from .harness/project/deny-rules.json" % (_sp, len(_pj)))
 
 # Conflicts are listed again by NAME: a count alone reads as "all fine", and the
 # whole point of this pass is that some files were deliberately NOT updated.
@@ -962,8 +1081,81 @@ if [[ "$WITH_CI_GATES" == "1" ]]; then
   fi
 fi
 
+# --- Managed .gitignore block (B-107, PS parity: install.ps1). The rules are DATA
+# (C2): .harness/templates/gitignore.template from this bundle's payload, else the
+# copy beside this installer. The block between the markers is rewritten on every
+# install; everything outside it is the project's and is left byte-for-byte.
+# `pwd -W` on Git Bash: a Windows python cannot open a /e/... path.
+GI_TPL_BESIDE="$(cd "$(dirname "$0")/../.." 2>/dev/null && { pwd -W 2>/dev/null || pwd; } || true)/.harness/templates/gitignore.template"
+"$PY" - "$BUNDLE" "$TARGET" "$GI_TPL_BESIDE" <<'PY'
+import base64, json, os, re, sys
+bundle_path, target, beside = sys.argv[1], sys.argv[2], sys.argv[3]
+b = json.load(open(bundle_path, encoding="utf-8"))
+tpl = src = None
+for f in b["files"]:
+    if f["path"] == ".harness/templates/gitignore.template":
+        tpl, src = base64.b64decode(f["b64"]).decode("utf-8"), "bundle payload"
+        break
+if tpl is None and beside and os.path.isfile(beside):
+    tpl = open(beside, "rb").read().decode("utf-8")
+    src = "installer's copy %s (this bundle ships no template)" % os.path.normpath(beside)
+if tpl is None:
+    print("[gitignore] WARNING: no gitignore.template in the bundle or beside the installer -- managed block NOT written")
+    sys.exit(0)
+tpl_lines = re.split(r"\r?\n", tpl.lstrip("﻿"))
+while tpl_lines and tpl_lines[-1].strip() == "":
+    tpl_lines.pop()
+block = ["# BEGIN harness-gitignore -- managed by the harness installer; edit OUTSIDE this block"] + tpl_lines + ["# END harness-gitignore"]
+path = os.path.join(target, ".gitignore")
+old, bom = "", False
+if os.path.isfile(path):
+    raw = open(path, "rb").read()
+    bom = raw.startswith(b"\xef\xbb\xbf")
+    old = raw[3:].decode("utf-8") if bom else raw.decode("utf-8")
+eol = "\r\n" if "\r\n" in old else "\n"
+lines = re.split(r"\r?\n", old) if old else []
+if lines and lines[-1] == "":
+    lines.pop()
+bi = ei = -1
+for i, ln in enumerate(lines):
+    if bi < 0 and re.match(r"# BEGIN harness-gitignore\b", ln):
+        bi = i
+        continue
+    if bi >= 0 and re.match(r"# END harness-gitignore\b", ln):
+        ei = i
+        break
+if bi >= 0 and ei < 0:
+    print("[gitignore] WARNING: '# BEGIN harness-gitignore' without its END marker in .gitignore -- left untouched; fix the markers by hand")
+    sys.exit(0)
+if bi >= 0:
+    new, verb = lines[:bi] + block + lines[ei + 1:], "refreshed"
+else:
+    sep = [""] if lines and lines[-1].strip() != "" else []
+    new, verb = lines + sep + block, "added"
+out = eol.join(new) + eol
+if out == old:
+    print("[gitignore] managed block up to date (%s)" % src)
+else:
+    with open(path, "wb") as fh:
+        fh.write((b"\xef\xbb\xbf" if bom else b"") + out.encode("utf-8"))
+    print("[gitignore] %s managed block in .gitignore (%s)" % (verb, src))
+PY
+# Ignoring never untracks. Name what git still tracks so nobody reads the block as
+# "these are out of git" (C14). The repair is operator-run, never done here.
+if [[ -e "$TARGET/.git" ]] && command -v git >/dev/null 2>&1; then
+  GI_TRACKED="$(git -C "$TARGET" ls-files -ci --exclude-standard 2>/dev/null || true)"
+  if [[ -n "$GI_TRACKED" ]]; then
+    GI_N=$(printf '%s\n' "$GI_TRACKED" | wc -l | tr -d ' ')
+    echo "[gitignore] NOTE: $GI_N tracked file(s) match .gitignore -- git keeps tracking them (untrack: fix-untrack-machine-state):"
+    printf '%s\n' "$GI_TRACKED" | head -n 10 | sed 's/^/  - /'
+    if [[ "$GI_N" -gt 10 ]]; then echo "  ... and $((GI_N - 10)) more"; fi
+  fi
+fi
+
 # C5: never commit the ingest key. Ensure the target project's .gitignore
-# ignores it (idempotent -- add the line only if missing).
+# ignores it (idempotent -- add the line only if missing). Since B-107 the managed
+# block above carries this line and the four below; they stay as the fallback for an
+# install that found no template.
 GI="$TARGET/.gitignore"
 if ! grep -qF ".harness/portal-sync.key" "$GI" 2>/dev/null; then
   printf '\n# Harness Portal ingest key -- secret, never commit (C5)\n.harness/portal-sync.key\n' >> "$GI"

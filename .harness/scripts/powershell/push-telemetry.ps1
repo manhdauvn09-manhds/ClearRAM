@@ -88,11 +88,26 @@ try {
         $pyf = Get-Command python -ErrorAction SilentlyContinue
         if (-not $pyf) { $pyf = Get-Command python3 -ErrorAction SilentlyContinue }
         if ($pyf) {
-            $fj = (& $pyf.Source $FactsLib $HarnessRoot 2>$null) -join ""
+            $fj = (& $pyf.Source $FactsLib $HarnessRoot --portal-url "$($Config.portal_url)" 2>$null) -join ""
             if ($fj) { $Facts = $fj | ConvertFrom-Json }
         }
     }
 } catch { $Facts = $null }
+
+# portal-url-khong-ep-https: portal-sync.json is committed, so a PR could point it anywhere.
+# Nothing is sent (no credential, no legacy key) to a URL that is not https, or -- checked by the
+# shared lib -- not the origin this machine enrolled against. Without python the scheme rule
+# still applies. Parity with push-telemetry.sh.
+$PortalBlocked = ""
+$PU = "$($Config.portal_url)"
+if ($PU -notmatch '^(?i)https://[^/@\s]+' -and $PU -notmatch '^(?i)http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$)') {
+    $PortalBlocked = "portal_url is not https:// (plain http only to a loopback host)"
+}
+if ($Facts -and $Facts.portal_blocked) { $PortalBlocked = "$($Facts.portal_blocked)" }
+if ($PortalBlocked) {
+    Write-Warning "[push-telemetry] NOT sending the Portal credential: $PortalBlocked. Fix .harness/portal-sync.json, or re-enrol if the Portal really moved."
+    exit 0
+}
 
 # member_email (Portal v2 P1 1.7): names one PERSON, so it lives in the git-ignored
 # .harness/local/checkout.json, not in the committable portal-sync.json. The shared reader

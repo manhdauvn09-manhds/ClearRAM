@@ -114,22 +114,33 @@ if ((Test-Path $cfgFile)) {
     # when this machine holds one -- read by the shared reader, headers only (C5) -- else the
     # legacy shared key (X-Ingest-Key), with a once-a-day notice. Never both.
     $AuthHeaders = $null; $AuthSource = ""
+    # portal-url-khong-ep-https: portal-sync.json is committed; nothing (no credential, no legacy
+    # key) goes to a URL that is not https or not this machine's enrolled origin. Parity with .sh.
+    $PortalBlocked = ""
+    $PU = "$($cfg.portal_url)"
+    if ($PU -and $PU -notmatch '^(?i)https://[^/@\s]+' -and $PU -notmatch '^(?i)http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$)') {
+        $PortalBlocked = "portal_url is not https:// (plain http only to a loopback host)"
+    }
     $AuthLib = Join-Path $PSScriptRoot "..\lib\harness_checkout_facts.py"
     $pyc = Get-Command python -ErrorAction SilentlyContinue
     if (-not $pyc) { $pyc = Get-Command python3 -ErrorAction SilentlyContinue }
-    if ($pyc -and (Test-Path $AuthLib)) {
+    if ($pyc -and (Test-Path $AuthLib) -and -not $PortalBlocked) {
         try {
-            $aj = (& $pyc.Source $AuthLib --auth $HarnessRoot 2>$null) -join ""
+            $aj = (& $pyc.Source $AuthLib --auth $HarnessRoot $PU 2>$null) -join ""
             if ($aj) {
                 $Au = $aj | ConvertFrom-Json
-                if ($Au.checkout_id -and $Au.checkout_credential) {
+                if ($Au.blocked) { $PortalBlocked = "$($Au.blocked)" }
+                elseif ($Au.checkout_id -and $Au.checkout_credential) {
                     $AuthHeaders = @{ "X-Checkout-Id" = "$($Au.checkout_id)"; "X-Checkout-Credential" = "$($Au.checkout_credential)" }
                     $AuthSource = "checkout"
                 }
             }
         } catch { }
     }
-    if (-not $AuthHeaders) {
+    if ($PortalBlocked) {
+        Write-Warning "[harness-release] NOT sending the Portal credential: $PortalBlocked -- the release gate is not consulted."
+    }
+    if (-not $AuthHeaders -and -not $PortalBlocked) {
         $key = $env:HARNESS_PORTAL_INGEST_KEY
         if (-not $key -and (Test-Path "$HarnessRoot\.harness\portal-sync.key")) { $key = (Get-Content "$HarnessRoot\.harness\portal-sync.key" -Raw).Trim() }
         if ($key) {

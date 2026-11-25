@@ -547,6 +547,77 @@ function Get-HookMatcher($Entry) {
 # convention documented in bundle-ownership.yaml. Same contract as
 # Merge-JsonEntryMap: returns a result object, prints nothing, and emits the
 # byte-identical text install.sh's python emits.
+# B-106: `permissions` is a shipped top-level key, so the merge used to replace it
+# whole -- and every deny rule a project had added (FLA-gateway's BM-02
+# ssh/scp/sftp, twice) vanished with one console line as its only trace. A deny
+# or ask rule only narrows what the assistant may do, so those two lists are
+# UNIONED: shipped rules first, in shipped order, then the project's own. Other
+# lists (allow) stay the bundle's -- a project-only entry there is returned in
+# Dropped so the caller names it. Same result, same order, as install.sh.
+function Test-JsonList($v) {
+    return ($null -ne $v) -and ($v -is [System.Collections.IEnumerable]) -and -not ($v -is [string]) -and -not ($v -is [System.Collections.IDictionary])
+}
+function Merge-PermissionLists {
+    param($Ship, $Disk, $Extra)
+    $out = [ordered]@{}
+    foreach ($k in @($Ship.Keys)) { $out[$k] = $Ship[$k] }
+    $kept = @(); $proj = @(); $dropped = @()
+    $diskOk = ($null -ne $Disk) -and ($Disk -is [System.Collections.IDictionary])
+    foreach ($sub in @("deny", "ask")) {
+        $list = @()
+        $seen = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+        $shipHas = $Ship.Contains($sub) -and (Test-JsonList $Ship[$sub])
+        if ($shipHas) { foreach ($r in @($Ship[$sub])) { $list += ,$r; if ($r -is [string]) { [void]$seen.Add($r) } } }
+        $added = $false
+        if ($diskOk -and $Disk.Contains($sub) -and (Test-JsonList $Disk[$sub])) {
+            foreach ($r in @($Disk[$sub])) { if (($r -is [string]) -and $seen.Add($r)) { $list += ,$r; $kept += "$sub`:$r"; $added = $true } }
+        }
+        if ($null -ne $Extra -and $Extra.Contains($sub)) {
+            foreach ($r in @($Extra[$sub])) { if (($r -is [string]) -and $seen.Add($r)) { $list += ,$r; $proj += "$sub`:$r"; $added = $true } }
+        }
+        if ($shipHas -or $added) { $out[$sub] = $list }
+    }
+    if ($diskOk) {
+        foreach ($k in @($Disk.Keys)) {
+            if ($k -ceq "deny" -or $k -ceq "ask" -or -not (Test-JsonList $Disk[$k])) { continue }
+            $have = @(); if ($out.Contains($k) -and (Test-JsonList $out[$k])) { $have = @($out[$k]) }
+            foreach ($r in @($Disk[$k])) { if (($r -is [string]) -and -not ($have -ccontains $r)) { $dropped += "$k`:$r" } }
+        }
+    }
+    return [pscustomobject]@{ Value = $out; Kept = @($kept); Project = @($proj); Dropped = @($dropped) }
+}
+
+# Option C of B-106: deny/ask rules a project declares in a file the installer
+# never overwrites (.harness/project/* is project-owned), each with a reason.
+# Returns @{ deny = [rules]; ask = [rules] } plus the warnings to print; an
+# entry without rule+reason, or an `allow` list, is ignored and NAMED -- this
+# file can only narrow. Same validation as install.sh.
+function Read-ProjectPermissions {
+    param([string]$Root)
+    $res = [pscustomobject]@{ Rules = $null; Warnings = @() }
+    $p = Join-Path $Root ".harness\project\deny-rules.json"
+    if (-not (Test-Path -LiteralPath $p)) { return $res }
+    try { $doc = ConvertTo-OrderedTree ([System.IO.File]::ReadAllText($p, [System.Text.Encoding]::UTF8) | ConvertFrom-Json) }
+    catch { $res.Warnings += "could not parse .harness/project/deny-rules.json -- no project rule applied"; return $res }
+    if (-not ($doc -is [System.Collections.IDictionary])) { $res.Warnings += ".harness/project/deny-rules.json is not a JSON object -- no project rule applied"; return $res }
+    $rules = [ordered]@{ deny = @(); ask = @() }
+    foreach ($k in @($doc.Keys)) {
+        if ($k -ceq "deny" -or $k -ceq "ask") {
+            if (-not (Test-JsonList $doc[$k])) { $res.Warnings += "IGNORED .harness/project/deny-rules.json '$k': not a list"; continue }
+            foreach ($e in @($doc[$k])) {
+                $rule = $null; $why = $null
+                if ($e -is [System.Collections.IDictionary]) { $rule = $e["rule"]; $why = $e["reason"] }
+                if (($rule -is [string]) -and $rule.Trim() -and ($why -is [string]) -and $why.Trim()) { $rules[$k] += ,$rule }
+                else { $res.Warnings += "IGNORED a '$k' entry in .harness/project/deny-rules.json: needs non-empty 'rule' and 'reason'" }
+            }
+        } elseif ($k -ceq "allow") {
+            $res.Warnings += "IGNORED .harness/project/deny-rules.json 'allow': this file can only add deny/ask rules"
+        }
+    }
+    $res.Rules = $rules
+    return $res
+}
+
 function Merge-HookSettings {
     param([string]$DiskText, [string]$ShipText, [string]$HooksKey)
 
@@ -566,6 +637,7 @@ function Merge-HookSettings {
     if ($diskObj.Contains($HooksKey) -and ($diskObj[$HooksKey] -is [System.Collections.IDictionary])) { $diskHooks = $diskObj[$HooksKey] }
 
     $updated = 0; $added = @(); $yours = @(); $replaced = @(); $extraTop = @(); $topWins = @()
+    $permKept = @(); $permDropped = @()
 
     $mergedHooks = [ordered]@{}
     foreach ($ev in @($shipHooks.Keys)) {
@@ -619,6 +691,13 @@ function Merge-HookSettings {
     $root = [ordered]@{}
     foreach ($k in @($shipObj.Keys)) {
         if ($k -ceq $HooksKey) { $root[$k] = $mergedHooks; continue }
+        if ($k -ceq "permissions" -and ($shipObj[$k] -is [System.Collections.IDictionary])) {
+            $dp = $null; if ($diskObj.Contains($k)) { $dp = $diskObj[$k] }
+            $pm = Merge-PermissionLists $shipObj[$k] $dp $null
+            $root[$k] = $pm.Value; $permKept += $pm.Kept; $permDropped += $pm.Dropped
+            if ($diskObj.Contains($k) -and ((ConvertTo-HarnessJson $diskObj[$k]) -cne (ConvertTo-HarnessJson $pm.Value))) { $topWins += $k }
+            continue
+        }
         $root[$k] = $shipObj[$k]
         if ($diskObj.Contains($k) -and ((ConvertTo-HarnessJson $diskObj[$k]) -cne (ConvertTo-HarnessJson $shipObj[$k]))) { $topWins += $k }
     }
@@ -631,6 +710,7 @@ function Merge-HookSettings {
         Text = (ConvertTo-HarnessJson $root 0) + "`n"
         Added = @($added); Updated = $updated; Yours = @($yours)
         Replaced = @($replaced); ExtraTop = @($extraTop); TopWins = @($topWins)
+        PermKept = @($permKept); PermDropped = @($permDropped)
     }
 }
 
@@ -796,8 +876,10 @@ foreach ($f in $bundle.files) {
                 # Never silent: the next two lines name every project edit that
                 # did NOT survive (C10).
                 if (@($res.Replaced).Count -gt 0) { Write-Output "             bundle version replaces $(@($res.Replaced).Count) hook entry(ies) you had edited: $(@($res.Replaced) -join ', ')" }
-                if (@($res.TopWins).Count -gt 0)  { Write-Output "             bundle value wins on top-level key(s) you had changed: $(@($res.TopWins) -join ', ') (hold local overrides in .claude/settings.local.json)" }
-                $merges += "$($f.path): $(@($res.Yours).Count) project hook entry(ies) kept, $(@($res.ExtraTop).Count) extra top-level key(s) kept"
+                if (@($res.PermKept).Count -gt 0) { Write-Output "             kept your permission rule(s): $(@($res.PermKept) -join ', ')" }
+                if (@($res.PermDropped).Count -gt 0) { Write-Output "             bundle drops permission rule(s) you had: $(@($res.PermDropped) -join ', ') (only deny/ask are kept; allow stays the bundle's)" }
+                if (@($res.TopWins).Count -gt 0)  { Write-Output "             bundle value wins on top-level key(s) you had changed: $(@($res.TopWins) -join ', ') (hold local overrides in .claude/settings.local.json; deny/ask rules in .harness/project/deny-rules.json)" }
+                $merges += "$($f.path): $(@($res.Yours).Count) project hook entry(ies) kept, $(@($res.ExtraTop).Count) extra top-level key(s) kept, $(@($res.PermKept).Count) project deny/ask rule(s) kept"
                 $merged++
                 Remove-StaleNew $dest $f.path
                 $outcome[$f.path] = @{ State = "installed"; Base = $null }
@@ -886,6 +968,29 @@ foreach ($f in $bundle.files) {
     }
     $outcome[$f.path] = @{ State = "installed"; Base = $null }
     $written++
+}
+
+# --- B-106 option C: the project's own deny/ask rules (.harness/project/deny-rules.json)
+# go into every Claude Code settings file the bundle merges, whatever the loop above did
+# with it (merged, SAME, freshly written). After the loop on purpose: a settings file
+# that is byte-identical to the shipped one never reaches the merge.
+$pp = Read-ProjectPermissions -Root $TargetDir
+foreach ($w in @($pp.Warnings)) { Write-Output "  [PROJECT] $w" }
+if ($null -ne $pp.Rules -and (@($pp.Rules["deny"]).Count + @($pp.Rules["ask"]).Count) -gt 0) {
+    foreach ($sp in (@($hookSettings.Keys) | Sort-Object)) {
+        $sdest = Join-Path $TargetDir ($sp -replace '/', '\')
+        if (-not (Test-Path -LiteralPath $sdest)) { continue }
+        try { $sobj = ConvertTo-OrderedTree ([System.IO.File]::ReadAllText($sdest, [System.Text.Encoding]::UTF8) | ConvertFrom-Json) }
+        catch { Write-Output "  [PROJECT] $sp`: could not parse it -- project permission rules NOT applied"; continue }
+        if (-not ($sobj -is [System.Collections.IDictionary])) { Write-Output "  [PROJECT] $sp`: not a JSON object -- project permission rules NOT applied"; continue }
+        $cur = [ordered]@{}; if ($sobj.Contains("permissions") -and ($sobj["permissions"] -is [System.Collections.IDictionary])) { $cur = $sobj["permissions"] }
+        $pm = Merge-PermissionLists $cur $null $pp.Rules
+        if (@($pm.Project).Count -eq 0) { Write-Output "  [PROJECT] $sp`: project permission rule(s) already present"; continue }
+        $sobj["permissions"] = $pm.Value
+        if (-not $DryRun) { [System.IO.File]::WriteAllText($sdest, (ConvertTo-HarnessJson $sobj 0) + "`n", $Utf8NoBom) }
+        Write-Output "  [PROJECT] $sp`: added $(@($pm.Project).Count) rule(s) from .harness/project/deny-rules.json: $(@($pm.Project) -join ', ')"
+        $merges += "$sp`: $(@($pm.Project).Count) rule(s) added from .harness/project/deny-rules.json"
+    }
 }
 
 # --- Summary. Conflicts are listed again, by name: a count alone reads as "all
@@ -1340,9 +1445,92 @@ $setup
     }
 }
 
-# C5: never commit the ingest key. Ensure the target project's .gitignore
-# ignores it (idempotent -- add the line only if missing).
+# --- Managed .gitignore block (B-107). Installs left the ledger, telemetry, the
+# context store and Claude worktrees untracked in every project, one `git add .`
+# away from a commit. The rules are DATA (C2): .harness/templates/gitignore.template,
+# read from this bundle's payload, else from the copy beside this installer (a bundle
+# packed before the template existed). The block between the markers is rewritten on
+# every install; everything outside it is the project's and is left byte-for-byte.
+# Parity: install.sh runs the same algorithm in python.
 $giPath = Join-Path $TargetDir ".gitignore"
+$giBeginRx = '^# BEGIN harness-gitignore\b'
+$giEndRx   = '^# END harness-gitignore\b'
+$giTplText = $null; $giTplSrc = $null
+$giTplEntry = $bundle.files | Where-Object { $_.path -eq '.harness/templates/gitignore.template' } | Select-Object -First 1
+if ($giTplEntry) {
+    $giTplText = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($giTplEntry.b64))
+    $giTplSrc = "bundle payload"
+} else {
+    $giBeside = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.harness\templates\gitignore.template"))
+    if (Test-Path -LiteralPath $giBeside) {
+        $giTplText = [System.IO.File]::ReadAllText($giBeside, [System.Text.Encoding]::UTF8)
+        $giTplSrc = "installer's copy $giBeside (this bundle ships no template)"
+    }
+}
+if ($null -eq $giTplText) {
+    # C12: say the step did not run; the per-line fallbacks below still cover C5.
+    Write-Output "[gitignore] WARNING: no gitignore.template in the bundle or beside the installer -- managed block NOT written"
+} else {
+    $giTplLines = @(($giTplText.TrimStart([char]0xFEFF)) -split "`r?`n")
+    while ($giTplLines.Count -gt 0 -and $giTplLines[-1].Trim() -eq '') { $giTplLines = @($giTplLines[0..($giTplLines.Count - 2)]) }
+    $giBlock = @("# BEGIN harness-gitignore -- managed by the harness installer; edit OUTSIDE this block") + $giTplLines + @("# END harness-gitignore")
+    $giOld = ""; $giBom = $false
+    if (Test-Path -LiteralPath $giPath) {
+        $giBytes = [System.IO.File]::ReadAllBytes($giPath)
+        $giBom = ($giBytes.Length -ge 3 -and $giBytes[0] -eq 0xEF -and $giBytes[1] -eq 0xBB -and $giBytes[2] -eq 0xBF)
+        $giOld = (New-Object System.Text.UTF8Encoding($false)).GetString($giBytes)
+        if ($giBom) { $giOld = $giOld.Substring(1) }
+    }
+    $giEol = "`n"; if ($giOld.Contains("`r`n")) { $giEol = "`r`n" }
+    $giLines = @()
+    if ($giOld.Length -gt 0) {
+        $giLines = @($giOld -split "`r?`n")
+        if ($giLines[-1] -eq '') { $giLines = @($giLines | Select-Object -First ($giLines.Count - 1)) }
+    }
+    $giB = -1; $giE = -1
+    for ($i = 0; $i -lt $giLines.Count; $i++) {
+        if ($giB -lt 0 -and $giLines[$i] -match $giBeginRx) { $giB = $i; continue }
+        if ($giB -ge 0 -and $giLines[$i] -match $giEndRx) { $giE = $i; break }
+    }
+    $giNew = $null
+    if ($giB -ge 0 -and $giE -lt 0) {
+        Write-Output "[gitignore] WARNING: '# BEGIN harness-gitignore' without its END marker in .gitignore -- left untouched; fix the markers by hand"
+    } elseif ($giB -ge 0) {
+        $giHead = @(); if ($giB -gt 0) { $giHead = @($giLines[0..($giB - 1)]) }
+        $giTail = @(); if ($giE -lt $giLines.Count - 1) { $giTail = @($giLines[($giE + 1)..($giLines.Count - 1)]) }
+        $giNew = $giHead + $giBlock + $giTail
+        $giVerb = "refreshed"
+    } else {
+        $giSep = @(); if ($giLines.Count -gt 0 -and $giLines[-1].Trim() -ne '') { $giSep = @('') }
+        $giNew = $giLines + $giSep + $giBlock
+        $giVerb = "added"
+    }
+    if ($null -ne $giNew) {
+        $giOut = ($giNew -join $giEol) + $giEol
+        if ($giOut -ceq $giOld) {
+            Write-Output "[gitignore] managed block up to date ($giTplSrc)"
+        } else {
+            $giEnc = New-Object System.Text.UTF8Encoding($giBom)
+            [System.IO.File]::WriteAllText($giPath, $giOut, $giEnc)
+            Write-Output "[gitignore] $giVerb managed block in .gitignore ($giTplSrc)"
+        }
+        # Ignoring never untracks. Name what git still tracks so nobody reads the block as
+        # "these are out of git" (C14). The repair is operator-run, never done here.
+        if (Test-Path -LiteralPath (Join-Path $TargetDir ".git")) {
+            $giTracked = @(& git -C $TargetDir ls-files -ci --exclude-standard 2>$null | Where-Object { $_ })
+            if ($giTracked.Count -gt 0) {
+                Write-Output "[gitignore] NOTE: $($giTracked.Count) tracked file(s) match .gitignore -- git keeps tracking them (untrack: fix-untrack-machine-state):"
+                $giTracked | Select-Object -First 10 | ForEach-Object { Write-Output "  - $_" }
+                if ($giTracked.Count -gt 10) { Write-Output "  ... and $($giTracked.Count - 10) more" }
+            }
+        }
+    }
+}
+
+# C5: never commit the ingest key. Ensure the target project's .gitignore
+# ignores it (idempotent -- add the line only if missing). Since B-107 the managed
+# block above carries this line and the four below; they stay as the fallback for an
+# install that found no template.
 $giLine = ".harness/portal-sync.key"
 $giHas = (Test-Path $giPath) -and (Select-String -Path $giPath -SimpleMatch $giLine -Quiet)
 if (-not $giHas) {

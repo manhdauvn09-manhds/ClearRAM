@@ -237,7 +237,9 @@ def _log_error(root, msg):
 def main(argv):
     root = os.path.abspath(argv[1]) if len(argv) > 1 else os.getcwd()
     try:
-        raw = sys.stdin.buffer.read().decode("utf-8", "replace")
+        # utf-8-sig: PowerShell 5.1 under code page 65001 pipes a BOM first (B-97);
+        # with plain utf-8 the reminder silently never fired on such a machine.
+        raw = sys.stdin.buffer.read().decode("utf-8-sig", "replace")
         payload = json.loads(raw)
         if not isinstance(payload, dict):
             return 0

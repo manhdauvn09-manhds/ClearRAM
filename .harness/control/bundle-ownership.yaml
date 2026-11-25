@@ -138,6 +138,12 @@ merge_json_maps:
 #   - top-level keys the bundle ships stay the bundle's (a project edit there is
 #     replaced and NAMED in the report -- to hold a local deviation, use
 #     .claude/settings.local.json, already project-owned via the glob above);
+#   - EXCEPT permissions.deny and permissions.ask, which are UNIONED -- shipped
+#     rules first, then the project's own; a deny/ask rule is never dropped
+#     (B-106: the whole-key replace erased every project's own deny rules).
+#     permissions.allow stays the bundle's; a project-only allow is named.
+#     A project's durable deny/ask rules live in .harness/project/deny-rules.json
+#     (project-owned via the glob above), added to every settings file on install;
 #   - top-level keys only the project has ride along unchanged.
 #
 # Entry identity is the `matcher` STRING, compared within one event. Claude Code

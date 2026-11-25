@@ -1,0 +1,17 @@
+{
+  "$schema": "../schemas/write-scope.schema.json",
+  "schema_version": "1.0.0",
+  "description": "C17 write scope -- the shell verb table harness_write_scope.py reads to find the WRITE TARGETS of a Bash/PowerShell command (C2). Which folders a session may write to is project policy: casan-policies.yaml -> write_scope.",
+  "governs": "assistant_workflow",
+  "enforced_at": "pretooluse_harnessd",
+  "enforcement_note": "HONEST STATUS (C10): file tools (Write/Edit/MultiEdit/NotebookEdit) are checked exactly. Shell commands are checked by pattern: a target written as a literal, a variable assigned in the same command, or inside a script file the command runs. A path computed at run time (Join-Path, string building, a program's own default such as pytest's basetemp) is invisible; the after-command detection reports entries that appear in the drive root or beside the project. Defense-in-depth, not a boundary -- the only hard boundary is a restricted OS account.",
+  "all_args": ["mkdir", "md", "new-item", "ni", "rmdir", "rd", "rm", "del", "erase", "remove-item", "ri",
+               "touch", "out-file", "set-content", "sc", "add-content", "ac", "tee", "tee-object",
+               "export-csv", "export-clixml", "truncate"],
+  "last_arg": ["cp", "copy", "copy-item", "cpi", "mv", "move", "move-item", "mi", "ln", "install", "rsync",
+               "robocopy", "xcopy", "scp"],
+  "named_params": ["-destination", "-destinationpath", "-outfile", "-filepath", "-path", "-literalpath",
+                   "-outputpath", "-o", "--output", "-c", "--directory", "--basetemp", "--prefix", "--target",
+                   "-t", "--target-directory", "/d"],
+  "script_extensions": [".ps1", ".psm1", ".sh", ".bash", ".cmd", ".bat"]
+}

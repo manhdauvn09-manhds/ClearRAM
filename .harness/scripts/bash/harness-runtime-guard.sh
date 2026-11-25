@@ -322,6 +322,20 @@ if not headers:
         src = "legacy-key"
 if not headers:
     raise SystemExit
+# portal-url-khong-ep-https: portal-sync.json is committed; nothing goes to a URL that is not
+# https or not the origin this machine enrolled against (parity with the .ps1 and harnessd).
+if fm is not None:
+    _ok, _why = fm.check_portal_url(_native(os.environ["HARNESS_ROOT"]), cfg["portal_url"])
+else:
+    _ok, _why = bool(re.match(r"(?i)^(https://[^/@\s]+|http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$))", str(cfg["portal_url"]))), "portal_url is not https:// (plain http only to a loopback host)"
+if not _ok:
+    try:
+        _w = fm.blocked_warning("harness-runtime-guard", _why) if fm is not None else ""
+        if _w:
+            sys.stderr.write(_w + "\n")
+    except Exception:
+        pass
+    raise SystemExit
 # Legacy path: at most one line a day per machine (stamp file), never per tool call (C14).
 warn = ""
 if src == "legacy-key" and fm is not None:

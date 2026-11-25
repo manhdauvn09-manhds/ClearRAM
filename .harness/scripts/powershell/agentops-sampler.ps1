@@ -10,7 +10,8 @@
   Fields recorded:
     - agent_name, model, session_id
     - tokens_in, tokens_out, total_tokens
-    - estimated_cost_usd (using ~$3/M input, ~$15/M output for Opus)
+    - estimated_cost_usd + cost_basis (rates from .harness/control/token-pricing.json, C2;
+      unknown model = unpriced -> 0, never a guessed rate)
     - latency_ms, start_time, end_time
     - tool_calls_count, status (success/error/interrupted)
 .NOTES
@@ -151,10 +152,29 @@ try {
     $LatencyMs = 0
 }
 
-# Cost estimation (rough: ~$3/M input, ~$15/M output for mid-tier models)
-$InputCostPerM = 3.0
-$OutputCostPerM = 15.0
-$EstimatedCost = ($TokensIn / 1000000.0 * $InputCostPerM) + ($TokensOut / 1000000.0 * $OutputCostPerM)
+# Cost: USD list-price equivalent from .harness/control/token-pricing.json (C2: data, not
+# a literal -- until 13-11-2026 this hardcoded $3/$15, a rate that matched NO model).
+# Exact key match on the recorded model id; an absent key falls to `default`; a null
+# rate = UNPRICED -> 0 and cost_basis says so (C13/C14: a plausible invented number is
+# worse than a visible gap). Cache reads are not in tokens_in (see above), so only the
+# input/output rates apply. Same rules as harness_token_rates.py (the bash twin calls it).
+$EstimatedCost = 0.0
+$CostBasis = "unpriced"
+$PricingFile = Join-Path $HarnessRoot ".harness\control\token-pricing.json"
+if (Test-Path $PricingFile) {
+    try {
+        $Pricing = Get-Content -Path $PricingFile -Raw -Encoding utf8 | ConvertFrom-Json
+        $Rates = $null
+        if ($Pricing.models -and $Pricing.models.PSObject.Properties[$ModelName]) { $Rates = $Pricing.models.$ModelName }
+        if ($null -eq $Rates) { $Rates = $Pricing.default }
+        if ($Rates -and $null -ne $Rates.input -and $null -ne $Rates.output) {
+            $EstimatedCost = ($TokensIn / 1000000.0 * [double]$Rates.input) + ($TokensOut / 1000000.0 * [double]$Rates.output)
+            $CostBasis = "priced"
+        }
+    } catch {
+        $EstimatedCost = 0.0; $CostBasis = "unpriced"
+    }
+}
 
 # --- Attribution stamps: WHICH Claude account, WHICH human. Two independent axes --
 # one human can hold two accounts; two humans can in principle share a machine -- so
@@ -185,6 +205,7 @@ $Record = @{
     tokens_out = $TokensOut
     total_tokens = $TotalTokens
     estimated_cost_usd = [math]::Round($EstimatedCost, 6)
+    cost_basis = $CostBasis          # priced | unpriced (ignored by the ingest, kept for audit)
     latency_ms = $LatencyMs
     tool_calls = $ToolCalls
     start_time = $StartTime

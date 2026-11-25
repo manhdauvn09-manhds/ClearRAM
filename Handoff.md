@@ -24,15 +24,18 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Máy dev: hardening do operator chạy `docs/security/Harden-RdpSmb.ps1` (admin), assistant đo lại xong 23/11. 2 cảnh báo Defender là fixture test của Ops và SecAegis (đã xác nhận) — dương tính giả.
 - Docs/HTML đồng bộ lại (9b2d8b4): đường dẫn mới, README, danh sách handoff tự sinh, Memory L3 max10. Checks 23/11: check-plan PASS, clean-data 18/18, memory-design 13/13, runtime-policies 9/9.
 
+**Harness 2026-11-25** — bundle standard-governance 1.8.36 / harnessd 0.3.3 (HarnessAIToolKIT release c32bb41) commit vào repo; `harnessd.py` khớp SHA1 nguồn toolkit (d1ad936…), `tests/policy/test_harnessd_root_and_shutdown.py` của toolkit 7/7 pass; untrack 12 file telemetry/ledger/context (vẫn trên đĩa). Checks plan/clean-data/memory-design/runtime-policies PASS 25/11.
+
 ## NEXT
 
-1. Việc dở của phiên 2026-11-23: operator xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now; KEV hạn 24/11), rồi assistant đo `VersionToReport` trong `HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration` và cập nhật report mục 6. Chờ bundle harness mới từ HarnessAIToolKIT.
+1. Việc dở của phiên 2026-11-23: operator xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now; KEV hạn 24/11), rồi assistant đo `VersionToReport` trong `HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration` và cập nhật report mục 6.
 2. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
 3. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
 ## OPEN
 
-- Bản harness cập nhật nằm chưa commit trong working tree (một phần đã stage; không do phiên app tạo) có 2 lỗi Medium H1/H2 trong `harnessd.py` (chi tiết chỉ ở report local). HarnessAIToolKIT nhận 23/11, sửa ở bundle sau. until: có bundle mới đã sửa; phiên app chỉ commit file của mình (`git commit -- <paths>`).
+- 3 file `*.new` installer để lại (`.harness/control/casan-policies.yaml.new`, `.harness/control/token-pricing.json.new`, `contracts/project.yaml.new`; gitignored) khác bản đang dùng. until: gộp tay rồi xóa `.new`.
+- `_trash/2026-11-25/` (6 .pyc từ /project-cleanup, gitignored). until: operator xem xong và xóa.
 - `docs/security/` (report + Harden-RdpSmb.ps1) chỉ ở local. until: operator chọn giữ local hoặc commit.
 - Office (CyberAlert KEV): update kích hoạt 23/11 nhưng lần đo cuối build chưa đổi (16.0.20625.20108). until: build mới hơn được đo và đối chiếu advisory.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
@@ -49,7 +52,7 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 ## AVOID
 
-- Không `git add -A` / commit bản harness đang chờ cùng việc app; không stage `.data`, `artifacts`, telemetry/ledger.
+- Không `git add -A`; commit cập nhật harness tách riêng khỏi việc app; không stage `.data`, `artifacts`, telemetry/ledger.
 - Không bật gate (executionEnabled/productionExecutionEnabled) để né dependencies; không import FixtureExecutor vào GUI; không auto Close→Force, kill tree, UAC/ACL/TrustedInstaller bypass.
 - Không thử Clear/Close/Kill/cleanup trên app hoặc dữ liệu thật để QA; fixture luôn cô lập, chỉ dọn PID/file do test tạo.
 - Không coi tên/CPU/RAM/size/tuổi/thiếu uninstall key là bằng chứng rác hoặc app không cần; không cộng size unknown/quarantine cùng ổ vào reclaim.

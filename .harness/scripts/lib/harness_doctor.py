@@ -86,6 +86,122 @@ def _git(root, *args):
         return ""
 
 
+def _ci_server_summary(root):
+    """The server-side CI run for THIS HEAD, or None.
+
+    12-11-2026: GitHub-hosted runners are blocked on billing and the operator decided not
+    to pay; the same job commands run on mcp-80 (tools/dev/ci-on-server) and the server's
+    summary.json is committed as docs/_parts/ci-on-server/<sha12>.json. It counts only for
+    the exact commit it names -- a summary for another sha proves nothing about HEAD (C12),
+    and the detail always names the file (C13)."""
+    head = _git_head(root)
+    if not head:
+        return None
+    s = _read_server_summary(root, head)
+    if s is None:
+        # A commit that changes nothing the CI workflow triggers on (the evidence file itself,
+        # Handoff.md, CHANGELOG...) would not get a GitHub run either; the newest ancestor that
+        # DID need CI carries the honest verdict. Walk at most 5 such commits; any commit that
+        # touches a trigger path is untested code and stops the walk.
+        ref = "HEAD"
+        for _ in range(5):
+            if _changes_need_ci(root, ref):
+                break
+            parent = _git_head(root, ref + "~1")
+            if not parent:
+                break
+            s = _read_server_summary(root, parent)
+            if s is not None:
+                s["_note"] = ("HEAD %s changes no CI trigger path since %s; verdict is for that commit"
+                              % (head[:12], parent[:12]))
+                break
+            ref = ref + "~1"
+    return s
+
+
+def _read_server_summary(root, sha):
+    p = os.path.join(root, "docs", "_parts", "ci-on-server", sha[:12] + ".json")
+    try:
+        with open(p, encoding="utf-8-sig") as f:
+            s = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(s, dict) or not str(s.get("sha") or "").startswith(sha[:12]):
+        return None
+    s["_path"] = os.path.relpath(p, root).replace("\\", "/")
+    return s
+
+
+# The push path filter of policy-ci.yml (read from the file when present): a commit that
+# touches none of these would not get a run on GitHub either.
+_CI_TRIGGER_PATHS = (".harness/**", "bundles/**", "contracts/**", "gateway/**", "tests/**", "tools/**",
+                     "portal/**", ".github/workflows/**", "docs/design/**")
+
+
+def _ci_trigger_paths(root):
+    p = os.path.join(root, ".github", "workflows", "policy-ci.yml")
+    try:
+        with open(p, encoding="utf-8-sig") as f:
+            txt = f.read()
+    except OSError:
+        return list(_CI_TRIGGER_PATHS)
+    m = re.search(r"^\s*push:\s*\n(?:.*\n)*?\s*paths:\s*\n((?:\s*-\s*'[^']+'\s*\n)+)", txt, re.M)
+    if not m:
+        return list(_CI_TRIGGER_PATHS)
+    globs = re.findall(r"-\s*'([^']+)'", m.group(1))
+    return globs or list(_CI_TRIGGER_PATHS)
+
+
+def _glob_hit(path, glob):
+    if glob.endswith("/**"):
+        return path.startswith(glob[:-3] + "/")
+    import fnmatch
+    return fnmatch.fnmatch(path, glob)
+
+
+def _changes_need_ci(root, ref="HEAD"):
+    """True when the commit at `ref` touches a path the CI workflow triggers on (or when git
+    cannot say -- unknown must not read as 'no CI needed')."""
+    try:
+        p = subprocess.run(["git", "-C", root, "diff", "--name-only", ref + "~1", ref],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return True
+    if p.returncode != 0:
+        return True
+    files = [l.strip().replace("\\", "/") for l in (p.stdout or "").splitlines() if l.strip()]
+    globs = _ci_trigger_paths(root)
+    return any(_glob_hit(f, g) for f in files for g in globs)
+
+
+def _git_head(root, ref="HEAD"):
+    try:
+        p = subprocess.run(["git", "-C", root, "rev-parse", "--verify", "--quiet", ref], capture_output=True, text=True, timeout=10)
+        return (p.stdout or "").strip() if p.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def _ci_state(root):
+    """GitHub's answer, overlaid with the server-side run for this exact HEAD when GitHub
+    cannot vouch for it (fail / none / unknown). A server pass is reported with its
+    source; a server fail is a fail that names the jobs."""
+    state, detail = _ci_last_run(root)
+    if state == "pass":
+        return state, detail
+    s = _ci_server_summary(root)
+    if not s:
+        return state, detail
+    jobs = s.get("jobs") or {}
+    note = (" (%s)" % s["_note"]) if s.get("_note") else ""
+    if s.get("verdict") == "pass":
+        return "pass", ("server CI on %s for %s: %d job(s) pass [source %s]%s; GitHub: %s"
+                        % (s.get("host", "?"), str(s.get("sha", ""))[:12], len(jobs), s["_path"], note, detail))
+    failed = [n for n, r in jobs.items() if isinstance(r, dict) and r.get("status") == "fail"]
+    return "fail", ("server CI on %s for HEAD %s FAILED: %s [source %s]; GitHub: %s"
+                    % (s.get("host", "?"), str(s.get("sha", ""))[:12], ", ".join(failed) or "verdict fail", s["_path"], detail))
+
+
 def _ci_last_run(root):
     """-> (state, detail). state ∈ pass | fail | none | unknown.
 
@@ -307,8 +423,8 @@ def _c15_handoff(root):
 
 def _c16_worktrees(root):
     """C16: worktrees besides main within worktrees.max_extra, none left behind
-    after a merge, none abandoned. WARN at worst, never FAIL (C14); `unknown`
-    (INFO) when git cannot list them (C12)."""
+    after a merge, none abandoned. FAIL by default since 12-11 (worktrees.doctor_grade:
+    warn softens it); `unknown` (INFO) when git cannot list them (C12)."""
     label = "worktrees (C16)"
     try:
         import harness_worktree as HW
@@ -324,12 +440,15 @@ def _c16_worktrees(root):
         yield INFO, label, "unknown: `git worktree list` unreadable here -- budget not checked."
         return
     over, ex, lines = r
+    # 12-11: a breach is FAIL unless the project sets worktrees.doctor_grade: warn
+    # (operator decision -- "finished means on main and the folder gone").
+    grade = WARN if cfg.get("doctor_grade") == "warn" else FAIL
     if over:
-        yield WARN, label, ("%d worktree(s) besides main, limit %d -- finish one "
-                            "(harness-worktree finish): %s" % (len(ex), cfg["max_extra"],
-                                                              "; ".join(HW._short(w) for w in ex)))
+        yield grade, label, ("%d worktree(s) besides main, limit %d -- finish one "
+                             "(harness-worktree finish): %s" % (len(ex), cfg["max_extra"],
+                                                               "; ".join(HW._short(w) for w in ex)))
     if lines:
-        yield WARN, label, "left behind: " + " | ".join(lines)
+        yield grade, label, "left behind: " + " | ".join(lines)
     if not over and not lines:
         yield OK, label, "%d/%d worktree(s) besides main, none merged-and-kept or abandoned." % (
             len(ex), cfg["max_extra"])
@@ -396,6 +515,40 @@ def _ignored_on_ci(label, rel):
         "not checkable on a CI runner: %s is gitignored in this repo (git check-ignore), so a "
         "clone never holds it and its absence here says nothing. Unproven here, not passing -- "
         "run harness doctor on the workstation where the bundle was installed for this line." % rel)
+
+
+_TS_RE = re.compile(r"(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)")
+
+
+def _parse_ts(text):
+    """ISO-ish timestamp -> aware datetime (UTC), or None. A naive stamp is taken as
+    local time, which is what every hook writes when it omits the offset."""
+    m = _TS_RE.search(str(text or ""))
+    if not m:
+        return None
+    s = m.group(1).replace(" ", "T")
+    s = re.sub(r"(\.\d{6})\d+", r"\1", s)        # PowerShell writes 7 fractional digits
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        d = datetime.datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if d.tzinfo is None:
+        d = d.astimezone()
+    return d.astimezone(datetime.timezone.utc)
+
+
+def _line_ts(line):
+    """The timestamp of one hook-errors.log line: JSON `timestamp`, else a leading
+    `[...]` or any ISO stamp in the text; None when there is none (counted as live)."""
+    try:
+        j = json.loads(line)
+        if isinstance(j, dict) and j.get("timestamp"):
+            return _parse_ts(j["timestamp"])
+    except Exception:
+        pass
+    return _parse_ts(line)
 
 
 def _not_here(label, rel):
@@ -570,6 +723,20 @@ def run(root, ci=False):
                 % (len(fake), len(errs), why))
         else:
             yield OK, "log integrity (C14)", "no known false-positive signature in hook-errors.log."
+        # Live vs acknowledged: `agentops.hook_errors_acknowledged_through` in
+        # casan-policies.yaml is a timestamp; entries at or before it were read and
+        # handled, and they STAY in the log (C14: never delete diagnostics to quiet a
+        # file). Only newer entries are live. Before 13-11 every historical error was
+        # reported as live forever, and a warning that never clears gets ignored.
+        ack_raw, ack = "", None
+        try:
+            import harness_handoff as HH
+            ack_raw = str((HH.read_config(root, block="agentops") or {})
+                          .get("hook_errors_acknowledged_through") or "")
+        except Exception:
+            ack_raw = ""
+        if ack_raw:
+            ack = _parse_ts(ack_raw)
         if real:
             last = real[-1]
             try:
@@ -577,7 +744,30 @@ def run(root, ci=False):
                 last = "%s: %s" % (j.get("hook", "?"), j.get("error", "")[:80])
             except Exception:
                 last = last[:90]
-            yield WARN, "hook errors", "%d genuine error(s) recorded — most recent: %s" % (len(real), last)
+            if ack_raw and ack is None:
+                yield WARN, "hook errors", (
+                    "%d genuine error(s) recorded — most recent: %s. (agentops."
+                    "hook_errors_acknowledged_through = %r is not a timestamp, so nothing "
+                    "is acknowledged.)" % (len(real), last, ack_raw))
+            elif ack is not None and ack > datetime.datetime.now(datetime.timezone.utc):
+                yield WARN, "hook errors", (
+                    "%d genuine error(s) recorded — most recent: %s. (agentops."
+                    "hook_errors_acknowledged_through = %s is in the FUTURE: a mark cannot "
+                    "acknowledge errors not yet written, C14 — ignored.)" % (len(real), last, ack_raw))
+            elif ack is not None:
+                live = [l for l in real if (_line_ts(l) is None) or (_line_ts(l) > ack)]
+                acked = len(real) - len(live)
+                if live:
+                    yield WARN, "hook errors", (
+                        "%d live error(s) after %s (%d older acknowledged, kept in the log) — "
+                        "most recent: %s" % (len(live), ack_raw, acked, last))
+                else:
+                    yield OK, "hook errors", (
+                        "0 live since %s; %d older error(s) acknowledged in casan-policies.yaml "
+                        "(agentops.hook_errors_acknowledged_through), log untouched (C14)."
+                        % (ack_raw, acked))
+            else:
+                yield WARN, "hook errors", "%d genuine error(s) recorded — most recent: %s" % (len(real), last)
         else:
             yield OK, "hook errors", "none recorded."
     else:
@@ -894,7 +1084,7 @@ def run(root, ci=False):
         # comfortable "cannot verify from here". Unproven and failing look the
         # same from a distance, which is precisely why C12 forbids resting there
         # when the fact is obtainable.
-        state, detail = _ci_last_run(root)
+        state, detail = _ci_state(root)
         if state == "pass":
             proven.append("ci (%s)" % detail)
         elif state == "fail":

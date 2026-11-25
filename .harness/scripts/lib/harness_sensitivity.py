@@ -327,6 +327,14 @@ def ask_portal(root, rel, rule, tool, tool_input):
         # approval.  The shared key is the legacy fallback only (read lazily: no credential
         # means no extra file read on the credential path).
         facts = _checkout_facts()
+        # portal-url-khong-ep-https: portal-sync.json is committed; no header goes to a URL that
+        # is not https or not the origin this machine enrolled against. F2 stays denied then.
+        if facts:
+            ok, why = facts.check_portal_url(root, str(cfg["portal_url"]))
+        else:
+            ok, why = bool(re.match(r"(?i)^(https://[^/@\s]+|http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$))", str(cfg["portal_url"]))), "portal_url is not https:// (plain http only to a loopback host)"
+        if not ok:
+            return out("unreachable", "credential not sent: " + why)
         cred = facts.checkout_auth(root) if facts else {}
         key = ""
         if not cred:

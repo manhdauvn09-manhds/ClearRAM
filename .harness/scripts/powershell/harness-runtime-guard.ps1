@@ -329,6 +329,14 @@ try {
                 # goes into the request headers and nowhere else (C5).
                 $AuthHeaders = $null
                 $AuthSource = ""
+                # portal-url-khong-ep-https: portal-sync.json is committed; nothing (no credential,
+                # no legacy key) goes to a URL that is not https, or -- the shared lib, when a
+                # credential is held -- not the origin this machine enrolled against.
+                $PortalBlocked = ""
+                $PU = "$($SyncCfg.portal_url)"
+                if ($PU -notmatch '^(?i)https://[^/@\s]+' -and $PU -notmatch '^(?i)http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$)') {
+                    $PortalBlocked = "portal_url is not https:// (plain http only to a loopback host)"
+                }
                 $AuthLib = Join-Path $PSScriptRoot "..\lib\harness_checkout_facts.py"
                 if (($env:HARNESS_CHECKOUT_CREDENTIAL -or (Test-Path "$SyncRoot\.harness\local\checkout.json") `
                         -or (Test-Path "$HarnessRoot\.harness\local\checkout.json") `
@@ -336,17 +344,29 @@ try {
                     $pyc = Get-Command python -ErrorAction SilentlyContinue
                     if (-not $pyc) { $pyc = Get-Command python3 -ErrorAction SilentlyContinue }
                     if ($pyc) {
-                        $aj = (& $pyc.Source $AuthLib --auth $HarnessRoot 2>$null) -join ""
+                        $aj = (& $pyc.Source $AuthLib --auth $HarnessRoot $PU 2>$null) -join ""
                         if ($aj) {
                             $Au = $aj | ConvertFrom-Json
-                            if ($Au.checkout_id -and $Au.checkout_credential) {
+                            if ($Au.blocked) { $PortalBlocked = "$($Au.blocked)" }
+                            elseif ($Au.checkout_id -and $Au.checkout_credential) {
                                 $AuthHeaders = @{ "X-Checkout-Id" = "$($Au.checkout_id)"; "X-Checkout-Credential" = "$($Au.checkout_credential)" }
                                 $AuthSource = "checkout"
                             }
                         }
                     }
                 }
-                if (-not $AuthHeaders) {
+                if ($PortalBlocked) {
+                    $AuthHeaders = $null
+                    try {
+                        $pyb = Get-Command python -ErrorAction SilentlyContinue
+                        if (-not $pyb) { $pyb = Get-Command python3 -ErrorAction SilentlyContinue }
+                        if ($pyb -and (Test-Path $AuthLib)) {
+                            $bw = (& $pyb.Source $AuthLib --blocked-warning harness-runtime-guard $PortalBlocked 2>$null) -join ""
+                            if ($bw) { [Console]::Error.WriteLine($bw) }
+                        }
+                    } catch { }
+                }
+                if (-not $AuthHeaders -and -not $PortalBlocked) {
                     $Key = $env:HARNESS_PORTAL_INGEST_KEY
                     if (-not $Key) {
                         $KeyFile = "$SyncRoot\.harness\portal-sync.key"

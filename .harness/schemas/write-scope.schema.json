@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "write-scope.schema.json",
+  "title": "C17 write scope -- shell verb table",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "governs", "all_args", "last_arg", "named_params"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "description": { "type": "string" },
+    "governs": { "type": "string", "enum": ["assistant_workflow"] },
+    "enforced_at": { "type": "string" },
+    "enforcement_note": { "type": "string" },
+    "all_args": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Verbs whose every path argument is a write target (mkdir, New-Item, rm, Out-File...)" },
+    "last_arg": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Verbs whose destination is the last positional argument (cp, Copy-Item, mv...); robocopy/xcopy use the second" },
+    "named_params": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Parameters whose value is a write target (-Destination, --output, --basetemp...)" },
+    "script_extensions": { "type": "array", "items": { "type": "string", "pattern": "^\\." }, "description": "A script file the command runs is read and checked with the same table" }
+  }
+}

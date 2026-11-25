@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "deny-rules.schema.json",
+  "title": "A project's own Claude Code deny/ask rules (.harness/project/deny-rules.json)",
+  "description": "B-106: rules a project adds to permissions.deny / permissions.ask of every Claude Code settings file the bundle merges (.claude/settings.json, .claude/settings.posix.json). Project-owned: bundle installs never ship or overwrite .harness/project/, and the installer adds these rules on every install, so they cannot be lost the way hand-added rules in settings.json were. Can only NARROW: there is no allow list, and an entry without rule + reason is ignored and named. Written by the owner (AI writes are blocked by self-protect-paths.json). Local Claude Code rules are defense-in-depth, not a boundary (C10).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "governs": { "type": "string", "enum": ["assistant_workflow"] },
+    "deny": { "$ref": "#/definitions/rules" },
+    "ask": { "$ref": "#/definitions/rules" }
+  },
+  "definitions": {
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule", "reason"],
+        "properties": {
+          "rule": { "type": "string", "minLength": 3, "description": "A Claude Code rule, e.g. Bash(ssh:*)" },
+          "reason": { "type": "string", "minLength": 5, "description": "Why, e.g. the review item it implements (BM-02)" }
+        }
+      }
+    }
+  }
+}

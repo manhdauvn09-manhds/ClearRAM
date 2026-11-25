@@ -51,6 +51,14 @@
               "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/harness-worktree.sh",
               "start"
             ]
+          },
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/harnessd.sh",
+              "ensure"
+            ]
           }
         ]
       }
@@ -65,6 +73,14 @@
             "args": [
               "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/injection-scan.sh"
             ]
+          },
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/harnessd.sh",
+              "ensure"
+            ]
           }
         ]
       }
@@ -74,10 +90,14 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "bash",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/harness-runtime-guard.sh"
+            "type": "http",
+            "url": "http://127.0.0.1:47631/hook/pre-tool-use",
+            "timeout": 20,
+            "headers": {
+              "X-Harnessd-Token": "$HARNESSD_TOKEN"
+            },
+            "allowedEnvVars": [
+              "HARNESSD_TOKEN"
             ]
           }
         ]
@@ -88,10 +108,14 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "bash",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.harness/scripts/bash/harness-post-tool-use.sh"
+            "type": "http",
+            "url": "http://127.0.0.1:47631/hook/post-tool-use",
+            "timeout": 20,
+            "headers": {
+              "X-Harnessd-Token": "$HARNESSD_TOKEN"
+            },
+            "allowedEnvVars": [
+              "HARNESSD_TOKEN"
             ]
           }
         ]

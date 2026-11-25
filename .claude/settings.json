@@ -55,6 +55,16 @@
               "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/harness-worktree.ps1",
               "start"
             ]
+          },
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": [
+              "-NoProfile",
+              "-File",
+              "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/harnessd.ps1",
+              "ensure"
+            ]
           }
         ]
       }
@@ -71,6 +81,16 @@
               "-File",
               "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/injection-scan.ps1"
             ]
+          },
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": [
+              "-NoProfile",
+              "-File",
+              "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/harnessd.ps1",
+              "ensure"
+            ]
           }
         ]
       }
@@ -80,12 +100,14 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "powershell",
-            "args": [
-              "-NoProfile",
-              "-File",
-              "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/harness-runtime-guard.ps1"
+            "type": "http",
+            "url": "http://127.0.0.1:47631/hook/pre-tool-use",
+            "timeout": 20,
+            "headers": {
+              "X-Harnessd-Token": "$HARNESSD_TOKEN"
+            },
+            "allowedEnvVars": [
+              "HARNESSD_TOKEN"
             ]
           }
         ]
@@ -96,12 +118,14 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command",
-            "command": "powershell",
-            "args": [
-              "-NoProfile",
-              "-File",
-              "${CLAUDE_PROJECT_DIR}/.harness/scripts/powershell/harness-post-tool-use.ps1"
+            "type": "http",
+            "url": "http://127.0.0.1:47631/hook/post-tool-use",
+            "timeout": 20,
+            "headers": {
+              "X-Harnessd-Token": "$HARNESSD_TOKEN"
+            },
+            "allowedEnvVars": [
+              "HARNESSD_TOKEN"
             ]
           }
         ]

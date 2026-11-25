@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tool-overrides.schema.json",
+  "title": "Per-project owner overrides for deny-by-default tools (.harness/project/tool-overrides.json)",
+  "description": "The project owner's decision to turn a registry tool marked default_action=deny into ASK -- the person approves every call. Never allow: ASK is the only action. Project-owned: bundle installs never ship or overwrite .harness/project/. Written by the owner (AI writes are blocked by self-protect-paths.json). harnessd ignores an incomplete or expired entry and keeps the deny.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "overrides"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "governs": { "type": "string", "enum": ["assistant_workflow"] },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "action", "reason", "approved_by", "approved_on"],
+        "properties": {
+          "tool": { "type": "string", "minLength": 3, "description": "Registry key, e.g. codeprovider-mcp.run_command" },
+          "action": { "type": "string", "enum": ["ask"], "description": "The only relaxation allowed: ask the person every time" },
+          "reason": { "type": "string", "minLength": 10 },
+          "approved_by": { "type": "string", "minLength": 2 },
+          "approved_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "expires_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Optional; after this date the deny is back" }
+        }
+      }
+    }
+  }
+}

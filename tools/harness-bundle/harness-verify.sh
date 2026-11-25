@@ -83,6 +83,15 @@ else:
         hook_msg = "no PreToolUse hook"
     elif isinstance(pre, str):
         hook_msg = "OLD bare-path format -> hooks will NOT fire (re-install settings.json)"
+    elif str(pre[0]["hooks"][0].get("type", "")) == "http":
+        # 1.8.25: PreToolUse is an http hook served by harnessd; wired when the URL is loopback
+        # /hook/pre-tool-use and the daemon lib ships with the project (parity with the .ps1).
+        cmd = pre[0]["hooks"][0]
+        url_ok = re.match(r"^http://127\.0\.0\.1:\d+/hook/pre-tool-use$", str(cmd.get("url", ""))) is not None
+        lib_ok = os.path.exists(os.path.join(target, ".harness", "scripts", "lib", "harnessd.py"))
+        hooks_wired = url_ok and lib_ok
+        hook_msg = "http schema; url='%s' %s; harnessd.py %s" % (
+            cmd.get("url"), "OK" if url_ok else "UNEXPECTED", "found" if lib_ok else "MISSING")
     else:
         cmd = pre[0]["hooks"][0]
         arg = [a for a in cmd.get("args", []) if not a.startswith("-")]

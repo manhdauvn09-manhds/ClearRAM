@@ -93,6 +93,19 @@ if not headers:
             w=fm.legacy_warning("harness-release") if fm else ""
             if w: sys.stderr.write(w+chr(10))
         except Exception: pass
+# portal-url-khong-ep-https: no header to a URL that is not https or not this machine's
+# enrolled origin (parity with the .ps1). Blocked = the gate is not consulted.
+if cfg.get("portal_url") and headers:
+    if fm is not None:
+        _ok,_why=fm.check_portal_url(root,cfg["portal_url"])
+    else:
+        _ok,_why=bool(re.match(r"(?i)^(https://[^/@\s]+|http://(localhost|127\.0\.0\.1|\[::1\]|[^/:@\s]+\.localhost)(:\d+)?(/|$))", str(cfg["portal_url"]))),"portal_url is not https:// (plain http only to a loopback host)"
+    if not _ok:
+        headers={}
+        try:
+            w=fm.blocked_warning("harness-release",_why) if fm else ""
+            if w: sys.stderr.write(w+chr(10))
+        except Exception: pass
 if cfg.get("portal_url") and cfg.get("project_id") and headers:
     url=cfg["portal_url"].rstrip("/")+"/api/pdp/"+cfg["project_id"]+"/decide"
     # The REAL requester: HARNESS_USER, else git user.email; with neither, empty and the

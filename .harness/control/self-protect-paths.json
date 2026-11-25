@@ -18,7 +18,9 @@
         ".harness/control/**",
         ".harness/scripts/**",
         ".claude/settings.json",
-        ".claude/settings.posix.json"
+        ".claude/settings.posix.json",
+        ".harness/project/tool-overrides.json",
+        ".harness/project/deny-rules.json"
       ],
       "exclude_globs": [
         ".harness/control/casan-policies.yaml",

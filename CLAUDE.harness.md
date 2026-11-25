@@ -54,7 +54,7 @@ what is inside it. Run the installer with `-MergeGuides` / `--merge-guides`.
 - **Lowest layer sets the ceiling:** the weakest governance layer caps the whole
   system's assurance; don't advertise more safety than the weakest link gives.
 
-## Key Conventions (C1–C10)
+## Key Conventions (C1–C17)
 
 - **C1 — Native layout:** use the agent tool's native config dir (`.claude/`);
   project memory lives in `CLAUDE.md`.
@@ -149,11 +149,14 @@ what is inside it. Run the installer with `-MergeGuides` / `--merge-guides`.
   `Stop` when files changed this session but `Handoff.md` did not, and
   `harness doctor` warns when it falls behind the latest commit
   (`casan-policies.yaml` → `handoff`).
-- **C16 — Worktree budget: at most two, finished means merged and removed.**
+- **C16 — Worktree budget: at most one, finished means merged and removed.**
   A git worktree is a full second copy of the source on disk, and a forgotten
-  one is a second place the truth lives. Keep **at most two** worktrees besides
-  the main checkout per repository (`casan-policies.yaml` → `worktrees.max_extra`),
-  and prefer working in the main checkout when the task does not need isolation.
+  one is a second place the truth lives. Keep **at most one** worktree besides
+  the main checkout per repository (`casan-policies.yaml` → `worktrees.max_extra`;
+  fleet default 1 since 12·11, was 2), and prefer working in the main checkout
+  when the task does not need isolation. A merged, clean worktree left idle for
+  `merged_idle_hours` is finished automatically (SessionStart, Stop, the daily
+  sweep); a detached copy already in `main` is simply removed.
   When the work in a worktree is done, **merge it into `main` at once, push, and
   remove the worktree and its branch** — one command does all of it and refuses
   on any doubt (uncommitted files, a conflict, `main` not clean), never with
@@ -164,6 +167,22 @@ what is inside it. Run the installer with `-MergeGuides` / `--merge-guides`.
   hook reminds once per commit to finish; an assistant whose hooks do not run
   this guard (Codex today) is only warned — by a git `post-checkout` hook (`harness-worktree
   install-git-hook`), at `SessionStart` and by `harness doctor` (C10).
+- **C17 — Write scope: write only inside the project folder you were granted.**
+  A session may create or change files **only inside the project folder it was
+  opened on** (for a worktree session: that worktree), plus that project's own
+  Claude memory directory (`~/.claude/projects/<project key>/memory`). Not `%TEMP%`,
+  not the session scratchpad, not the drive root, not a sibling project — scratch
+  and test copies go inside the project, in a git-ignored folder (`.harness/tmp/`,
+  `.pytest-tmp/`). Reading elsewhere is fine. A tool's own default that writes
+  outside (pytest's basetemp, a package cache) is pointed inside the project.
+  Writing outside on purpose is the operator's step, or a path the project adds to
+  `casan-policies.yaml` → `write_scope.extra_allowed`. Claude Code's PreToolUse
+  guard (harnessd) denies file-tool writes outside exactly, denies shell commands
+  whose write target it can see (redirects, mkdir/New-Item, copy/move destination,
+  git clone/worktree add, also inside a script the command runs), and reports an
+  entry that appears in the drive root or beside the project after a command.
+  Pattern-based for shell and local only (C10) — the hard boundary is a
+  restricted OS account.
 
 ## Plane separation — what these policies do NOT govern
 

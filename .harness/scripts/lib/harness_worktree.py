@@ -19,6 +19,8 @@ Callers (thin wrappers, so PowerShell and bash decide identically, C7):
   status  Human (or --json) list of worktrees with their state.
   finish  Merge the worktree's branch into merge_target, push, remove the
           worktree, delete the branch (git branch -d). Refuses on any doubt.
+          A DETACHED worktree that is clean and already in merge_target (a
+          deploy copy, a scratch copy) has nothing to merge: only removed.
   post-checkout / install-git-hook
           The git-level detector for tools without hooks (Codex, a person):
           git runs post-checkout on `git worktree add`; it cannot abort the
@@ -48,14 +50,20 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import harness_handoff as HH  # noqa: E402  (shared casan-policies block reader)
 
+# 12-11 (operator: "triet de" -- finished means on main and the folder gone):
+# one worktree besides main, a merged one is removed after 2 idle hours, an
+# untouched one is "abandoned" after a day, merged ones are finished AUTOMATICALLY
+# at SessionStart / Stop / the daily sweep, and doctor grades a breach FAIL.
 DEFAULTS = {
     "enabled": True,
-    "max_extra": 2,
+    "max_extra": 1,
     "merge_target": "main",
     "push_after_merge": True,
     "remind_on_stop": True,
-    "merged_idle_hours": 12,
-    "stale_after_days": 3,
+    "merged_idle_hours": 2,
+    "stale_after_days": 1,
+    "auto_finish_merged": True,     # SessionStart/Stop/sweep run `finish` on merged+clean+idle worktrees
+    "doctor_grade": "fail",         # fail | warn -- how harness doctor grades over-budget / left-behind
 }
 
 NULL_SHA = "0" * 40
@@ -76,6 +84,8 @@ def effective_config(root):
             cfg[k] = max(0, int(cfg[k]))
         except (TypeError, ValueError):
             cfg[k] = DEFAULTS[k]
+    cfg["auto_finish_merged"] = cfg.get("auto_finish_merged") is not False
+    cfg["doctor_grade"] = "warn" if str(cfg.get("doctor_grade") or "").lower() == "warn" else "fail"
     return cfg
 
 
@@ -277,14 +287,49 @@ def report_lines(root, cfg=None):
     return over, ex, out
 
 
+def auto_finish(root, cfg=None, exclude=None, log=None):
+    """`finish` every worktree whose state is `merged` (merged into merge_target, clean,
+    idle >= merged_idle_hours), except `exclude` (the folder the caller stands in: on
+    Windows it cannot be removed from inside). Returns [(path, rc_or_reason)]. Never
+    raises: a refusal is reported, the next worktree still gets its turn."""
+    cfg = cfg or effective_config(root)
+    if cfg.get("enabled") is False or not cfg.get("auto_finish_merged"):
+        return []
+    wts = list_worktrees(root)
+    if not wts:
+        return []
+    done = []
+    for w in extras(wts):
+        if exclude and _same(w["path"], exclude):
+            continue
+        if w["locked"]:
+            continue
+        # detached is fine: state "merged" means clean + HEAD already in target, and
+        # finish() then only removes the folder.
+        d = describe(root, w, cfg)
+        if d["state"] != "merged":
+            continue
+        try:
+            rc = finish(wts[0]["path"], path=w["path"], log=log or (lambda *a: None))
+            done.append((w["path"], rc))
+        except Refuse as e:
+            done.append((w["path"], "tu choi: %s" % str(e).splitlines()[0]))
+        except Exception as e:  # noqa: BLE001
+            done.append((w["path"], "loi: %s" % e))
+    return done
+
+
 def decide_start(root):
     cfg = effective_config(root)
     if cfg.get("enabled") is False:
         return ""
+    fin = auto_finish(root, cfg)
     r = report_lines(root, cfg)
     if not r:
         return ""
     over, ex, lines = r
+    for p, rc in fin:
+        lines.insert(0, "da tu finish (merge, push, xoa): %s" % p if rc == 0 else "finish %s -> %s" % (p, rc))
     if not over and not lines:
         return ""
     head = "[harness C16] worktree: %d/%d ngoai main" % (len(ex), cfg["max_extra"])
@@ -303,7 +348,12 @@ def decide_stop(root, payload):
     if rc != 0:
         return None
     wts = list_worktrees(root)
-    if not wts or _same(top, wts[0]["path"]):
+    if not wts:
+        return None
+    # Other worktrees of this repo that are merged and idle go now -- not the one this
+    # session stands in (Windows cannot remove a folder in use; the reminder covers it).
+    auto_finish(wts[0]["path"], cfg, exclude=top)
+    if _same(top, wts[0]["path"]):
         return None  # in the main checkout: nothing to finish
     me = next((w for w in wts[1:] if _same(w["path"], top)), None)
     if me is None or me["detached"] or not me["branch"]:
@@ -349,6 +399,42 @@ class Refuse(Exception):
     pass
 
 
+def _finish_detached(main, me, cfg, target, log):
+    """A detached worktree has no branch to merge. When it is clean and its HEAD is already
+    in `target` (deploy-pushed's copy of origin/main, a session's scratch copy), finishing it
+    is just removing the folder -- nothing is lost. Any own commit or change: refuse, as
+    before (13-11: SessionStart advised `finish` for such a copy and `finish` refused it)."""
+    wt = me["path"]
+    if me["locked"]:
+        raise Refuse("worktree %s dang bi khoa (git worktree unlock neu chac chan)" % wt)
+    rc, st, _ = _git(wt, "status", "--porcelain")
+    if rc != 0 or st:
+        raise Refuse("%s dang detached HEAD va con thay doi chua commit - tao nhanh va commit "
+                     "(hoac bo thay doi) truoc:\n%s" % (wt, st))
+    head = me.get("head") or ""
+    rc, n, _ = _git(main, "rev-list", "--count", "%s..%s" % (target, head))
+    if rc != 0 or not n.isdigit():
+        raise Refuse("%s dang detached HEAD - khong so duoc commit so voi %s" % (wt, target))
+    if int(n) != 0:
+        raise Refuse("%s dang detached HEAD voi %s commit chua nam trong %s - tao nhanh "
+                     "(git switch -c <ten>) roi chay lai" % (wt, n, target))
+    log("[1/1] %s detached tai %s, da nam trong %s, khong co thay doi -> chi xoa thu muc"
+        % (wt, head[:8], target))
+    try:
+        os.chdir(main)
+    except OSError:
+        pass
+    rc, _, err = _git(main, "worktree", "remove", wt, timeout=180)
+    if rc != 0:
+        log("CANH BAO: khong xoa duoc thu muc worktree:\n  %s\nThuong la do mot tien trinh con giu "
+            "thu muc. Dong no roi chay lai." % err)
+        return 3
+    _git(main, "worktree", "prune")
+    left = extras(list_worktrees(main) or [])
+    log("XONG: worktree detached da xoa. Con %d/%d worktree ngoai main." % (len(left), cfg["max_extra"]))
+    return 0
+
+
 def finish(root, path=None, no_push=False, log=print):
     """Merge -> push -> remove -> delete branch. Returns 0 done, 1 refused,
     3 merged+pushed but the folder could not be removed (in use)."""
@@ -374,7 +460,7 @@ def finish(root, path=None, no_push=False, log=print):
         _git(main, "worktree", "prune")
         raise Refuse("thu muc %s da mat; da chay `git worktree prune`" % wt)
     if me["detached"] or not me["branch"]:
-        raise Refuse("%s dang detached HEAD - tao nhanh va commit truoc" % wt)
+        return _finish_detached(main, me, cfg, target, log)
     branch = me["branch"]
     if branch == target:
         raise Refuse("worktree %s dang o chinh nhanh %s" % (wt, target))
@@ -465,6 +551,140 @@ def status(root, as_json=False):
     return 0
 
 
+# ---- sweep (daily, fleet-wide) ------------------------------------------------
+
+def _discover(bases):
+    """Harness checkouts under each base: depth 1, depth 2, and repos|apps|projects at
+    depth 3 (same shape rules as lib-discover-projects). A linked worktree is not a
+    project (its own repo lists it)."""
+    def is_proj(d):
+        if not os.path.isdir(os.path.join(d, ".harness")):
+            return False
+        g = os.path.join(d, ".git")
+        if not os.path.isfile(g):
+            return True
+        try:
+            with open(g, encoding="utf-8", errors="replace") as f:
+                return "/worktrees/" not in f.readline().replace("\\", "/")
+        except OSError:
+            return False
+    out, seen = [], set()
+    for base in bases:
+        base = str(base).strip()
+        if not base or not os.path.isdir(base):
+            continue
+        try:
+            level1 = sorted(os.listdir(base))
+        except OSError:
+            continue
+        for a in level1:
+            pa = os.path.join(base, a)
+            if not os.path.isdir(pa) or a.startswith("."):
+                continue
+            cands = [pa]
+            try:
+                for b in sorted(os.listdir(pa)):
+                    pb = os.path.join(pa, b)
+                    if os.path.isdir(pb) and not b.startswith("."):
+                        cands.append(pb)
+                        if b in ("repos", "apps", "projects"):
+                            try:
+                                cands.extend(os.path.join(pb, c) for c in sorted(os.listdir(pb)))
+                            except OSError:
+                                pass
+            except OSError:
+                pass
+            for c in cands:
+                k = os.path.normcase(os.path.realpath(c))
+                if k not in seen and os.path.isdir(c) and is_proj(c):
+                    seen.add(k)
+                    out.append(c)
+    return out
+
+
+def _only_deletions(path):
+    rc, st, _ = _git(path, "--no-optional-locks", "status", "--porcelain")
+    if rc != 0:
+        return None
+    # _git() strips the output, so the first line loses its leading space: compare the
+    # XY code after lstrip. "D " covers both an unstaged and a staged deletion.
+    lines = [l for l in st.splitlines() if l.strip()]
+    return bool(lines) and all(l.lstrip().startswith("D ") for l in lines)
+
+
+def sweep(bases, dry_run=False, log=print):
+    """Walk every harness checkout under `bases` and enforce C16 without a person:
+      merged + clean + idle          -> finish (merge, push, remove, branch -d)
+      detached + only deleted files  -> restore the files, remove (a dead session's scratch
+                                        copy; nothing of its own is in it)
+      anything else                  -> report (unmerged work is never merged by a sweep)
+    Returns one row per worktree: {repo, path, branch, state, action, result}. Also appends
+    one JSON line per run to <state dir>/worktree-sweep.jsonl (C12: the sweep proves it ran)."""
+    rows = []
+    for repo in _discover(bases):
+        cfg = effective_config(repo)
+        if cfg.get("enabled") is False:
+            continue
+        wts = list_worktrees(repo)
+        if not wts:
+            continue
+        main = wts[0]["path"]
+        ex = extras(wts)
+        for w in ex:
+            d = describe(repo, w, cfg)
+            row = {"repo": repo, "path": w["path"], "branch": w.get("branch") or "(detached)",
+                   "state": d["state"], "ahead": d.get("ahead"), "dirty": d.get("dirty"),
+                   "idle_hours": d.get("idle_hours"), "action": "report", "result": ""}
+            if d["state"] == "merged" and not w["locked"] and cfg.get("auto_finish_merged"):
+                # a branch: merge + push + remove; detached (clean, already in main): remove only
+                row["action"] = "finish"
+                if dry_run:
+                    row["result"] = "dry-run"
+                else:
+                    try:
+                        rc = finish(main, path=w["path"], log=lambda *a: None)
+                        row["result"] = "ok" if rc == 0 else "merged, folder kept (rc %s)" % rc
+                    except Refuse as e:
+                        row["result"] = "tu choi: " + str(e).splitlines()[0]
+                    except Exception as e:  # noqa: BLE001
+                        row["result"] = "loi: %s" % e
+            elif w["detached"] and os.path.isdir(w["path"]) and _only_deletions(w["path"]):
+                row["action"] = "remove-scratch"
+                if dry_run:
+                    row["result"] = "dry-run"
+                else:
+                    rc1, _, e1 = _git(w["path"], "checkout", "--", ".")
+                    rc2, _, e2 = _git(main, "worktree", "remove", w["path"], timeout=180)
+                    row["result"] = "ok" if rc1 == 0 and rc2 == 0 else "loi: %s %s" % (e1, e2)
+                    _git(main, "worktree", "prune")
+            else:
+                why = []
+                if d.get("ahead"):
+                    why.append("%s commit chua merge" % d["ahead"])
+                if d.get("dirty"):
+                    why.append("co thay doi chua commit")
+                if d["state"] == "stale":
+                    why.append("bo do %.0f ngay" % ((d.get("idle_hours") or 0) / 24.0))
+                row["result"] = "; ".join(why) or "dang dung"
+            rows.append(row)
+        if len(ex) > cfg["max_extra"]:
+            rows.append({"repo": repo, "path": "", "branch": "", "state": "over-budget", "ahead": None, "dirty": None,
+                         "idle_hours": None, "action": "report", "result": "%d/%d worktree ngoai main" % (len(ex), cfg["max_extra"])})
+    for r in rows:
+        log("%-16s %-14s %s  [%s]  %s" % (r["action"], r["state"], r["path"] or r["repo"], r["branch"], r["result"]))
+    try:
+        sd = os.environ.get("HARNESS_STATE_DIR") or (
+            os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "harness") if os.name == "nt"
+            else os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "harness"))
+        os.makedirs(sd, exist_ok=True)
+        with open(os.path.join(sd, "worktree-sweep.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "bases": list(bases), "dry_run": dry_run,
+                                "rows": rows}, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+    return rows
+
+
 # ---- git-level detector (Codex / a person) ------------------------------------
 
 HOOK_MARK = "harness-c16-post-checkout"
@@ -532,7 +752,10 @@ def install_git_hook(root):
 
 def _payload():
     try:
-        raw = sys.stdin.buffer.read().decode("utf-8", "replace")
+        # utf-8-sig, not utf-8: Windows PowerShell 5.1 under console code page 65001
+        # prefixes a BOM to whatever it pipes into a native process (B-97) --
+        # json.loads then fails, the payload is {}, and the guard falls OPEN silently.
+        raw = sys.stdin.buffer.read().decode("utf-8-sig", "replace")
         p = json.loads(raw) if raw.strip() else {}
         return p if isinstance(p, dict) else {}
     except Exception:
@@ -553,6 +776,7 @@ def _log_error(root, msg):
 USAGE = ("usage: harness_worktree.py guard|start|stop|post-checkout ROOT  (hook modes)\n"
          "       harness_worktree.py status ROOT [--json]\n"
          "       harness_worktree.py finish ROOT [--path WORKTREE] [--no-push]\n"
+         "       harness_worktree.py sweep ROOT --base DIR[;DIR] [--dry-run]\n"
          "       harness_worktree.py install-git-hook ROOT")
 
 
@@ -594,6 +818,23 @@ def main(argv):
         return status(root, as_json="--json" in opts)
     if mode == "install-git-hook":
         return install_git_hook(root)
+    if mode == "sweep":
+        bases, dry, i = [], False, 0
+        while i < len(opts):
+            if opts[i] == "--base" and i + 1 < len(opts):
+                bases.extend(b for b in opts[i + 1].split(";") if b.strip())
+                i += 1
+            elif opts[i] == "--dry-run":
+                dry = True
+            i += 1
+        if not bases:
+            bases = [os.path.dirname(root)]
+        rows = sweep(bases, dry_run=dry)
+        acted = sum(1 for r in rows if r["action"] != "report")
+        print("sweep: %d worktree ngoai main trong %d repo; %d da xu ly, %d chi bao cao%s"
+              % (sum(1 for r in rows if r["path"]), len({r["repo"] for r in rows}), acted,
+                 sum(1 for r in rows if r["action"] == "report" and r["path"]), " (dry-run)" if dry else ""))
+        return 0
     if mode == "finish":
         path, no_push, i = None, False, 0
         while i < len(opts):
