@@ -34,7 +34,6 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 
 ## OPEN
 
-- `_trash/2026-11-25/` (gitignored): 6 .pyc từ /project-cleanup + `contracts/project.yaml.new` (template toolkit, tên "harness-toolkit" — không dùng). until: operator xem xong và xóa.
 - `docs/security/` (report + Harden-RdpSmb.ps1) chỉ ở local. until: operator chọn giữ local hoặc commit.
 - Office (CyberAlert KEV): update kích hoạt 23/11 nhưng lần đo cuối build chưa đổi (16.0.20625.20108). until: build mới hơn được đo và đối chiếu advisory.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
