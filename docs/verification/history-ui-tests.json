@@ -1,0 +1,63 @@
+﻿{
+    "Timestamp":  "2026-11-26T02:52:14.4236410Z",
+    "Runtime":  "5.1.26100.9818",
+    "Passed":  10,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Disk tab has the read-only history button",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "All fixture runs listed with Vietnamese labels",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Edited journal shows as broken with its reason",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Run without end entry shows as interrupted with guidance",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Summary counts broken and interrupted runs",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Type filter narrows to Memory runs",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Refresh picks up a new journal",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Window offers no action besides refresh and close",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Missing .data shows an empty, explained history",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Offscreen visual renders",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "Scope":  "Offscreen WPF history window on fixture journals (deleted after run); preview artifacts\\history-ui-preview.png",
+    "Unverified":  [
+                       "Human keyboard/DPI",
+                       "Shown as a real modal from the Disk tab"
+                   ]
+}

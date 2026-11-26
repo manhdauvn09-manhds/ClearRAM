@@ -1,9 +1,9 @@
 ﻿{
-    "Timestamp":  "2026-10-11T02:10:18.0573213Z",
-    "Runtime":  "5.1.26100.9444",
+    "Timestamp":  "2026-11-26T02:53:05.9570171Z",
+    "Runtime":  "5.1.26100.9818",
     "Passed":  30,
     "Failed":  0,
-    "DiskControls":  29,
+    "DiskControls":  30,
     "Tabs":  2,
     "SharedLock":  true,
     "SearchFilter":  true,
@@ -12,5 +12,5 @@
     "ReviewedTempEntryAvailable":  true,
     "Mode":  "Offscreen WPF/native readonly fixture worker; no user file scan/deletion or visible window",
     "Image":  "artifacts/disk-ui-preview.png",
-    "WorkingSetMB":  187.4
+    "WorkingSetMB":  186.8
 }

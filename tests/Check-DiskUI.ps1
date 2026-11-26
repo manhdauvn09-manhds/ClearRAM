@@ -6,7 +6,7 @@ Set-Location -LiteralPath $projectRoot
 . (Join-Path $projectRoot 'MemoryClear.ps1') -SmokeTest -ControlsOnly
 $script:diskUiChecks=0
 function Assert {param([bool]$Condition,[string]$Message);if(-not$Condition){throw $Message};$script:diskUiChecks++}
-Assert ( $diskUI.Count-eq29) 'Expected 29 disk controls'
+Assert ( $diskUI.Count-eq30) 'Expected 30 disk controls (29 + DiskHistory)'
 Assert ($diskUI.DiskClean.IsEnabled-and$diskUI.DiskClean.Content-eq'Dọn Temp có duyệt...') 'Separate reviewed Temp entry must be available'
 Assert ($window.FindName('MainTabs').Items.Count-eq2) 'Expected Memory and Disk tabs'
 $script:diskResult=[pscustomobject]@{Offset=0;HasMore=$false;Rows=@([pscustomobject]@{Name='old-temp.bin';Path='C:\Fixture\old-temp.bin';Identity='fixture-ID';LogicalMB=12;AllocatedMB=12;AgeDays=10;Risk='SafeCandidate';RiskLabel='Temp cũ · ứng viên';Effect='Readonly fixture; not deletion permission'},[pscustomobject]@{Name='backup.vhdx';Path='C:\Fixture\backup.vhdx';Identity='fixture-VM';LogicalMB=10240;AllocatedMB=5120;AgeDays=120;Risk='NeedsReview';RiskLabel='Cần duyệt giá trị';Effect='Could contain VM/user data; not auto selected'})}

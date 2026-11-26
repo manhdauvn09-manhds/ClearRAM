@@ -2,13 +2,14 @@
 #requires -version 5.1
 . (Join-Path $PSScriptRoot 'OperationView.ps1')
 . (Join-Path $PSScriptRoot 'TempView.ps1')
+. (Join-Path $PSScriptRoot 'HistoryView.ps1')
 function Initialize-MCDiskView {
     param([string]$ProjectRoot)
     $script:diskRoot=[IO.Path]::GetFullPath($ProjectRoot)
 
     $diskReader=New-Object Xml.XmlNodeReader ([xml](Get-Content -LiteralPath (Join-Path $diskRoot 'app\CleanData\DiskView.xaml') -Raw -Encoding UTF8))
     $script:diskView=[Windows.Markup.XamlReader]::Load($diskReader);$window.FindName('DiskHost').Content=$diskView
-    $script:diskUI=@{};foreach($name in @('DiskScope','DiskLevel1','DiskLevel2','DiskLevel3','DiskSearch','DiskLarge','DiskScan','DiskStop','DiskFiles','DiskElapsed','DiskState','DiskProgress','DiskStatus','DiskDetails','DiskClean','DiskPrevious','DiskNext','DiskMinimumMB','DiskMinimumAge','DiskExtensions','DiskChooseFolder','DiskResetFolder','DiskFolderHint','DiskAnalyze','DiskAppData','DiskReview')){$script:diskUI[$name]=$diskView.FindName($name);if(-not$diskUI[$name]){throw "Missing disk control: $name"}}
+    $script:diskUI=@{};foreach($name in @('DiskScope','DiskLevel1','DiskLevel2','DiskLevel3','DiskSearch','DiskLarge','DiskScan','DiskStop','DiskFiles','DiskElapsed','DiskState','DiskProgress','DiskStatus','DiskDetails','DiskClean','DiskHistory','DiskPrevious','DiskNext','DiskMinimumMB','DiskMinimumAge','DiskExtensions','DiskChooseFolder','DiskResetFolder','DiskFolderHint','DiskAnalyze','DiskAppData','DiskReview')){$script:diskUI[$name]=$diskView.FindName($name);if(-not$diskUI[$name]){throw "Missing disk control: $name"}}
     $script:diskRunning=$false;$script:diskModalActive=$false;$script:diskResult=$null;$script:diskPS=$null;$script:diskToken=$null;$script:diskWatch=$null
     foreach($name in @('DiskWindowsStorage','DiskWindowsApps','DiskTransactions')){$script:diskUI[$name]=$diskView.FindName($name);if(-not$diskUI[$name]){throw "Missing disk control: $name"}}
     $script:diskUserRoots=@()
@@ -16,6 +17,7 @@ function Initialize-MCDiskView {
     $diskUI.DiskWindowsApps.Add_Click({Open-MCDiskWindowsPanel 'Apps'})
     $diskUI.DiskTransactions.Add_Click({Show-MCDiskTransactionExample})
     $diskUI.DiskClean.Add_Click({Show-MCTempCleanup})
+    $diskUI.DiskHistory.Add_Click({Show-MCHistory})
     $diskUI.DiskScope.Text='Ổ Windows: '+[IO.Path]::GetPathRoot($env:SystemRoot)+' · Chỉ đọc · App data chưa rõ chủ sở hữu giữ lại'
     $diskUI.DiskSearch.Add_TextChanged({Update-MCDiskView})
     $diskUI.DiskFiles.Add_SelectionChanged({$diskUI.DiskReview.IsEnabled=-not$operation-and$null-ne$diskResult-and$diskUI.DiskFiles.SelectedItems.Count-gt0})
