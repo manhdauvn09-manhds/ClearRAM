@@ -1,7 +1,7 @@
 ﻿{
-    "Timestamp":  "2026-10-11T02:11:32.9744494Z",
-    "Runtime":  "5.1.26100.9444",
-    "Passed":  13,
+    "Timestamp":  "2026-11-26T02:27:13.4709468Z",
+    "Runtime":  "5.1.26100.9818",
+    "Passed":  17,
     "Failed":  0,
     "Checks":  [
                    {
@@ -61,6 +61,26 @@
                    },
                    {
                        "Name":  "Cancellation during close wait keeps unresponsive QA child alive",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "SAFE-04 process gone after approval is skipped, never counted as exited",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "SAFE-04 same-name executable outside the opt-in path stays out",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "SAFE-04 unopenable or missing PID fails closed",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "SAFE-04 closing an approved parent leaves its unapproved descendant running",
                        "Passed":  true,
                        "Error":  ""
                    },

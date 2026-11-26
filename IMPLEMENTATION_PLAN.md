@@ -1,6 +1,6 @@
 # MemoryClear — Kế hoạch triển khai
 
-Phiên bản: 2026-10-11.2. Cập nhật: 2026-10-11 (Asia/Tokyo).
+Phiên bản: 2026-11-26.1. Cập nhật: 2026-11-26 (Asia/Tokyo).
 
 Windows11/PS5.1 portable preview. Clear Normal/Strong và Dọn Temp có duyệt đã có chức năng thật; không tự kill hoặc xóa dữ liệu app tùy ý. Memory3: saved executable opt-in, native PID/start/window/exe fingerprint, frozen plan/TTL/permission revalidation, graceful-only executor và worker/progress/cancel/journal đã chuẩn bị. QA chỉ đóng app thử nghiệm mới tạo; không sửa settings hoặc đóng app người dùng. Shipped executionEnabled=false giữ gate SAFE-04/QA-02 chưa đủ; không tự force. Windows10/VM, human DPI/save-dialog, orphan appdata production và backup khác ổ chưa nghiệm thu. Bộ portable có script build/checksum/manifest, không kèm .data. Phase10/12 chưa hoàn tất; mọi handoff/status phản ánh giới hạn thực tế.
 
@@ -283,13 +283,13 @@ Tiến độ tính theo số task, không phải theo thời gian. Ngày công l
 
 #### SAFE-04 — Kiểm thử âm tính và race condition của policy
 
-- **Trạng thái:** Chưa bắt đầu · **Ưu tiên:** P0
+- **Trạng thái:** Đang làm · **Ưu tiên:** P0
 - **Phụ trách:** Chưa phân công · **Ước lượng:** 1–2 ngày
 - **Phụ thuộc:** SAFE-02, SAFE-03, HO-03
 - **Tiêu chí hoàn thành:** Test giả lập protected/unknown, PID đổi, thiếu quyền, process biến mất, tên giả, descendant chưa duyệt; không có lệnh tác động mục tiêu bị chặn.
-- **Bằng chứng:** Chưa có
-- **Ghi chú / bước tiếp theo:** Gate bắt buộc trước nghiệm thu hành động thực. Source preview đã có trong module/GUI/CLI, chưa coi là nghiệm thu phase; tiếp tục theo gate khi HO-03 hoàn tất.
-- **Cập nhật:** 2026-10-07
+- **Bằng chứng:** tests/Check-TaskRelease.ps1; docs/verification/task-release-tests.json (17/17 trên PowerShell 5.1, 26/11/2026)
+- **Ghi chú / bước tiếp theo:** 26/11: test âm tính tự động cho executor Memory3 (chỉ app QA do test tạo): protected, PID/start-time đổi, process biến mất sau duyệt, executable cùng tên ngoài đường dẫn opt-in và đường dẫn giả, PID không mở được/không tồn tại, descendant chưa duyệt vẫn chạy, cửa sổ/hash/foreground/service đổi. Chưa có: test thiếu quyền với process elevated thật (cần UAC), race cửa sổ đối kháng, mapped exe writer. Deps SAFE-02/SAFE-03/HO-03 chưa xong nên chưa nghiệm thu.
+- **Cập nhật:** 2026-11-26
 
 #### HO-04 — Tạo tài liệu handoff và kết thúc phase 04
 

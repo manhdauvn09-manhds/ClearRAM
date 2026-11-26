@@ -24,13 +24,15 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Máy dev: hardening do operator chạy `docs/security/Harden-RdpSmb.ps1` (admin), assistant đo lại xong 23/11. 2 cảnh báo Defender là fixture test của Ops và SecAegis (đã xác nhận) — dương tính giả.
 - Docs/HTML đồng bộ lại (9b2d8b4): đường dẫn mới, README, danh sách handoff tự sinh, Memory L3 max10. Checks 23/11: check-plan PASS, clean-data 18/18, memory-design 13/13, runtime-policies 9/9.
 
+**SAFE-04 2026-11-26** — thêm 4 test âm tính vào `tests/Check-TaskRelease.ps1` (process biến mất sau duyệt → Skipped; exe cùng tên ngoài đường dẫn opt-in/đường dẫn giả → không eligible; PID không mở được (4) / không tồn tại → fail closed; đóng parent đã duyệt không đụng descendant chưa duyệt). Suite 17/17, `tests/Run-Tests.ps1` 14/14 (PS 5.1); không còn process QA sót. SAFE-04 → doing trong `plan/tasks.json` (rev 2026-11-26.1); executor vẫn `executionEnabled=false`.
+
 **Office 2026-11-26** — operator chạy `docs/security/Update-Office.ps1` (local); đo `VersionToReport` 16.0.20625.20108 → 16.0.20625.20142. Bản vá CVE Outlook KEV cho Current Channel là 2610 build 20527.20196 (nguồn thứ cấp) → đã vá; report local mục 6 cập nhật.
 
 **Harness 2026-11-25** — bundle standard-governance 1.8.36 / harnessd 0.3.3 (HarnessAIToolKIT release c32bb41) commit vào repo; `harnessd.py` khớp SHA1 nguồn toolkit (d1ad936…), `tests/policy/test_harnessd_root_and_shutdown.py` của toolkit 7/7 pass; untrack 12 file telemetry/ledger/context (vẫn trên đĩa). Đã gộp `.new`: `casan-policies.yaml` (+worktrees/write_scope/daemon port 47631, không mất dòng nào) và `token-pricing.json` (+model 5.5) lấy bản mới, pass schema; `contracts/project.yaml` giữ bản dự án. Checks plan/clean-data/memory-design/runtime-policies PASS 25/11.
 
 ## NEXT
 
-1. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
+1. Ưu tiên sản phẩm: mở Memory3 graceful-only cần ML-01 + SAFE-04 + QA-02. Chuỗi đang chặn ở nghiệm thu người dùng: UI-01/CLEAR-01/QA-01 (review) → HO-03 → SAFE-02/SAFE-03 → SAFE-04 nghiệm thu → QA-02 (kịch bản ghi "máy ảo"; user chỉ có Win11 — cần chốt QA-02 làm trên app QA cô lập ở Win11 hay giữ chờ). Phần SAFE-04 còn tự làm được: thiếu quyền với process elevated thật (cần UAC, operator chạy), race cửa sổ. Song song: CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
 2. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
 ## OPEN
