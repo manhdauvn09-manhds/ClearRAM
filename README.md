@@ -77,7 +77,10 @@ Process critical, Windows component, service, host hiện tại, user/session kh
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\MemoryClear.Cli.ps1 -Command List -Json
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\MemoryClear.Cli.ps1 -Command Inspect -ProcessId 1234
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\MemoryClear.Cli.ps1 -Command History -Limit 20 -Json
 ```
+
+`History` chỉ đọc journal `.data\temp-operation-*.jsonl` / `memory-operation-*.jsonl`: kiểm chuỗi hash (`Valid` / `Broken` / `NotChain` cho journal thử nghiệm / `Empty`) và tóm tắt lượt chạy (`Completed`, `Partial`, `Cancelled`, `Interrupted` khi thiếu dòng kết thúc). Hash SHA256 không khóa: phát hiện hỏng, cắt cụt, đảo dòng; không chống người cố ý ghi lại toàn bộ chuỗi.
 
 Close/Kill cần `-ProcessId` và `-StartTicks` từ List/Inspect. Mặc định dry-run, `-Execute` mới yêu cầu xác nhận tương tác. GUI/CLI sử dụng cùng policy. Không tự dùng `-Confirm:$false` để tác động công việc thật.
 

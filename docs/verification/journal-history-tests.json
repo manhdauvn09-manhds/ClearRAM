@@ -1,0 +1,102 @@
+﻿{
+    "Timestamp":  "2026-11-26T02:45:26.1092217Z",
+    "Runtime":  "5.1.26100.9818",
+    "Passed":  15,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Valid temp chain is summarised from its own entries",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Memory run without Finished is reported Interrupted, not Completed",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Held memory outcomes are counted as held",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Edited payload breaks the chain",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Removed line (sequence gap) breaks the chain",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Reordered lines break the chain",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Truncated last line is detected",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "First entry must be the Plan",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Test-only journal without a chain is NotChain, not a false alarm",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Empty journal is Empty",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Journal still open by the writer can be read without blocking it",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "History filters by name pattern, type and limit",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Missing .data gives an empty history",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "Real .data journals are read without any change",
+                       "Passed":  true,
+                       "Error":  ""
+                   },
+                   {
+                       "Name":  "CLI History returns JSON and exit code 0",
+                       "Passed":  true,
+                       "Error":  ""
+                   }
+               ],
+    "RealJournals":  [
+                         {
+                             "Group":  "Memory, Valid",
+                             "Count":  47
+                         },
+                         {
+                             "Group":  "Temp, Valid",
+                             "Count":  46
+                         },
+                         {
+                             "Group":  "Temp, NotChain",
+                             "Count":  16
+                         }
+                     ],
+    "Scope":  "Read-only journal history: fixture journals under artifacts (deleted after run); real .data journals only read and verified unchanged",
+    "Limits":  [
+                   "Unkeyed SHA256 chain detects corruption/truncation/reordering, not a deliberate rewrite of the whole chain",
+                   "No GUI history view yet"
+               ]
+}

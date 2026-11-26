@@ -33,6 +33,8 @@ Trên Windows11 Client build26200/25H2, PS5.1.26100.9444, đã chạy:
 
 7/7 check đạt: worker/DispatcherTimer thật, checkbox template click cập nhật source hai chiều, Back bỏ approval, shared lock, native QA deletion/end status và render content. Report `docs/verification/temp-ui-tests.json`, ảnh `artifacts/temp-ui-preview.png` đã xem. Chưa thay thế nghiệm thu thao tác người dùng/keyboard/DPI.
 
+Lịch sử journal (CD-04, 26/11/2026): `app/CleanData/JournalHistory.psm1` và `MemoryClear.Cli.ps1 -Command History` chỉ đọc, kiểm chuỗi hash và tóm tắt từng lượt Temp/Memory. `tests/Check-JournalHistory.ps1` 15/15 (sửa payload, mất dòng, đảo dòng, cắt cụt, thiếu Plan, journal thử nghiệm, đọc khi writer còn mở, `.data` thật không đổi byte nào); report `docs/verification/journal-history-tests.json`. Chưa có màn hình lịch sử trong GUI.
+
 Guard-only/CI dùng `Check-TempCleanup.ps1` không có switch, ghi `temp-cleanup-guard-tests.json`; không coi guard-only là chứng cứ đã xóa Temp thật. `Verify-Readiness.ps1 -OwnTempSelfTest` bật đúng hai suite QA riêng. Windows10 chưa test; user chỉ có host Windows11. Không giả định đây là VM.
 
 Nguồn API: [Known Folders của Microsoft](https://learn.microsoft.com/en-us/windows/win32/shell/known-folders) khuyến nghị .NET `Environment.GetFolderPath` cho ứng dụng .NET. Native metadata/handle/disposition dựa trên API Win32 hiện có của dự án.

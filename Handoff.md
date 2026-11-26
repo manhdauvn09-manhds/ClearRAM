@@ -24,6 +24,8 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Máy dev: hardening do operator chạy `docs/security/Harden-RdpSmb.ps1` (admin), assistant đo lại xong 23/11. 2 cảnh báo Defender là fixture test của Ops và SecAegis (đã xác nhận) — dương tính giả.
 - Docs/HTML đồng bộ lại (9b2d8b4): đường dẫn mới, README, danh sách handoff tự sinh, Memory L3 max10. Checks 23/11: check-plan PASS, clean-data 18/18, memory-design 13/13, runtime-policies 9/9.
 
+**CD-04 lịch sử journal 2026-11-26** — `app/CleanData/JournalHistory.psm1` + `MemoryClear.Cli.ps1 -Command History` (chỉ đọc): kiểm chuỗi hash journal Temp/Memory trong `.data`, tóm tắt Completed/Partial/Cancelled/Interrupted. `tests/Check-JournalHistory.ps1` 15/15, Run-Tests 14/14. Đọc 109 journal thật: 93 Valid, 16 `NotChain` (journal `{"Kind":"TestOnly"}` do `Check-TempCleanup` ghi vào `.data` thật), 0 Broken; không đổi byte nào. Chưa có GUI lịch sử; portable cần build lại mới có module.
+
 **SAFE-04 2026-11-26** — thêm 4 test âm tính vào `tests/Check-TaskRelease.ps1` (process biến mất sau duyệt → Skipped; exe cùng tên ngoài đường dẫn opt-in/đường dẫn giả → không eligible; PID không mở được (4) / không tồn tại → fail closed; đóng parent đã duyệt không đụng descendant chưa duyệt). Suite 17/17, `tests/Run-Tests.ps1` 14/14 (PS 5.1); không còn process QA sót. SAFE-04 → doing trong `plan/tasks.json` (rev 2026-11-26.1); executor vẫn `executionEnabled=false`.
 
 **Office 2026-11-26** — operator chạy `docs/security/Update-Office.ps1` (local); đo `VersionToReport` 16.0.20625.20108 → 16.0.20625.20142. Bản vá CVE Outlook KEV cho Current Channel là 2610 build 20527.20196 (nguồn thứ cấp) → đã vá; report local mục 6 cập nhật.
@@ -48,6 +50,7 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Danh sách app đóng một chạm. until: user cung cấp và duyệt; mặc định trống, không suy ra từ CPU thấp.
 - Nhiều instance cùng ghi settings/log/cooldown. until: có kiểm thử multi-instance.
 - Visual QA các trang HTML. until: operator xem trực quan; DOM fixture không thay visual QA, không vòng chặn file:// bằng server/browser khác.
+- `tests/Check-TempCleanup.ps1` (check "Journal create-new…") ghi journal thử nghiệm vào `.data` thật (16 file `NotChain`). until: test chuyển sang project root fixture, hoặc chấp nhận và ghi rõ.
 - Low còn lại: journal hash không khóa (đổi chữ "tamper-evident" hoặc HMAC/DPAPI); giới hạn 64MiB hardcode ở FileInventory.cs:310 thay vì policy JSON (C2). until: chọn sửa hoặc chấp nhận ghi rõ.
 
 ## AVOID

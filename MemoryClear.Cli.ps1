@@ -1,10 +1,11 @@
 ﻿#requires -version 5.1
 [CmdletBinding()]
-param([ValidateSet('List','Inspect','Close','Kill')][string]$Command='List',[int]$ProcessId=0,[long]$StartTicks=0,[switch]$Json,[switch]$Execute)
+param([ValidateSet('List','Inspect','Close','Kill','History')][string]$Command='List',[int]$ProcessId=0,[long]$StartTicks=0,[switch]$Json,[switch]$Execute,[ValidateRange(1,500)][int]$Limit=20)
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'app\MemoryClear.Core.psm1') -Force
 try {
     if($Command-eq'List'){$first=Get-MCSnapshot;Start-Sleep -Milliseconds 700;$snapshot=Get-MCSnapshot -Previous $first;$result=@($snapshot.Rows|Select-Object Name,Pid,StartTicks,RamMB,PrivateMB,Cpu,Policy,Allowed,Path)}
+    elseif($Command-eq'History'){Import-Module (Join-Path $PSScriptRoot 'app\CleanData\JournalHistory.psm1') -Force;$result=@(Get-MCJournalHistory -ProjectRoot $PSScriptRoot -Limit $Limit|Select-Object Type,Id,Integrity,Status,Started,Finished,Items,Done,Held,Skipped,Problem)}
     elseif($Command-eq'Inspect'){$snapshot=Get-MCSnapshot;$result=@($snapshot.Rows|Where-Object{$_.Pid-eq$ProcessId}|Select-Object Name,Pid,StartTicks,RamMB,PrivateMB,Cpu,Policy,Allowed,Path);if(-not$result.Count){throw 'Process not found.'}}
     else{if($ProcessId-le0-or$StartTicks-le0){throw 'Close/Kill require -ProcessId and -StartTicks from List/Inspect.'}
       if(-not$Execute){$result=[pscustomobject]@{DryRun=$true;Pid=$ProcessId;StartTicks=$StartTicks;Action=$Command;Message='No action performed. Use -Execute for an interactive confirmation.'}}
