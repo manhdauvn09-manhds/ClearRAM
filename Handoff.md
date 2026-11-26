@@ -24,18 +24,18 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Máy dev: hardening do operator chạy `docs/security/Harden-RdpSmb.ps1` (admin), assistant đo lại xong 23/11. 2 cảnh báo Defender là fixture test của Ops và SecAegis (đã xác nhận) — dương tính giả.
 - Docs/HTML đồng bộ lại (9b2d8b4): đường dẫn mới, README, danh sách handoff tự sinh, Memory L3 max10. Checks 23/11: check-plan PASS, clean-data 18/18, memory-design 13/13, runtime-policies 9/9.
 
+**Office 2026-11-26** — operator chạy `docs/security/Update-Office.ps1` (local); đo `VersionToReport` 16.0.20625.20108 → 16.0.20625.20142. Bản vá CVE Outlook KEV cho Current Channel là 2610 build 20527.20196 (nguồn thứ cấp) → đã vá; report local mục 6 cập nhật.
+
 **Harness 2026-11-25** — bundle standard-governance 1.8.36 / harnessd 0.3.3 (HarnessAIToolKIT release c32bb41) commit vào repo; `harnessd.py` khớp SHA1 nguồn toolkit (d1ad936…), `tests/policy/test_harnessd_root_and_shutdown.py` của toolkit 7/7 pass; untrack 12 file telemetry/ledger/context (vẫn trên đĩa). Đã gộp `.new`: `casan-policies.yaml` (+worktrees/write_scope/daemon port 47631, không mất dòng nào) và `token-pricing.json` (+model 5.5) lấy bản mới, pass schema; `contracts/project.yaml` giữ bản dự án. Checks plan/clean-data/memory-design/runtime-policies PASS 25/11.
 
 ## NEXT
 
-1. Việc dở của phiên 2026-11-23: operator xác nhận Office đã cập nhật (Outlook → File → Office Account → Update Now; KEV hạn 24/11), rồi assistant đo `VersionToReport` trong `HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration` và cập nhật report mục 6.
-2. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
-3. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
+1. Ưu tiên sản phẩm (không đổi): ML01 nonempty profile/identity/TTL invalidation + SAFE-04/QA-02 → mới mở Memory3 graceful-only; tiếp CD04 production journal/history, CD05 backup khác volume/restore no-overwrite/fault QA.
+2. Khi muốn trace readiness ở vị trí mới: `powershell -NoProfile -STA -File "E:\Develop\OthersApplication\MemoryClear\scripts\Verify-Readiness.ps1" -ExpectedFamily Windows11 -OwnTempSelfTest`.
 
 ## OPEN
 
 - `docs/security/` (report + Harden-RdpSmb.ps1) chỉ ở local. until: operator chọn giữ local hoặc commit.
-- Office (CyberAlert KEV): update kích hoạt 23/11 nhưng lần đo cuối build chưa đổi (16.0.20625.20108). until: build mới hơn được đo và đối chiếu advisory.
 - Security log (4624/4625) chưa đọc được (cần admin). until: operator chạy kiểm Security log elevated (Get-WinEvent Security 4624 type 10 / 4625, 72h).
 - Shortcut Desktop (source + portable) chưa launch thử. until: user mở GUI từ từng shortcut và xác nhận.
 - Trace readiness ở vị trí mới chưa có. until: chạy Verify-Readiness (NEXT 3) và có `artifacts\readiness-*\readiness.json` mới.
