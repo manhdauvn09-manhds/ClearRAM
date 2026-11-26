@@ -13,10 +13,9 @@ Một bản duy nhất (C15). Các bản 2026-10-10.4 / 2026-10-11.1 / 2026-10-1
 - Memory mức 3: executor graceful-only đã có; `app/memory-task-policy.json` executionEnabled=false, forceEnabled=false, max10, TTL60s, close timeout 20s. Disk production delete khóa (`productionExecutionEnabled=false`); FixtureExecutor chỉ cho fixture có marker.
 - CI source 57fb2d2: [run 38106638093](https://github.com/manhdauvn09-manhds/ClearRAM/actions/runs/38106638093) success (`docs/verification/github-actions-portable.json`). Commit sau đó chỉ đổi docs/plan/harness/workflow — CI của các commit này chưa quan sát từ đây.
 
-**Bộ chạy portable (build lại 2026-11-23)**
-- Folder: `E:\Develop\OthersApplication\MemoryClear\artifacts\releases\20261123-012134-a2d615\MemoryClear\Start-MemoryClear.cmd`; ZIP `MemoryClear-2026.10.11.1-preview.zip` cùng thư mục cha, 192596 bytes, 55 file, SHA256 1C42AAC4…E16E (khớp sidecar). Packaged WPF smoke + ZIP entry hashes Passed; không có .data/.git/.harness. Proof `docs/verification/portable-build.json`; ReleaseAcceptance=Unverified.
-- Desktop: `MemoryClear.lnk` → source mới; `MemoryClear Portable 2026-10-11.lnk` → folder portable trên. Cả hai COM readback Verified, Launched=false.
-- `scripts/Create-PortableShortcut.ps1` (sửa 2026-11-23) giờ đặt tên shortcut theo version trong `package-manifest.json` → lần build sau sẽ tạo `MemoryClear Portable 2026.10.11.1-preview.lnk`; bản trong ZIP 20261123 vẫn là script cũ (tên 2026-10-11).
+**Bộ chạy portable (build lại 2026-11-26, có cửa sổ Lịch sử thao tác)**
+- Folder: `E:\Develop\OthersApplication\MemoryClearrtifactseleases61126-134228-32c5a6\MemoryClear\Start-MemoryClear.cmd`; ZIP `MemoryClear-2026.10.11.1-preview.zip` cùng thư mục cha, 199478 bytes, 58 file, SHA256 10D796A2…6E72 (khớp sidecar). Packaged WPF smoke + ZIP entry hashes Passed; có JournalHistory/HistoryView; không có .data/.git/.harness; CLI `History` trong gói chạy exit 0. Proof `docs/verification/portable-build.json`; ReleaseAcceptance=Unverified.
+- Desktop: `MemoryClear.lnk` → source; `MemoryClear Portable 2026-10-11.lnk` vẫn trỏ bản 20261123 (cũ). Shortcut cho bản 20261126 chưa tạo (ghi Desktop nằm ngoài thư mục dự án → operator chạy `Create-DesktopShortcut.ps1` trong gói; tên mới `MemoryClear Portable 2026.10.11.1-preview.lnk`).
 
 **Audit bảo mật 2026-11-23** — report local `docs/security/Security-Report-2026-11-23.html` (untracked; Ops/OPS-MCP-80 đã review, bản Ops ở `E:\Develop\ClaudeMCPServer\docs\Security\ops-review-20261123.md` mục B).
 - Code sản phẩm: 0 Critical/High/Medium; Low còn lại ở OPEN; workflow đã có `permissions: contents: read` (9b2d8b4).
